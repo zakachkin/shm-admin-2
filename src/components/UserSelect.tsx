@@ -1,0 +1,313 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { shm_request } from '../lib/shm_request';
+
+interface User {
+  user_id: number;
+  login: string;
+  full_name?: string;
+  [key: string]: any;
+}
+
+interface UserSelectProps {
+  /** Текущий user_id */
+  value?: number | null;
+  /** Callback при выборе пользователя */
+  onChange?: (userId: number | null, user: User | null) => void;
+  /** Callback при изменении состояния загрузки */
+  onLoadingChange?: (loading: boolean) => void;
+  /** Режим только для чтения */
+  readonly?: boolean;
+  /** Placeholder для поля поиска */
+  placeholder?: string;
+  /** Дополнительные CSS классы */
+  className?: string;
+}
+
+/**
+ * Глобальный компонент выбора пользователя с автокомплитом.
+ * 
+ * Использование:
+ * - readonly mode: показывает "user_id# (login) full_name"
+ * - edit mode: поле поиска с dropdown для выбора пользователя
+ */
+export default function UserSelect({
+  value,
+  onChange,
+  onLoadingChange,
+  readonly = false,
+  placeholder = '... начните вводить имя, логин или id пользователя',
+  className = '',
+}: UserSelectProps) {
+  const [search, setSearch] = useState('');
+  const [items, setItems] = useState<User[]>([]);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(false);
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastLoadedUserIdRef = useRef<number | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Форматирование отображения пользователя
+  const formatUser = (user: User) => {
+    return `${user.user_id}# (${user.login}) ${user.full_name || ''}`.trim();
+  };
+
+  // Загрузка пользователя по ID при инициализации или изменении value
+  useEffect(() => {
+    // Отменяем предыдущий запрос при изменении value
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // Загружаем только если value есть и отличается от последнего загруженного
+    if (value && lastLoadedUserIdRef.current !== value) {
+      lastLoadedUserIdRef.current = value;
+      abortControllerRef.current = new AbortController();
+      setLoadingUser(true);
+      
+      shm_request(`/shm/v1/admin/user?user_id=${value}&limit=1`)
+        .then(res => {
+          const data = res.data || res;
+          const users = Array.isArray(data) ? data : [];
+          if (users.length > 0) {
+            setSelectedUser(users[0]);
+            setSearch(formatUser(users[0]));
+          }
+        })
+        .catch(err => {
+          if (err.name !== 'AbortError') {
+            console.error(err);
+          }
+        })
+        .finally(() => setLoadingUser(false));
+    } else if (!value) {
+      // Сброс при отсутствии value
+      lastLoadedUserIdRef.current = null;
+      setSelectedUser(null);
+      setSearch('');
+    }
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [value]);
+
+  // Уведомляем родителя об изменении состояния загрузки
+  useEffect(() => {
+    onLoadingChange?.(loadingUser);
+  }, [loadingUser, onLoadingChange]);
+  
+  // Поиск пользователей
+  const searchUsers = useCallback((query: string) => {
+    if (!query || query.length < 1) {
+      setItems([]);
+      setDropdownVisible(false);
+      return;
+    }
+
+    setLoading(true);
+    
+    const filter = {
+      block: 0,
+      '-or': [
+        { 'full_name': { '-like': `%${query}%` } },
+        { 'login': { '-like': `%${query}%` } },
+        { 'user_id': query },
+      ],
+    };
+
+    shm_request(`/shm/v1/admin/user?limit=10&filter=${encodeURIComponent(JSON.stringify(filter))}`)
+      .then(res => {
+        const data = res.data || res;
+        const users = Array.isArray(data) ? data : [];
+        setItems(users);
+        setDropdownVisible(users.length > 0);
+        setSelectedIndex(users.length > 0 ? 0 : -1);
+      })
+      .catch(() => {
+        setItems([]);
+        setDropdownVisible(false);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Обработка изменения поиска с debounce
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setSearch(newValue);
+    setDropdownVisible(!!newValue);
+
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      searchUsers(newValue);
+    }, 300);
+  };
+
+  // Выбор пользователя
+  const selectUser = (user: User) => {
+    setSelectedUser(user);
+    setSearch(formatUser(user));
+    setDropdownVisible(false);
+    setItems([]);
+    onChange?.(user.user_id, user);
+  };
+
+  // Обработка клавиш
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!dropdownVisible || !items.length) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev < items.length - 1 ? prev + 1 : 0));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev > 0 ? prev - 1 : items.length - 1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < items.length) {
+        selectUser(items[selectedIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setDropdownVisible(false);
+    }
+  };
+
+  // Закрытие dropdown при клике вне компонента
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setDropdownVisible(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Очистка таймера при размонтировании
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const inputStyles = {
+    backgroundColor: 'var(--theme-input-bg)',
+    borderColor: 'var(--theme-input-border)',
+    color: 'var(--theme-input-text)',
+  };
+
+  const dropdownStyles = {
+    backgroundColor: 'var(--theme-content-bg)',
+    borderColor: 'var(--theme-input-border)',
+    color: 'var(--theme-content-text)',
+  };
+
+  // Readonly режим
+  if (readonly) {
+    // Показываем skeleton пока загружается пользователь
+    if (loadingUser) {
+      return (
+        <div 
+          className={`w-full px-3 py-2 text-sm rounded border ${className}`}
+          style={inputStyles}
+        >
+          <div className="flex items-center gap-2">
+            <div 
+              className="h-4 rounded animate-pulse" 
+              style={{ 
+                width: '40px',
+                backgroundColor: 'var(--theme-input-border)',
+              }} 
+            />
+            <div 
+              className="h-4 rounded animate-pulse" 
+              style={{ 
+                width: '80px',
+                backgroundColor: 'var(--theme-input-border)',
+              }} 
+            />
+            <div 
+              className="h-4 rounded animate-pulse flex-1" 
+              style={{ 
+                maxWidth: '120px',
+                backgroundColor: 'var(--theme-input-border)',
+              }} 
+            />
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <input
+        type="text"
+        value={selectedUser ? formatUser(selectedUser) : (value ? `#${value}` : '')}
+        readOnly
+        className={`w-full px-3 py-2 text-sm rounded border opacity-60 ${className}`}
+        style={inputStyles}
+      />
+    );
+  }
+
+  // Edit режим с автокомплитом
+  return (
+    <div ref={containerRef} className={`relative ${className}`}>
+      <input
+        ref={inputRef}
+        type="text"
+        value={search}
+        onChange={handleSearchChange}
+        onFocus={() => items.length > 0 && setDropdownVisible(true)}
+        onKeyDown={handleKeyDown}
+        placeholder={placeholder}
+        autoComplete="off"
+        className="w-full px-3 py-2 text-sm rounded border"
+        style={inputStyles}
+      />
+      
+      {loading && (
+        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+          <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin"
+               style={{ borderColor: 'var(--theme-input-border)', borderTopColor: 'transparent' }} />
+        </div>
+      )}
+
+      {dropdownVisible && items.length > 0 && (
+        <ul
+          className="absolute z-50 w-full mt-1 rounded border shadow-lg max-h-60 overflow-auto"
+          style={dropdownStyles}
+        >
+          {items.map((item, index) => (
+            <li
+              key={item.user_id}
+              onClick={() => selectUser(item)}
+              onMouseEnter={() => setSelectedIndex(index)}
+              className={`px-3 py-2 cursor-pointer text-sm transition-colors ${
+                index === selectedIndex ? 'bg-opacity-20' : ''
+              }`}
+              style={{
+                backgroundColor: index === selectedIndex ? 'var(--accent-primary)' : 'transparent',
+                color: index === selectedIndex ? 'var(--accent-text)' : 'inherit',
+              }}
+            >
+              {formatUser(item)}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}

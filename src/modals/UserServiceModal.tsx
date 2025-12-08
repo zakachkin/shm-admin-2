@@ -1,0 +1,477 @@
+import React, { useState, useEffect, useRef } from 'react';
+import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
+import { Save, Trash2, X, Loader2, ChevronDown } from 'lucide-react';
+import toast from 'react-hot-toast';
+import JsonEditor from '../components/JsonEditor';
+import UserSelect from '../components/UserSelect';
+import ServiceSelect from '../components/ServiceSelect';
+import { shm_request } from '../lib/shm_request';
+
+interface UserServiceModalProps {
+  open: boolean;
+  onClose: () => void;
+  data: Record<string, any> | null;
+  onSave: (data: Record<string, any>) => void | Promise<void>;
+  onDelete?: () => void | Promise<void>;
+  onRefresh?: () => void;
+}
+
+// Статусы услуги пользователя
+const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string }> = {
+  'ACTIVE': { label: 'Активен', color: '#16a34a', bgColor: '#dcfce7' },
+  'BLOCK': { label: 'Заблокирован', color: '#dc2626', bgColor: '#fee2e2' },
+  'NOT PAID': { label: 'Не оплачена', color: '#2563eb', bgColor: '#dbeafe' },
+  'INIT': { label: 'Инициализация', color: '#6b7280', bgColor: '#f3f4f6' },
+  'PROGRESS': { label: 'Обработка', color: '#9333ea', bgColor: '#f3e8ff' },
+  'ERROR': { label: 'Ошибка', color: '#ea580c', bgColor: '#ffedd5' },
+};
+
+export default function UserServiceModal({
+  open,
+  onClose,
+  data,
+  onSave,
+  onDelete,
+  onRefresh,
+}: UserServiceModalProps) {
+  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [services, setServices] = useState<any[]>([]);
+  const [loadingServices, setLoadingServices] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(false);
+  const [contentReady, setContentReady] = useState(false);
+  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  
+  const statusMenuRef = useRef<HTMLDivElement>(null);
+
+  // Синхронизация данных при открытии
+  useEffect(() => {
+    if (open && data) {
+      setFormData({ ...data });
+    } else if (!open) {
+      // Сброс при закрытии модалки
+      setFormData({});
+      setContentReady(false);
+    }
+  }, [data, open]);
+
+  // Загрузка списка услуг для "Следующая услуга"
+  useEffect(() => {
+    if (open) {
+      setLoadingServices(true);
+      shm_request('/shm/v1/admin/service?limit=100')
+        .then(res => {
+          const items = res.data || res;
+          setServices(Array.isArray(items) ? items : []);
+        })
+        .catch(console.error)
+        .finally(() => setLoadingServices(false));
+    }
+  }, [open]);
+
+  // Определяем готовность контента
+  useEffect(() => {
+    if (open && data && !loadingServices && !loadingUser) {
+      setContentReady(true);
+    } else if (!open) {
+      setContentReady(false);
+      setStatusMenuOpen(false);
+    }
+  }, [open, data, loadingServices, loadingUser]);
+
+  // Закрытие меню статуса при клике вне него
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (statusMenuRef.current && !statusMenuRef.current.contains(e.target as Node)) {
+        setStatusMenuOpen(false);
+      }
+    };
+    
+    if (statusMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [statusMenuOpen]);
+
+  const handleChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await onSave(formData);
+      onClose();
+      toast.success('Услуга сохранена');
+    } catch (error) {
+      console.error('Ошибка сохранения:', error);
+      toast.error('Ошибка сохранения');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!onDelete) return;
+    
+    const canDelete = formData.status === 'BLOCK' || formData.status === 'NOT PAID';
+    if (!canDelete) {
+      toast.error('Можно удалить только заблокированные или неоплаченные услуги');
+      return;
+    }
+
+    setConfirmDelete(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!onDelete) return;
+    
+    setDeleting(true);
+    setConfirmDelete(false);
+    try {
+      await onDelete();
+      onClose();
+      toast.success('Услуга удалена');
+    } catch (error) {
+      console.error('Ошибка удаления:', error);
+      toast.error('Ошибка удаления');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // Блокировка услуги
+  const handleBlock = async () => {
+    try {
+      await shm_request('/shm/v1/admin/user/service/stop', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          user_id: formData.user_id,
+          user_service_id: formData.user_service_id,
+          auto_bill: 0,
+        }),
+      });
+      toast.success('Услуга заблокирована');
+      onRefresh?.();
+      // Обновляем локальный статус без закрытия модалки
+      setFormData(prev => ({ ...prev, status: 'BLOCK', auto_bill: 0 }));
+    } catch (error) {
+      console.error('Ошибка блокировки:', error);
+      toast.error('Ошибка блокировки');
+    }
+  };
+
+  // Активация услуги
+  const handleActivate = async () => {
+    try {
+      await shm_request('/shm/v1/admin/user/service/activate', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          user_id: formData.user_id,
+          user_service_id: formData.user_service_id,
+          auto_bill: 1,
+        }),
+      });
+      toast.success('Услуга активирована');
+      onRefresh?.();
+      // Обновляем локальный статус без закрытия модалки
+      setFormData(prev => ({ ...prev, status: 'ACTIVE', auto_bill: 1 }));
+    } catch (error) {
+      console.error('Ошибка активации:', error);
+      toast.error('Ошибка активации');
+    }
+  };
+
+  // Ручная смена статуса (без подтверждения)
+  const handleSetStatus = async (status: string) => {
+    try {
+      await shm_request('/shm/v1/admin/user/service/status', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          user_id: formData.user_id,
+          user_service_id: formData.user_service_id, 
+          status,
+        }),
+      });
+      toast.success('Статус изменён');
+      onRefresh?.();
+      setFormData(prev => ({ ...prev, status }));
+    } catch (error) {
+      console.error('Ошибка смены статуса:', error);
+      toast.error('Ошибка смены статуса');
+    }
+  };
+
+  const inputStyles = {
+    backgroundColor: 'var(--theme-input-bg)',
+    borderColor: 'var(--theme-input-border)',
+    color: 'var(--theme-input-text)',
+  };
+
+  const labelStyles = {
+    color: 'var(--theme-content-text-muted)',
+  };
+
+  const canDelete = formData.status === 'BLOCK' || formData.status === 'NOT PAID';
+  const statusConfig = STATUS_CONFIG[formData.status] || { label: formData.status, color: '#6b7280', bgColor: '#f3f4f6' };
+
+  const renderFooter = () => (
+    <div className="flex justify-between w-full">
+      <div>
+        {onDelete && canDelete && (
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className="px-4 py-2 rounded flex items-center gap-2 bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+          >
+            <Trash2 className="w-4 h-4" />
+            {deleting ? 'Удаление...' : 'Удалить'}
+          </button>
+        )}
+      </div>
+      <div className="flex gap-2">
+        <button
+          onClick={onClose}
+          className="px-4 py-2 rounded flex items-center gap-2"
+          style={{
+            backgroundColor: 'var(--theme-button-secondary-bg)',
+            color: 'var(--theme-button-secondary-text)',
+            border: '1px solid var(--theme-button-secondary-border)',
+          }}
+        >
+          <X className="w-4 h-4" />
+          Отмена
+        </button>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="px-4 py-2 rounded flex items-center gap-2"
+          style={{
+            backgroundColor: 'var(--accent-primary)',
+            color: 'var(--accent-text)',
+          }}
+        >
+          <Save className="w-4 h-4" />
+          {saving ? 'Сохранение...' : 'Сохранить'}
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={`Услуга #${data?.user_service_id || ''}: ${data?.name || ''}`}
+      footer={contentReady ? renderFooter() : undefined}
+      size="xl"
+    >
+      {!contentReady ? (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--accent-primary)' }} />
+          <span className="ml-3 text-sm" style={{ color: 'var(--theme-content-text-muted)' }}>
+            Загрузка...
+          </span>
+        </div>
+      ) : (
+      <div className="space-y-4">
+        {/* Пользователь */}
+        <div className="flex items-center gap-3">
+          <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
+            Пользователь
+          </label>
+          <div className="flex-1">
+            <UserSelect 
+              value={formData.user_id} 
+              readonly 
+              onLoadingChange={setLoadingUser}
+            />
+          </div>
+        </div>
+
+        {/* Услуга */}
+        <div className="flex items-center gap-3">
+          <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
+            Услуга
+          </label>
+          <input
+            type="text"
+            value={`${formData.user_service_id || ''}# ${formData.name || ''}`}
+            disabled
+            className="flex-1 px-3 py-2 text-sm rounded border opacity-60"
+            style={inputStyles}
+          />
+        </div>
+
+        {/* Статус и Биллинг */}
+        <div className="grid grid-cols-2 gap-6">
+          <div className="flex items-center gap-3">
+            <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
+              Статус
+            </label>
+            <div className="relative" ref={statusMenuRef}>
+              {/* Кнопка статуса с выпадающим меню */}
+              <button
+                onClick={() => setStatusMenuOpen(!statusMenuOpen)}
+                className="flex items-center gap-1 px-3 py-1 rounded text-sm font-medium cursor-pointer hover:opacity-80 transition-opacity"
+                style={{ backgroundColor: statusConfig.bgColor, color: statusConfig.color }}
+              >
+                {statusConfig.label}
+                <ChevronDown className={`w-4 h-4 transition-transform ${statusMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {/* Выпадающее меню */}
+              {statusMenuOpen && (
+                <div 
+                  className="absolute top-full left-0 mt-1 py-1 rounded shadow-lg border z-50 min-w-[140px]"
+                  style={{ 
+                    backgroundColor: 'var(--theme-content-bg)',
+                    borderColor: 'var(--theme-input-border)',
+                  }}
+                >
+                  {formData.status === 'ACTIVE' && (
+                    <button
+                      onClick={() => { handleBlock(); setStatusMenuOpen(false); }}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                      Заблокировать
+                    </button>
+                  )}
+                  {formData.status === 'BLOCK' && (
+                    <button
+                      onClick={() => { handleActivate(); setStatusMenuOpen(false); }}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-green-50 text-green-600 flex items-center gap-2"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                      Активировать
+                    </button>
+                  )}
+                  {(formData.status === 'ERROR' || formData.status === 'NOT PAID' || formData.status === 'INIT' || formData.status === 'PROGRESS') && (
+                    <>
+                      <button
+                        onClick={() => { handleActivate(); setStatusMenuOpen(false); }}
+                        className="w-full px-3 py-2 text-left text-sm hover:bg-green-50 text-green-600 flex items-center gap-2"
+                      >
+                        <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                        Активировать
+                      </button>
+                      <button
+                        onClick={() => { handleBlock(); setStatusMenuOpen(false); }}
+                        className="w-full px-3 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2"
+                      >
+                        <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                        Заблокировать
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
+              Биллинг
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={!!formData.auto_bill}
+                onChange={(e) => handleChange('auto_bill', e.target.checked ? 1 : 0)}
+                className="w-4 h-4 rounded"
+              />
+              {formData.auto_bill ? (
+                <span className="text-green-500 text-sm font-medium">Включен</span>
+              ) : (
+                <span className="text-red-500 text-sm font-medium">Выключен</span>
+              )}
+            </label>
+          </div>
+        </div>
+
+        {/* Стоимость и Действует до */}
+        <div className="grid grid-cols-2 gap-6">
+          <div className="flex items-center gap-3">
+            <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
+              Стоимость
+            </label>
+            <input
+              type="text"
+              value={formData.withdraws?.total ?? ''}
+              disabled
+              className="flex-1 px-3 py-2 text-sm rounded border opacity-60"
+              style={inputStyles}
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
+              Действует до
+            </label>
+            <input
+              type="text"
+              value={formData.expire || ''}
+              disabled
+              className="flex-1 px-3 py-2 text-sm rounded border opacity-60"
+              style={inputStyles}
+            />
+          </div>
+        </div>
+
+        {/* Следующая услуга */}
+        <div className="flex items-center gap-3">
+          <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
+            След. услуга
+          </label>
+          <select
+            value={formData.next ?? ''}
+            onChange={(e) => {
+              const val = e.target.value;
+              handleChange('next', val === '' ? null : val === '-1' ? -1 : Number(val));
+            }}
+            className="flex-1 px-3 py-2 text-sm rounded border"
+            style={inputStyles}
+          >
+            <option value="">Не изменять</option>
+            <option value="-1">Удалить по истечению</option>
+            {services.map(s => (
+              <option key={s.service_id} value={s.service_id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Settings (JSON) */}
+        <div className="pt-2">
+          <label className="text-sm font-medium" style={labelStyles}>
+            Settings
+          </label>
+          <div className="mt-2">
+            <JsonEditor
+              data={formData.settings ?? {}}
+              onChange={(newData) => handleChange('settings', newData)}
+              showInput={true}
+            />
+          </div>
+        </div>
+      </div>
+      )}
+
+      {/* Модалка подтверждения удаления */}
+      <ConfirmModal
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={handleConfirmDelete}
+        title="Удаление услуги"
+        message={`Вы уверены, что хотите удалить услугу #${formData.user_service_id}?`}
+        confirmText="Удалить"
+        cancelText="Отмена"
+        variant="danger"
+        loading={deleting}
+      />
+    </Modal>
+  );
+}

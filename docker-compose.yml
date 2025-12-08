@@ -1,0 +1,35 @@
+# Docker Compose for shm-admin-2
+# Add this service to your main SHM docker-compose.yml
+# Or use: docker-compose -f /path/to/shm/docker-compose.yml -f docker-compose.yml up
+
+services:
+  mysql:
+    image: "mysql:lts"
+    restart: always
+    environment:
+      TZ: ${TZ}
+      LANG: C.UTF-8
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASS}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASS}
+    ports:
+      - "3306:3306"
+    volumes:
+      - "mysql-data:/var/lib/mysql"
+    healthcheck:
+      test: "mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD"
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  redis:
+    ports:
+      - "6379:6379"
+    image: redis:latest
+    restart: always
+
+volumes:
+  mysql-data:
+    driver: local
+  shm-data:
+    driver: local
