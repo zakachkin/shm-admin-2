@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/shm/v1': {
-        target: 'https://shm.bkcloud.ru',
+        target: 'https://admin.ev-agency.io',
         changeOrigin: true,
         secure: false,
       },

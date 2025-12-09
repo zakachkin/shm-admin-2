@@ -1,0 +1,609 @@
+import { useEffect, useState } from 'react';
+import {
+  TrendingUp,
+  DollarSign,
+  Users,
+  Package,
+  Server,
+  CreditCard,
+  Activity,
+  Calendar,
+  ArrowDownRight,
+  BarChart3,
+  RefreshCw,
+  Target,
+  Percent,
+  UserCheck,
+  Crown,
+  Repeat,
+  Download,
+  ShoppingCart,
+  Zap,
+  PieChart,
+} from 'lucide-react';
+import Help from '../components/Help';
+import { StatCard, StatCardGrid, ChartCard, MetricRow, EmptyState } from '../components/analytics';
+import { AreaLineChart, BarChart, MultiLineChart } from '../components/charts';
+import {
+  fetchPaymentStats,
+  fetchUserServiceStats,
+  fetchUserStats,
+  fetchRevenueStats,
+  fetchTaskStats,
+  fetchTopServices,
+  fetchServerStats,
+  fetchFinancialMetrics,
+  fetchTopCustomers,
+  fetchMRRStats,
+  PaymentStats,
+  UserServiceStats,
+  UserStats,
+  RevenueStats,
+  FinancialMetrics,
+  TopCustomer,
+  MRRStats,
+} from '../lib/analyticsApi';
+
+type TimePeriod = 7 | 14 | 30 | 90 | 'month';
+
+/**
+ * Analytics page with comprehensive data visualization
+ */
+function Analytics() {
+  const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState<TimePeriod>('month');
+  const [paymentStats, setPaymentStats] = useState<PaymentStats | null>(null);
+  const [userServiceStats, setUserServiceStats] = useState<UserServiceStats | null>(null);
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [revenueStats, setRevenueStats] = useState<RevenueStats | null>(null);
+  const [taskStats, setTaskStats] = useState<{ pending: number; completed: number; failed: number; byEvent: { name: string; value: number }[] } | null>(null);
+  const [topServices, setTopServices] = useState<{ name: string; count: number; revenue: number }[]>([]);
+  const [serverStats, setServerStats] = useState<{ total: number; byGroup: { name: string; value: number }[] } | null>(null);
+  const [financialMetrics, setFinancialMetrics] = useState<FinancialMetrics | null>(null);
+  const [topCustomers, setTopCustomers] = useState<TopCustomer[]>([]);
+  const [mrrStats, setMrrStats] = useState<MRRStats | null>(null);
+
+  const fetchAllData = async () => {
+    setLoading(true);
+    try {
+      const [
+        payments,
+        userServices,
+        users,
+        revenue,
+        tasks,
+        services,
+        servers,
+        financial,
+        customers,
+        mrr,
+      ] = await Promise.all([
+        fetchPaymentStats(period),
+        fetchUserServiceStats(),
+        fetchUserStats(period),
+        fetchRevenueStats(period),
+        fetchTaskStats(),
+        fetchTopServices(),
+        fetchServerStats(),
+        fetchFinancialMetrics(),
+        fetchTopCustomers(10),
+        fetchMRRStats(),
+      ]);
+
+      setPaymentStats(payments);
+      setUserServiceStats(userServices);
+      setUserStats(users);
+      setRevenueStats(revenue);
+      setTaskStats(tasks);
+      setTopServices(services);
+      setServerStats(servers);
+      setFinancialMetrics(financial);
+      setTopCustomers(customers);
+      setMrrStats(mrr);
+    } catch (error) {
+      console.error('Failed to fetch analytics data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllData();
+  }, [period]);
+
+  const periodButtons: { value: TimePeriod; label: string }[] = [
+    { value: 7, label: '7 дней' },
+    { value: 14, label: '14 дней' },
+    { value: 30, label: '30 дней' },
+    { value: 90, label: '90 дней' },
+    { value: 'month', label: 'Текущий месяц' },
+  ];
+
+  // Combine revenue and withdraw timelines for comparison chart
+  const revenueComparisonData = revenueStats ? 
+    revenueStats.revenueTimeline.map((item, index) => ({
+      ...item,
+      revenue: item.value,
+      withdraws: revenueStats.withdrawTimeline[index]?.value || 0,
+    })) : [];
+
+  return (
+    <div>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center">
+          <h2 className="text-xl font-bold">Аналитика</h2>
+          <Help content="<b>Аналитика</b>: детальная статистика и визуализация данных системы." />
+        </div>
+        <div className="flex items-center gap-3">
+          {/* Period selector */}
+          <div className="flex rounded-lg overflow-hidden border" style={{ borderColor: 'var(--theme-card-border)' }}>
+            {periodButtons.map((btn) => (
+              <button
+                key={btn.value}
+                onClick={() => setPeriod(btn.value)}
+                className={`px-3 py-1.5 text-sm transition-colors ${
+                  period === btn.value 
+                    ? 'text-white' 
+                    : ''
+                }`}
+                style={{
+                  backgroundColor: period === btn.value ? 'var(--theme-primary-color)' : 'var(--theme-card-bg)',
+                  color: period === btn.value ? 'white' : 'var(--theme-content-text-muted)',
+                }}
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
+          {/* Refresh button */}
+          <button
+            onClick={fetchAllData}
+            disabled={loading}
+            className="btn-secondary flex items-center gap-2"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            Обновить
+          </button>
+        </div>
+      </div>
+
+      {/* KPI Cards Row */}
+      <StatCardGrid columns={4}>
+        <StatCard
+          title="Выручка"
+          value={revenueStats ? `${revenueStats.totalRevenue.toLocaleString()} ₽` : '...'}
+          icon={DollarSign}
+          color="emerald"
+          subtitle={period === 'month' ? 'Текущий месяц' : `За ${period} дней`}
+          loading={loading}
+        />
+        <StatCard
+          title="Списания"
+          value={revenueStats ? `${revenueStats.totalWithdraws.toLocaleString()} ₽` : '...'}
+          icon={ArrowDownRight}
+          color="rose"
+          subtitle={period === 'month' ? 'Текущий месяц' : `За ${period} дней`}
+          loading={loading}
+        />
+        <StatCard
+          title="Новые пользователи"
+          value={userStats?.newUsers ?? '...'}
+          icon={Users}
+          color="cyan"
+          subtitle={period === 'month' ? 'Текущий месяц' : `За ${period} дней`}
+          loading={loading}
+        />
+        <StatCard
+          title="Платежей"
+          value={paymentStats?.count ?? '...'}
+          icon={CreditCard}
+          color="violet"
+          subtitle={`Всего: ${paymentStats?.total.toLocaleString() || 0} ₽`}
+          loading={loading}
+        />
+      </StatCardGrid>
+
+      {/* Financial Metrics Row */}
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--theme-content-text)' }}>
+          Финансовые метрики
+        </h3>
+        <StatCardGrid columns={5}>
+          <StatCard
+            title="MRR"
+            value={mrrStats ? `${Math.round(mrrStats.mrr).toLocaleString()} ₽` : '...'}
+            icon={Repeat}
+            color="emerald"
+            subtitle={mrrStats && mrrStats.mrrGrowth !== 0 
+              ? `${mrrStats.mrrGrowth > 0 ? '+' : ''}${mrrStats.mrrGrowth.toFixed(1)}% к пред. месяцу` 
+              : 'Регулярный доход'}
+            loading={loading}
+          />
+          <StatCard
+            title="ARPU"
+            value={financialMetrics ? `${Math.round(financialMetrics.arpu).toLocaleString()} ₽` : '...'}
+            icon={Target}
+            color="blue"
+            subtitle="Выручка на пользователя"
+            loading={loading}
+          />
+          <StatCard
+            title="ARPPU"
+            value={financialMetrics ? `${Math.round(financialMetrics.arppu).toLocaleString()} ₽` : '...'}
+            icon={UserCheck}
+            color="cyan"
+            subtitle="Выручка на платящего"
+            loading={loading}
+          />
+          <StatCard
+            title="LTV"
+            value={financialMetrics ? `${Math.round(financialMetrics.ltv).toLocaleString()} ₽` : '...'}
+            icon={TrendingUp}
+            color="violet"
+            subtitle="Пожизненная ценность"
+            loading={loading}
+          />
+          <StatCard
+            title="Churn Rate"
+            value={financialMetrics ? `${financialMetrics.churnRate.toFixed(1)}%` : '...'}
+            icon={Percent}
+            color={financialMetrics && financialMetrics.churnRate > 10 ? 'rose' : 'amber'}
+            subtitle="Отток услуг"
+            loading={loading}
+          />
+        </StatCardGrid>
+      </div>
+
+      {/* Conversion & Payment Metrics Row */}
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--theme-content-text)' }}>
+          Конверсия и платежи
+        </h3>
+        <StatCardGrid columns={4}>
+          <StatCard
+            title="Конверсия"
+            value={financialMetrics ? `${financialMetrics.conversionRate.toFixed(1)}%` : '...'}
+            icon={PieChart}
+            color={financialMetrics && financialMetrics.conversionRate > 20 ? 'emerald' : 'amber'}
+            subtitle={`${financialMetrics?.payingUsersCount || 0} из ${financialMetrics?.totalUsers || 0} платили`}
+            loading={loading}
+          />
+          <StatCard
+            title="Средний чек"
+            value={financialMetrics ? `${Math.round(financialMetrics.avgRevenuePerPayment).toLocaleString()} ₽` : '...'}
+            icon={ShoppingCart}
+            color="cyan"
+            subtitle="Сумма на платёж"
+            loading={loading}
+          />
+          <StatCard
+            title="Платежей на клиента"
+            value={financialMetrics ? financialMetrics.avgPaymentsPerUser.toFixed(1) : '...'}
+            icon={Zap}
+            color="violet"
+            subtitle="Среднее кол-во"
+            loading={loading}
+          />
+          <StatCard
+            title="Платящих клиентов"
+            value={financialMetrics?.payingUsersCount ?? '...'}
+            icon={UserCheck}
+            color="blue"
+            subtitle={`${((financialMetrics?.payingUsersCount || 0) / (financialMetrics?.totalUsers || 1) * 100).toFixed(0)}% от всех`}
+            loading={loading}
+          />
+        </StatCardGrid>
+      </div>
+
+      {/* Main Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        {/* Revenue vs Withdraws Chart */}
+        <ChartCard
+          title="Выручка и списания"
+          subtitle="Сравнение по дням"
+          icon={TrendingUp}
+          iconColor="text-emerald-400"
+          loading={loading}
+        >
+          {revenueComparisonData.length > 0 ? (
+            <MultiLineChart
+              data={revenueComparisonData}
+              lines={[
+                { dataKey: 'revenue', name: 'Выручка', color: '#22c55e', type: 'area' },
+                { dataKey: 'withdraws', name: 'Списания', color: '#ef4444', type: 'line' },
+              ]}
+              height={280}
+              valueFormatter={(v) => `${v.toLocaleString()} ₽`}
+            />
+          ) : (
+            <EmptyState icon={TrendingUp} />
+          )}
+        </ChartCard>
+
+        {/* User Services by Status */}
+        <ChartCard
+          title="Услуги по статусу"
+          subtitle="Распределение активных услуг"
+          icon={BarChart3}
+          iconColor="text-violet-400"
+          loading={loading}
+        >
+          {userServiceStats && userServiceStats.byStatus.length > 0 ? (
+            <BarChart
+              data={userServiceStats.byStatus}
+              height={280}
+              layout="vertical"
+            />
+          ) : (
+            <EmptyState icon={BarChart3} />
+          )}
+        </ChartCard>
+      </div>
+
+      {/* Second Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        {/* Payments Timeline */}
+        <ChartCard
+          title="Динамика платежей"
+          subtitle={period === 'month' ? 'Сумма платежей за текущий месяц' : `Сумма платежей за ${period} дней`}
+          icon={CreditCard}
+          iconColor="text-cyan-400"
+          loading={loading}
+        >
+          {paymentStats && paymentStats.timeline.length > 0 ? (
+            <AreaLineChart
+              data={paymentStats.timeline}
+              height={250}
+              color="#22d3ee"
+              valueFormatter={(v) => `${v.toLocaleString()} ₽`}
+              averageLine
+            />
+          ) : (
+            <EmptyState icon={CreditCard} />
+          )}
+        </ChartCard>
+
+        {/* New Users Timeline */}
+        <ChartCard
+          title="Регистрации"
+          subtitle={period === 'month' ? 'Новые пользователи за текущий месяц' : `Новые пользователи за ${period} дней`}
+          icon={Users}
+          iconColor="text-blue-400"
+          loading={loading}
+        >
+          {userStats && userStats.timeline.length > 0 ? (
+            <AreaLineChart
+              data={userStats.timeline}
+              height={250}
+              color="#3b82f6"
+              averageLine
+            />
+          ) : (
+            <EmptyState icon={Users} />
+          )}
+        </ChartCard>
+      </div>
+
+      {/* Third Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+        {/* Top Services */}
+        <ChartCard
+          title="Популярные услуги"
+          subtitle="Топ-10 по количеству"
+          icon={Package}
+          iconColor="text-amber-400"
+          loading={loading}
+        >
+          {topServices.length > 0 ? (
+            <BarChart
+              data={topServices.map(s => ({ name: s.name, value: s.count }))}
+              layout="vertical"
+              height={280}
+            />
+          ) : (
+            <EmptyState icon={Package} />
+          )}
+        </ChartCard>
+
+        {/* Payment Systems */}
+        <ChartCard
+          title="Платежные системы"
+          subtitle="Распределение по сумме"
+          icon={CreditCard}
+          iconColor="text-emerald-400"
+          loading={loading}
+        >
+          {paymentStats && paymentStats.byPaySystem.length > 0 ? (
+            <BarChart
+              data={paymentStats.byPaySystem}
+              height={280}
+              layout="vertical"
+              valueFormatter={(v) => `${v.toLocaleString()} ₽`}
+            />
+          ) : (
+            <EmptyState icon={CreditCard} />
+          )}
+        </ChartCard>
+
+        {/* Tasks Stats */}
+        <ChartCard
+          title="Задачи"
+          subtitle="Статистика выполнения"
+          icon={Activity}
+          iconColor="text-rose-400"
+          loading={loading}
+        >
+          {taskStats ? (
+            <BarChart
+              data={[
+                { name: 'В очереди', value: taskStats.pending, color: '#f59e0b' },
+                { name: 'Выполнено', value: taskStats.completed, color: '#22c55e' },
+                { name: 'Ошибки', value: taskStats.failed, color: '#ef4444' },
+              ]}
+              height={200}
+            />
+          ) : (
+            <EmptyState icon={Activity} />
+          )}
+        </ChartCard>
+      </div>
+
+      {/* Detailed Stats Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        {/* Services List */}
+        <ChartCard
+          title="Детализация услуг"
+          subtitle="Статистика по каждой услуге"
+          icon={BarChart3}
+          iconColor="text-violet-400"
+          loading={loading}
+        >
+          {userServiceStats && userServiceStats.byService.length > 0 ? (
+            <div className="max-h-72 overflow-y-auto">
+              {userServiceStats.byService.map((service, idx) => {
+                const total = userServiceStats.byService.reduce((s, i) => s + i.value, 0);
+                return (
+                  <MetricRow
+                    key={service.name}
+                    label={service.name}
+                    value={service.value}
+                    percentage={(service.value / total) * 100}
+                    color={[
+                      '#22d3ee', '#8b5cf6', '#22c55e', '#f59e0b', '#ef4444',
+                      '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1',
+                    ][idx % 10]}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <EmptyState icon={BarChart3} />
+          )}
+        </ChartCard>
+
+        {/* Server Groups */}
+        <ChartCard
+          title="Серверы по группам"
+          subtitle="Распределение серверов"
+          icon={Server}
+          iconColor="text-orange-400"
+          loading={loading}
+        >
+          {serverStats && serverStats.byGroup.length > 0 ? (
+            <BarChart
+              data={serverStats.byGroup}
+              height={250}
+            />
+          ) : (
+            <EmptyState 
+              icon={Server} 
+              title="Нет данных о серверах"
+              description="Серверы не найдены в системе"
+            />
+          )}
+        </ChartCard>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        <StatCard
+          title="Всего пользователей"
+          value={userStats?.total ?? '...'}
+          icon={Users}
+          color="blue"
+          subtitle={`Активных за 7 дней: ${userStats?.activeUsers ?? 0}`}
+          loading={loading}
+        />
+        <StatCard
+          title="Активных услуг"
+          value={userServiceStats?.total ?? '...'}
+          icon={Package}
+          color="amber"
+          loading={loading}
+        />
+        <StatCard
+          title="Серверов"
+          value={serverStats?.total ?? '...'}
+          icon={Server}
+          color="orange"
+          loading={loading}
+        />
+        <StatCard
+          title="Чистая выручка"
+          value={revenueStats ? `${revenueStats.netRevenue.toLocaleString()} ₽` : '...'}
+          icon={TrendingUp}
+          color="emerald"
+          subtitle="Выручка минус списания"
+          loading={loading}
+        />
+      </div>
+
+      {/* Top Customers */}
+      <div className="mt-6">
+        <ChartCard
+          title="Топ клиентов"
+          subtitle="По сумме платежей"
+          icon={Crown}
+          iconColor="text-amber-400"
+          loading={loading}
+        >
+          {topCustomers.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--theme-table-border)' }}>
+                    <th className="text-left py-2 px-3 font-medium" style={{ color: 'var(--theme-content-text-muted)' }}>#</th>
+                    <th className="text-left py-2 px-3 font-medium" style={{ color: 'var(--theme-content-text-muted)' }}>Пользователь</th>
+                    <th className="text-right py-2 px-3 font-medium" style={{ color: 'var(--theme-content-text-muted)' }}>Сумма</th>
+                    <th className="text-right py-2 px-3 font-medium" style={{ color: 'var(--theme-content-text-muted)' }}>Платежей</th>
+                    <th className="text-right py-2 px-3 font-medium" style={{ color: 'var(--theme-content-text-muted)' }}>Услуг</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topCustomers.map((customer, idx) => (
+                    <tr 
+                      key={customer.userId} 
+                      className="hover:opacity-80 transition-opacity"
+                      style={{ borderBottom: '1px solid var(--theme-table-border)' }}
+                    >
+                      <td className="py-2 px-3">
+                        {idx < 3 ? (
+                          <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
+                            idx === 0 ? 'bg-amber-500 text-white' :
+                            idx === 1 ? 'bg-gray-400 text-white' :
+                            'bg-amber-700 text-white'
+                          }`}>
+                            {idx + 1}
+                          </span>
+                        ) : (
+                          <span style={{ color: 'var(--theme-content-text-muted)' }}>{idx + 1}</span>
+                        )}
+                      </td>
+                      <td className="py-2 px-3 font-medium" style={{ color: 'var(--theme-content-text)' }}>
+                        {customer.login}
+                      </td>
+                      <td className="py-2 px-3 text-right font-semibold" style={{ color: '#22c55e' }}>
+                        {Math.round(customer.totalPayments).toLocaleString()} ₽
+                      </td>
+                      <td className="py-2 px-3 text-right" style={{ color: 'var(--theme-content-text-muted)' }}>
+                        {customer.paymentsCount}
+                      </td>
+                      <td className="py-2 px-3 text-right" style={{ color: 'var(--theme-content-text-muted)' }}>
+                        {customer.servicesCount}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState icon={Crown} title="Нет данных о клиентах" />
+          )}
+        </ChartCard>
+      </div>
+    </div>
+  );
+}
+
+export default Analytics;
