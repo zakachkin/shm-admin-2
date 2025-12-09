@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import DataTable, { SortDirection } from '../components/DataTable';
 import { UserServiceModal, UserServiceCreateModal } from '../modals';
 import Help from '../components/Help';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
 import { Plus } from 'lucide-react';
+import { useSelectedUserStore } from '../store/selectedUserStore';
 
 const userServiceColumns = [
   { key: 'user_service_id', label: 'ID', visible: true, sortable: true },
@@ -29,6 +30,17 @@ function UserServices() {
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+
+  // Получаем выбранного пользователя из store
+  const { selectedUser } = useSelectedUserStore();
+
+  // Формируем externalFilters для автоматического заполнения поля user_id
+  const externalFilters = useMemo(() => {
+    if (selectedUser?.user_id) {
+      return { user_id: String(selectedUser.user_id) };
+    }
+    return undefined;
+  }, [selectedUser]);
 
   const fetchData = useCallback((l: number, o: number, sf?: string, sd?: SortDirection) => {
     setLoading(true);
@@ -133,6 +145,7 @@ function UserServices() {
         onRowClick={handleRowClick}
         onRefresh={handleRefresh}
         storageKey="user-services"
+        externalFilters={externalFilters}
       />
       
       {/* Модалка редактирования */}

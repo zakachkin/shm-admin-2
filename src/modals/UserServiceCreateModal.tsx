@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import JsonEditor from '../components/JsonEditor';
 import UserSelect from '../components/UserSelect';
 import ServiceSelect from '../components/ServiceSelect';
+import { useSelectedUserStore } from '../store/selectedUserStore';
 
 interface UserServiceCreateModalProps {
   open: boolean;
@@ -20,15 +21,16 @@ export default function UserServiceCreateModal({
   onSave,
   defaultUserId,
 }: UserServiceCreateModalProps) {
+  const { selectedUser } = useSelectedUserStore();
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
 
-  // Сброс формы при открытии
+  // Сброс формы при открытии и автозаполнение user_id
   useEffect(() => {
     if (open) {
       setFormData({
-        user_id: defaultUserId || null,
+        user_id: defaultUserId || selectedUser?.user_id || null,
         service_id: null,
         cost: '',
         months: '',
@@ -36,7 +38,7 @@ export default function UserServiceCreateModal({
       });
       setSelectedService(null);
     }
-  }, [open, defaultUserId]);
+  }, [open, defaultUserId, selectedUser]);
 
   const handleChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));

@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import DataTable, { SortDirection } from '../components/DataTable';
 import Help from '../components/Help';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
 import { PayModal, PayCreateModal } from '../modals';
 import { Plus } from 'lucide-react';
+import { useSelectedUserStore } from '../store/selectedUserStore';
 
 const payColumns = [
   { key: 'id', label: 'ID', visible: true, sortable: true },
@@ -25,6 +26,17 @@ function Pays() {
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+
+  // Получаем выбранного пользователя из store
+  const { selectedUser } = useSelectedUserStore();
+
+  // Формируем externalFilters для автоматического заполнения поля user_id
+  const externalFilters = useMemo(() => {
+    if (selectedUser?.user_id) {
+      return { user_id: String(selectedUser.user_id) };
+    }
+    return undefined;
+  }, [selectedUser]);
 
   const fetchData = useCallback((l: number, o: number, sf?: string, sd?: SortDirection) => {
     setLoading(true);
@@ -96,6 +108,7 @@ function Pays() {
         onRowClick={handleRowClick}
         onRefresh={() => fetchData(limit, offset, sortField, sortDirection)}
         storageKey="pays"
+        externalFilters={externalFilters}
       />
       <PayModal
         open={modalOpen}

@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import DataTable, { SortDirection } from '../components/DataTable';
 import Help from '../components/Help';
 import EntityModal, { FieldConfig } from '../components/EntityModal';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
+import { useSelectedUserStore } from '../store/selectedUserStore';
 
 const spoolHistoryColumns = [
   { key: 'spool_id', label: 'ID', visible: true, sortable: true },
@@ -35,6 +36,17 @@ function SpoolHistory() {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
+      
+    // Получаем выбранного пользователя из store
+    const { selectedUser } = useSelectedUserStore();
+      
+    // Формируем externalFilters для автоматического заполнения поля user_id
+    const externalFilters = useMemo(() => {
+      if (selectedUser?.user_id) {
+        return { user_id: String(selectedUser.user_id) };
+      }
+      return undefined;
+    }, [selectedUser]);
 
   const fetchData = useCallback((l: number, o: number, sf?: string, sd?: SortDirection) => {
     setLoading(true);
@@ -92,6 +104,7 @@ function SpoolHistory() {
         onRowClick={handleRowClick}
         onRefresh={() => fetchData(limit, offset, sortField, sortDirection)}
         storageKey="spool-history"
+        externalFilters={externalFilters}
       />
       <EntityModal
         open={modalOpen}

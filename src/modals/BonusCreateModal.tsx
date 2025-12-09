@@ -3,6 +3,7 @@ import Modal from '../components/Modal';
 import { Plus, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserSelect from '../components/UserSelect';
+import { useSelectedUserStore } from '../store/selectedUserStore';
 
 interface BonusCreateModalProps {
   open: boolean;
@@ -15,6 +16,7 @@ export default function BonusCreateModal({
   onClose,
   onSave,
 }: BonusCreateModalProps) {
+  const { selectedUser } = useSelectedUserStore();
   const [formData, setFormData] = useState<Record<string, any>>({
     user_id: null,
     bonus: '',
@@ -22,16 +24,16 @@ export default function BonusCreateModal({
   });
   const [saving, setSaving] = useState(false);
 
-  // Сброс формы при открытии
+  // Сброс формы при открытии и автозаполнение user_id если пользователь выбран
   useEffect(() => {
     if (open) {
       setFormData({
-        user_id: null,
+        user_id: selectedUser?.user_id || null,
         bonus: '',
         comment: null,
       });
     }
-  }, [open]);
+  }, [open, selectedUser]);
 
   const handleChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));

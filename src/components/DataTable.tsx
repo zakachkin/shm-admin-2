@@ -44,6 +44,8 @@ interface DataTableProps {
   height?: string;
   /** Уникальный ключ для сохранения настроек в localStorage */
   storageKey?: string;
+  /** Внешние фильтры для программного управления */
+  externalFilters?: Record<string, string>;
 }
 
 const LIMITS = [50, 100, 500, 1000, 5000];
@@ -114,7 +116,8 @@ function DataTable({
   sortField,
   sortDirection,
   height = '500px',
-  storageKey
+  storageKey,
+  externalFilters
 }: DataTableProps) {
   // Инициализация колонок с учётом сохранённых настроек
   const [columns, setColumns] = useState<Column[]>(() => {
@@ -172,6 +175,31 @@ function DataTable({
   const columnsDropdownRef = useRef<HTMLDivElement>(null);
   const autoRefreshRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
+  const prevExternalFiltersKeys = useRef<Set<string>>(new Set());
+
+  // Синхронизация внешних фильтров с внутренними
+  useEffect(() => {
+    setColumnFilters(prev => {
+      const newFilters = { ...prev };
+      
+      // Удаляем предыдущие внешние фильтры
+      prevExternalFiltersKeys.current.forEach(key => {
+        if (!externalFilters || !(key in externalFilters)) {
+          delete newFilters[key];
+        }
+      });
+      
+      // Добавляем новые внешние фильтры
+      if (externalFilters) {
+        Object.assign(newFilters, externalFilters);
+        prevExternalFiltersKeys.current = new Set(Object.keys(externalFilters));
+      } else {
+        prevExternalFiltersKeys.current.clear();
+      }
+      
+      return newFilters;
+    });
+  }, [externalFilters]);
 
   // Сохранение настроек в localStorage при изменении колонок или автообновления
   useEffect(() => {

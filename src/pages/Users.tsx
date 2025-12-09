@@ -4,6 +4,7 @@ import { UserModal, UserCreateModal, UserChangePasswordModal} from '../modals';
 import Help from '../components/Help';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
 import { Plus } from 'lucide-react';
+import { useSelectedUserStore } from '../store/selectedUserStore';
 
 const userColumns = [
   { key: 'user_id', label: 'ID', visible: true, sortable: true},
@@ -25,6 +26,8 @@ function Users() {
   const [offset, setOffset] = useState(0);
   const [sortField, setSortField] = useState<string | undefined>();
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+  
+  const { setSelectedUser } = useSelectedUserStore();
   
   // Модальные окна
   const [selectedRow, setSelectedRow] = useState<any>(null);
@@ -66,6 +69,8 @@ function Users() {
   const handleRowClick = (row: any) => {
     setSelectedRow(row);
     setEditModalOpen(true);
+    // Устанавливаем глобально выбранного пользователя
+    setSelectedUser(row);
   };
 
   const handleCreate = () => {

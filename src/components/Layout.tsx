@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
+import SelectedUserDropdown from './SelectedUserDropdown';
 import {
   Users,
   Package,
@@ -371,7 +372,7 @@ function Layout() {
             <Menu className="w-6 h-6" />
           </button>
           <div className="flex items-center gap-4">
-            {/* Breadcrumb or title could go here */}
+            <SelectedUserDropdown />
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
