@@ -14,6 +14,7 @@ import Templates from './pages/Templates';
 import Config from './pages/Config';
 import Promo from './pages/Promo';
 import Dashboard from './pages/Dashboard';
+import Analytics from './pages/Analytics';
 import Profiles from './pages/Profiles';
 import Bonuses from './pages/Bonuses';
 import Storage from './pages/Storage';
@@ -70,6 +71,8 @@ function App() {
           }
         >
           <Route index element={<Dashboard />} />
+          {/* Аналитика */}
+          <Route path="analytics" element={<Analytics />} />
           {/* Пользователи */}
           <Route path="users" element={<Users />} />
           <Route path="profiles" element={<Profiles />} />

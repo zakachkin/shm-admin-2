@@ -30,6 +30,7 @@ import {
   Sun,
   Moon,
   Monitor,
+  TrendingUp,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useBrandingStore } from '../store/brandingStore';
@@ -48,6 +49,11 @@ const navigation: MenuItem[] = [
     name: 'Главная', 
     href: '/', 
     icon: Home 
+  },
+  { 
+    name: 'Аналитика', 
+    href: '/analytics', 
+    icon: TrendingUp 
   },
   { 
     name: 'Пользователи', 
