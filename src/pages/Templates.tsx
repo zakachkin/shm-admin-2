@@ -113,13 +113,13 @@ function Templates() {
             method: 'POST',
             body: JSON.stringify(data),
           });
-          fetchData(limit, offset, sortField, sortDirection);
+          fetchData(limit, offset, filters, sortField, sortDirection);
         }}
         onDelete={async (id) => {
           await shm_request(`/shm/v1/admin/template/${id}`, {
             method: 'DELETE',
           });
-          fetchData(limit, offset, sortField, sortDirection);
+          fetchData(limit, offset, filters, sortField, sortDirection);
         }}
       />
       <TemplateCreateModal
@@ -130,7 +130,7 @@ function Templates() {
             method: 'PUT',
             body: JSON.stringify(data),
           });
-          fetchData(limit, offset, sortField, sortDirection);
+          fetchData(limit, offset, filters, sortField, sortDirection);
         }}
       />
     </div>

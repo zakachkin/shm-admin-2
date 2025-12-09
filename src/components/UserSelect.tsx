@@ -155,7 +155,7 @@ export default function UserSelect({
       ],
     };
 
-    shm_request(`/shm/v1/admin/user?limit=10&filter=${encodeURIComponent(JSON.stringify(filter))}`)
+    shm_request(`/shm/v1/admin/user?limit=20&filter=${encodeURIComponent(JSON.stringify(filter))}`)
       .then(res => {
         const data = res.data || res;
         const users = Array.isArray(data) ? data : [];

@@ -282,12 +282,13 @@ export default function PromoCreateModal({
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Шаблон
           </label>
-            <TemplateSelect
+          <TemplateSelect
             value={formData.template_id}
             onChange={(id, template) => handleChange('template_id', id)}
             onTemplateUpdated={() => console.log('Обновлено')}
             readonly={false}
-            />
+            className="flex-1"
+          />
         </div>
       </div>
     </Modal>

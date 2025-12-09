@@ -1,24 +1,18 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import DataTable, { SortDirection } from '../components/DataTable';
-import EntityModal, { FieldConfig } from '../components/EntityModal';
+import EventModal from '../modals/EventModal';
 import Help from '../components/Help';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
+import { Plus } from 'lucide-react';
 
 const eventColumns = [
-  { key: 'event_id', label: 'ID', visible: true, sortable: true },
-  { key: 'name', label: 'Название', visible: true, sortable: true },
-  { key: 'title', label: 'Заголовок', visible: true, sortable: true },
-  { key: 'server_gid', label: 'Группа серверов', visible: true, sortable: true },
-  { key: 'server_id', label: 'Сервер ID', visible: true, sortable: true },
-];
-
-const eventModalFields: FieldConfig[] = [
-  { key: 'event_id', label: 'ID', copyable: true },
-  { key: 'name', label: 'Название' },
-  { key: 'title', label: 'Заголовок' },
-  { key: 'server_gid', label: 'Группа серверов', linkTo: '/server-groups' },
-  { key: 'server_id', label: 'ID сервера', linkTo: '/servers' },
-  { key: 'settings', label: 'Настройки', type: 'json' },
+  { key: 'title', label: 'Название', visible: true, sortable: true },
+  { key: 'name', label: 'Событие', visible: true, sortable: true },
+  { key: 'category', label: 'Категория', visible: true, sortable: false },
+  { key: 'id', label: 'ID', visible: false, sortable: true },
+  { key: 'kind', label: 'Тип', visible: false, sortable: true },
+  { key: 'server_gid', label: 'Группа серверов', visible: false, sortable: true },
+  { key: 'settings', label: 'Settings', visible: false, sortable: false },
 ];
 
 function Events() {
@@ -32,6 +26,7 @@ function Events() {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
@@ -47,7 +42,12 @@ function Events() {
     shm_request(url)
       .then(res => {
         const { data: items, total: count } = normalizeListResponse(res);
-        setData(items);
+        // Извлекаем category из settings для отображения в таблице
+        const processedItems = items.map((item: any) => ({
+          ...item,
+          category: item.settings?.category || '',
+        }));
+        setData(processedItems);
         setTotal(count);
       })
       .catch(() => setData([]))
@@ -79,11 +79,53 @@ function Events() {
     setModalOpen(true);
   };
 
+  const handleCreate = () => {
+    setCreateModalOpen(true);
+  };
+
+  const handleSaveEdit = async (eventData: any) => {
+    await shm_request('/shm/v1/admin/service/event', {
+      method: 'POST',
+      body: JSON.stringify(eventData),
+    });
+    fetchData(limit, offset, filters, sortField, sortDirection);
+  };
+
+  const handleSaveNew = async (eventData: any) => {
+    await shm_request('/shm/v1/admin/service/event', {
+      method: 'PUT',
+      body: JSON.stringify(eventData),
+    });
+    fetchData(limit, offset, filters, sortField, sortDirection);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedRow?.event_id) return;
+    
+    await shm_request(`/shm/v1/admin/service/event?id=${selectedRow.event_id}`, {
+      method: 'DELETE',
+    });
+    fetchData(limit, offset, filters, sortField, sortDirection);
+  };
+
   return (
     <div>
-      <div className="flex items-center mb-4">
-        <h2 className="text-xl font-bold">События услуг</h2>
-        <Help content="<b>События услуг</b>: список событий, связанных с услугами (подключение, отключение и т.д.)." />
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center">
+          <h2 className="text-xl font-bold">События услуг</h2>
+          <Help content="<b>События услуг</b>: список событий, связанных с услугами (подключение, отключение и т.д.)." />
+        </div>
+        <button
+          onClick={handleCreate}
+          className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
+          style={{ 
+            backgroundColor: 'var(--accent-primary)', 
+            color: 'var(--accent-text)' 
+          }}
+        >
+          <Plus className="w-4 h-4" />
+          Добавить
+        </button>
       </div>
       <DataTable
         columns={eventColumns}
@@ -101,12 +143,25 @@ function Events() {
         onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
         storageKey="events"
       />
-      <EntityModal
+      
+      {/* Модалка редактирования */}
+      <EventModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={`Событие: ${selectedRow?.name || selectedRow?.event_id || ''}`}
+        onClose={() => {
+          setModalOpen(false);
+          setSelectedRow(null);
+        }}
         data={selectedRow}
-        fields={eventModalFields}
+        onSave={handleSaveEdit}
+        onDelete={handleDelete}
+      />
+
+      {/* Модалка создания */}
+      <EventModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        data={null}
+        onSave={handleSaveNew}
       />
     </div>
   );

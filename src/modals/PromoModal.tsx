@@ -268,12 +268,11 @@ export default function PromoModal({
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Шаблон
           </label>
-          <div className="flex-1">
-            <TemplateSelect
-              value={formData.template_id}
-              readonly={true}
-              />
-        </div>
+          <TemplateSelect
+            value={formData.template_id}
+            readonly={true}
+            className="flex-1"
+          />
         </div>
 
         {/* Настройки (JSON) */}

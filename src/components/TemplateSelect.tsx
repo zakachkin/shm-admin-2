@@ -40,7 +40,6 @@ export default function TemplateSelect({
   onLoadingChange,
   onTemplateUpdated,
   readonly = false,
-  placeholder = '... начните вводить ID шаблона',
   className = '',
 }: TemplateSelectProps) {
   const [search, setSearch] = useState('');
@@ -313,13 +312,13 @@ export default function TemplateSelect({
   if (readonly && selectedTemplate) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        <div className="flex items-center gap-2 px-3 py-2 rounded border" style={inputStyles}>
+        <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded border" style={inputStyles}>
           <FileText className="w-4 h-4" style={{ color: 'var(--theme-content-text-muted)' }} />
           <span>{formatTemplate(selectedTemplate)}</span>
         </div>
         <button
           onClick={handleEdit}
-          className="p-2 rounded hover:bg-opacity-80 transition-colors"
+          className="p-2 rounded hover:bg-opacity-80 transition-colors shrink-0"
           style={{
             backgroundColor: 'var(--theme-button-secondary-bg)',
             color: 'var(--theme-button-secondary-text)',
@@ -353,17 +352,19 @@ export default function TemplateSelect({
   }
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
-      <div className="flex gap-2">
+    <div ref={containerRef} className={className}>
+      <div className="flex items-center gap-2">
         {/* Переключатель режима просмотра */}
         <button
           onClick={() => {
             const newMode = viewMode === 'search' ? 'list' : 'search';
             setViewMode(newMode);
             if (newMode === 'list') {
+              setItems(allTemplates);
               setDropdownVisible(true);
             } else {
               setDropdownVisible(false);
+              setItems([]);
             }
           }}
           className="p-2 rounded transition-colors"
@@ -394,7 +395,7 @@ export default function TemplateSelect({
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             onFocus={handleInputFocus}
-            placeholder={placeholder}
+            placeholder={viewMode === 'search' ? '... начните вводить ID шаблона' : 'Выберите шаблон'}
             disabled={loadingTemplate}
             className="w-full pl-10 pr-3 py-2 text-sm rounded border"
             style={inputStyles}

@@ -113,7 +113,7 @@ function Storage() {
           await shm_request(`/shm/v1/admin/storage/manage/${name}?user_id=${selectedRow.user_id}`, {
             method: 'DELETE',
           });
-          fetchData(limit, offset, sortField, sortDirection);
+          fetchData(limit, offset, filters, sortField, sortDirection);
         }}
       />
     </div>

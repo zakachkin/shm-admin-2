@@ -553,7 +553,7 @@ export default function TemplateModal({
   );
 
   // Отображаем плавающую кнопку если минимизировано и есть табы
-  if (isMinimized && tabs.length > 0) {
+  if (isMinimized && tabs.length > 0 && !open) {
     const hasUnsaved = tabs.some(t => t.hasUnsavedChanges);
     return (
       <button
@@ -565,7 +565,7 @@ export default function TemplateModal({
         style={{
           backgroundColor: 'var(--accent-primary)',
           color: 'var(--accent-text)',
-          zIndex: 9998,
+          zIndex: 40,
         }}
         title="Открыть редактор шаблонов"
       >
