@@ -8,7 +8,20 @@ const serverGroupColumns = [
   { key: 'group_id', label: 'ID', visible: true, sortable: true },
   { key: 'name', label: 'Название', visible: true, sortable: true },
   { key: 'type', label: 'Тип', visible: true, sortable: true },
-  { key: 'transport', label: 'Транспорт', visible: true, sortable: true },
+  { 
+    key: 'transport', 
+    label: 'Транспорт', 
+    visible: true, 
+    sortable: true,
+    filterType: 'select' as const,
+    filterOptions: [
+      { value: 'local', label: 'local' },
+      { value: 'http', label: 'http' },
+      { value: 'ssh', label: 'ssh' },
+      { value: 'mail', label: 'mail' },
+      { value: 'telegram', label: 'telegram' },
+    ]
+  },
 ];
 
 const serverGroupModalFields: FieldConfig[] = [

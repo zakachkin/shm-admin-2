@@ -24,6 +24,9 @@ interface Column {
   visible: boolean;
   width?: number;
   sortable?: boolean;
+  render?: (value: any, row: any) => React.ReactNode;
+  filterType?: 'text' | 'select';
+  filterOptions?: Array<{ value: string; label: string }>;
 }
 
 export type SortDirection = 'asc' | 'desc' | null;
@@ -677,35 +680,72 @@ function DataTable({
                     borderBottom: '1px solid var(--theme-table-border)',
                   }}
                 >
-                  <div className="relative">
-                    <Search 
-                      className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3" 
-                      style={{ color: 'var(--theme-content-text-muted)' }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Фильтр..."
-                      value={columnFilters[col.key] || ''}
-                      onChange={e => setColumnFilters(prev => ({
-                        ...prev,
-                        [col.key]: e.target.value
-                      }))}
-                      className="w-full text-xs py-1 pl-7 pr-2 rounded"
-                      style={{
-                        backgroundColor: 'var(--theme-input-bg)',
-                        border: '1px solid var(--theme-input-border)',
-                        color: 'var(--theme-input-text)',
-                      }}
-                    />
-                    {columnFilters[col.key] && (
-                      <button
-                        onClick={() => setColumnFilters(prev => ({ ...prev, [col.key]: '' }))}
-                        className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-slate-500/30"
+                  {col.filterType === 'select' && col.filterOptions ? (
+                    <div className="relative">
+                      <select
+                        value={columnFilters[col.key] || ''}
+                        onChange={e => setColumnFilters(prev => ({
+                          ...prev,
+                          [col.key]: e.target.value
+                        }))}
+                        className="w-full text-xs py-1 px-2 pr-6 rounded appearance-none"
+                        style={{
+                          backgroundColor: 'var(--theme-input-bg)',
+                          border: '1px solid var(--theme-input-border)',
+                          color: 'var(--theme-input-text)',
+                        }}
                       >
-                        <X className="w-3 h-3" style={{ color: 'var(--theme-content-text-muted)' }} />
-                      </button>
-                    )}
-                  </div>
+                        <option value="">Все</option>
+                        {col.filterOptions.map(opt => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown 
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none" 
+                        style={{ color: 'var(--theme-content-text-muted)' }}
+                      />
+                      {columnFilters[col.key] && (
+                        <button
+                          onClick={() => setColumnFilters(prev => ({ ...prev, [col.key]: '' }))}
+                          className="absolute right-6 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-slate-500/30"
+                        >
+                          <X className="w-3 h-3" style={{ color: 'var(--theme-content-text-muted)' }} />
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <Search 
+                        className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3" 
+                        style={{ color: 'var(--theme-content-text-muted)' }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Фильтр..."
+                        value={columnFilters[col.key] || ''}
+                        onChange={e => setColumnFilters(prev => ({
+                          ...prev,
+                          [col.key]: e.target.value
+                        }))}
+                        className="w-full text-xs py-1 pl-7 pr-2 rounded"
+                        style={{
+                          backgroundColor: 'var(--theme-input-bg)',
+                          border: '1px solid var(--theme-input-border)',
+                          color: 'var(--theme-input-text)',
+                        }}
+                      />
+                      {columnFilters[col.key] && (
+                        <button
+                          onClick={() => setColumnFilters(prev => ({ ...prev, [col.key]: '' }))}
+                          className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-slate-500/30"
+                        >
+                          <X className="w-3 h-3" style={{ color: 'var(--theme-content-text-muted)' }} />
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </th>
               ))}
             </tr>
@@ -770,7 +810,7 @@ function DataTable({
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {formatCellValue(row[col.key])}
+                      {col.render ? col.render(row[col.key], row) : formatCellValue(row[col.key])}
                     </td>
                   ))}
                 </tr>

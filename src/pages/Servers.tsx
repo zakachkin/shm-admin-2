@@ -12,7 +12,20 @@ const serverColumns = [
   { key: 'name', label: 'Имя', visible: true, sortable: true },
   { key: 'host', label: 'Хост', visible: true, sortable: true },
   { key: 'ip', label: 'IP', visible: false, sortable: true },
-  { key: 'transport', label: 'Транспорт', visible: true, sortable: true },
+  { 
+    key: 'transport', 
+    label: 'Транспорт', 
+    visible: true, 
+    sortable: true,
+    filterType: 'select' as const,
+    filterOptions: [
+      { value: 'local', label: 'local' },
+      { value: 'http', label: 'http' },
+      { value: 'ssh', label: 'ssh' },
+      { value: 'mail', label: 'mail' },
+      { value: 'telegram', label: 'telegram' },
+    ]
+  },
   { key: 'server_gid', label: 'Группа', visible: true, sortable: true },
   { key: 'enabled', label: 'Включен', visible: true, sortable: true },
   { key: 'weight', label: 'Вес', visible: false, sortable: true },
