@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
-import { Save, Trash2, X, Key } from 'lucide-react';
+import { Save, Trash2, X, Key, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import JsonEditor from '../components/JsonEditor';
+import PayCreateModal from './PayCreateModal';
+import BonusCreateModal from './BonusCreateModal';
 
 interface UserModalProps {
   open: boolean;
@@ -26,6 +28,8 @@ export default function UserModal({
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [payModalOpen, setPayModalOpen] = useState(false);
+  const [bonusModalOpen, setBonusModalOpen] = useState(false);
 
   // Синхронизация данных при открытии
   useEffect(() => {
@@ -264,6 +268,17 @@ export default function UserModal({
               className="flex-1 px-3 py-2 text-sm rounded border disabled:opacity-50"
               style={inputStyles}
             />
+            <button
+              onClick={() => setPayModalOpen(true)}
+              className="p-2 rounded hover:opacity-80 transition-opacity shrink-0 btn-success"
+              style={{
+                backgroundColor: 'var(--accent-primary)',
+                color: 'var(--accent-text)',
+              }}
+              title="Начислить платеж"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
           </div>
           <div className="flex items-center gap-3">
             <label className="w-28 text-sm font-medium shrink-0" style={labelStyles}>
@@ -276,6 +291,17 @@ export default function UserModal({
               className="flex-1 px-3 py-2 text-sm rounded border disabled:opacity-50"
               style={inputStyles}
             />
+            <button
+              onClick={() => setBonusModalOpen(true)}
+              className="p-2 rounded hover:opacity-80 transition-opacity shrink-0 btn-success"
+              style={{
+                backgroundColor: 'var(--accent-primary)',
+                color: 'var(--accent-text)',
+              }}
+              title="Начислить бонус"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
@@ -364,6 +390,24 @@ export default function UserModal({
         loading={deleting}
         confirmWord="delete"
         confirmWordHint="Введите «delete» для подтверждения удаления:"
+      />
+
+      <PayCreateModal
+        open={payModalOpen}
+        onClose={() => setPayModalOpen(false)}
+        onSave={async (payData) => {
+          // Здесь можно добавить логику сохранения платежа
+          // После успешного сохранения модалка закроется автоматически
+        }}
+      />
+
+      <BonusCreateModal
+        open={bonusModalOpen}
+        onClose={() => setBonusModalOpen(false)}
+        onSave={async (bonusData) => {
+          // Здесь можно добавить логику сохранения бонуса
+          // После успешного сохранения модалка закроется автоматически
+        }}
       />
     </Modal>
   );

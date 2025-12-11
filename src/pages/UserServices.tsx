@@ -6,11 +6,43 @@ import { shm_request, normalizeListResponse } from '../lib/shm_request';
 import { Plus } from 'lucide-react';
 import { useSelectedUserStore } from '../store/selectedUserStore';
 
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'ACTIVE':
+      return 'var(--accent-success)';
+    case 'BLOCK':
+      return 'var(--accent-danger)';
+    case 'NOT PAID':
+      return 'var(--accent-warning)';
+    case 'PROGRESS':
+      return 'var(--accent-info)';
+    default:
+      return 'var(--theme-content-text-muted)';
+  }
+};
+
 const userServiceColumns = [
   { key: 'user_service_id', label: 'ID', visible: true, sortable: true },
   { key: 'user_id', label: 'Пользователь', visible: true, sortable: true },
   { key: 'name', label: 'Услуга', visible: true, sortable: true },
-  { key: 'status', label: 'Статус', visible: true, sortable: true },
+  { 
+    key: 'status', 
+    label: 'Статус', 
+    visible: true, 
+    sortable: true,
+    filterType: 'select' as const,
+    filterOptions: [
+      { value: 'ACTIVE', label: 'ACTIVE' },
+      { value: 'BLOCK', label: 'BLOCK' },
+      { value: 'NOT PAID', label: 'NOT PAID' },
+      { value: 'PROGRESS', label: 'PROGRESS' },
+    ],
+    render: (value: string) => (
+      <span style={{ color: getStatusColor(value), fontWeight: 500 }}>
+        {value}
+      </span>
+    )
+  },
   { key: 'created', label: 'Создано', visible: true, sortable: true },
   { key: 'expire', label: 'Истекает', visible: true, sortable: true },
   { key: 'category', label: 'Категория', visible: false, sortable: true },
