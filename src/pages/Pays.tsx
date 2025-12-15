@@ -41,8 +41,9 @@ function Pays() {
     setLoading(true);
     let url = `/shm/v1/admin/user/pay?limit=${l}&offset=${o}`;
     
-    if (Object.keys(f).length > 0) {
-      url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
+    const combinedFilters = { ...f, ...externalFilters };
+    if (Object.keys(combinedFilters).length > 0) {
+      url += `&filter=${encodeURIComponent(JSON.stringify(combinedFilters))}`;
     }
     
     if (sf && sd) {
@@ -56,11 +57,11 @@ function Pays() {
       })
       .catch(() => setData([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [externalFilters]);
 
   useEffect(() => {
     fetchData(limit, offset, filters, sortField, sortDirection);
-  }, [limit, offset, filters, sortField, sortDirection]);
+  }, [limit, offset, filters, sortField, sortDirection, fetchData]);
 
   const handlePageChange = (newLimit: number, newOffset: number) => {
     setLimit(newLimit);
@@ -84,7 +85,7 @@ function Pays() {
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <h2 className="text-xl font-bold">Платежи</h2>
@@ -103,23 +104,25 @@ function Pays() {
           Добавить
         </button>
       </div>
-      <DataTable
-        columns={payColumns}
-        data={data}
-        loading={loading}
-        total={total}
-        limit={limit}
-        offset={offset}
-        onPageChange={handlePageChange}
-        onSort={handleSort}
-        onFilterChange={handleFilterChange}
-        sortField={sortField}
-        sortDirection={sortDirection}
-        onRowClick={handleRowClick}
-        onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
-        storageKey="pays"
-        externalFilters={externalFilters}
-      />
+      <div className="flex-1 overflow-hidden">
+        <DataTable
+          columns={payColumns}
+          data={data}
+          loading={loading}
+          total={total}
+          limit={limit}
+          offset={offset}
+          onPageChange={handlePageChange}
+          onSort={handleSort}
+          onFilterChange={handleFilterChange}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onRowClick={handleRowClick}
+          onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
+          storageKey="pays"
+          externalFilters={externalFilters}
+        />
+      </div>
       <PayModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

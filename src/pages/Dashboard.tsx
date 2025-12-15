@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users,
@@ -22,6 +22,7 @@ import {
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
 import { StatCard, StatCardGrid, ChartCard } from '../components/analytics';
 import { AreaLineChart, BarChart } from '../components/charts';
+import { useCacheStore } from '../store/cacheStore';
 import {
   fetchMainStats,
   fetchPaymentStats,
@@ -38,7 +39,10 @@ import {
 } from '../lib/analyticsApi';
 
 function Dashboard() {
+  const { settings, get: getCached, set: setCache, needsBackgroundRefresh } = useCacheStore();
   const [loading, setLoading] = useState(true);
+  const [isBackgroundRefresh, setIsBackgroundRefresh] = useState(false);
+  const backgroundRefreshRef = useRef(false);
   const [stats, setStats] = useState<AnalyticsStats | null>(null);
   const [paymentStats, setPaymentStats] = useState<PaymentStats | null>(null);
   const [serviceStats, setServiceStats] = useState<UserServiceStats | null>(null);
@@ -46,8 +50,33 @@ function Dashboard() {
   const [financialMetrics, setFinancialMetrics] = useState<FinancialMetrics | null>(null);
   const [mrrStats, setMrrStats] = useState<MRRStats | null>(null);
 
-  const fetchDashboardData = async () => {
-    setLoading(true);
+  const cacheKey = 'dashboard_main';
+
+  const fetchDashboardData = async (forceRefresh = false) => {
+    if (!forceRefresh && settings.enabled) {
+      const cached = getCached(cacheKey);
+      if (cached) {
+        setStats(cached.stats);
+        setPaymentStats(cached.paymentStats);
+        setServiceStats(cached.serviceStats);
+        setRevenueStats(cached.revenueStats);
+        setFinancialMetrics(cached.financialMetrics);
+        setMrrStats(cached.mrrStats);
+        setLoading(false);
+
+        if (needsBackgroundRefresh(cacheKey) && !backgroundRefreshRef.current) {
+          backgroundRefreshRef.current = true;
+          setIsBackgroundRefresh(true);
+          fetchDashboardData(true);
+        }
+        return;
+      }
+    }
+
+    if (!isBackgroundRefresh) {
+      setLoading(true);
+    }
+    
     try {
       const [
         mainStats,
@@ -69,12 +98,30 @@ function Dashboard() {
         shm_request('/shm/v1/admin/spool?limit=5').catch(() => ({ data: [] })),
       ]);
 
+      const data = {
+        stats: mainStats,
+        paymentStats: payments,
+        serviceStats: services,
+        revenueStats: revenue,
+        financialMetrics: financial,
+        mrrStats: mrr,
+      };
+
       setStats(mainStats);
       setPaymentStats(payments);
       setServiceStats(services);
       setRevenueStats(revenue);
       setFinancialMetrics(financial);
       setMrrStats(mrr);
+
+      if (settings.enabled) {
+        setCache(cacheKey, data);
+      }
+
+      if (isBackgroundRefresh) {
+        setIsBackgroundRefresh(false);
+        backgroundRefreshRef.current = false;
+      }
       
     } catch (error) {
     } finally {
@@ -105,14 +152,30 @@ function Dashboard() {
     <div>
       {}
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-bold">Главная</h2>
-          <p style={{ color: 'var(--theme-content-text-muted)' }}>
-            Обзор системы SHM
-          </p>
+        <div className="flex items-center gap-2">
+          <div>
+            <h2 className="text-xl font-bold">Главная</h2>
+            <p style={{ color: 'var(--theme-content-text-muted)' }}>
+              Обзор системы SHM
+            </p>
+          </div>
+          {settings.enabled && !loading && !isBackgroundRefresh && getCached(cacheKey) && (
+            <span 
+              className="text-xs px-2 py-1 rounded-full flex items-center gap-1"
+              style={{ 
+                backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                color: 'var(--theme-primary-color)',
+                border: '1px solid rgba(34, 211, 238, 0.3)',
+              }}
+              title="Данные загружены из кеша"
+            >
+              <Activity className="w-3 h-3" />
+              Кеш
+            </span>
+          )}
         </div>
         <button
-          onClick={fetchDashboardData}
+          onClick={() => fetchDashboardData(true)}
           disabled={loading}
           className="btn-secondary flex items-center gap-2"
         >
@@ -207,8 +270,6 @@ function Dashboard() {
             </div>
           )}
         </ChartCard>
-
-        {}
         <ChartCard
           title="Услуги по статусу"
           subtitle="Текущее распределение"
