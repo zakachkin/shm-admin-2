@@ -16,7 +16,7 @@ export default function Console({ pipelineId }: ConsoleProps) {
     destroyedRef.current = false;
     offsetRef.current = 1;
 
-    const authHeader = useAuthStore.getState().getAuthHeader();
+    const sessionId = useAuthStore.getState().getSessionId();
 
     const getLogs = async () => {
       try {
@@ -26,7 +26,7 @@ export default function Console({ pipelineId }: ConsoleProps) {
             credentials: 'include',
             headers: {
               'Accept': 'text/plain',
-              ...(authHeader ? { 'Authorization': authHeader } : {}),
+              ...(sessionId ? { 'session-id': `${sessionId}` } : {}),
             },
           }
         );

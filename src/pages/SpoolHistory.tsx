@@ -8,13 +8,13 @@ import { useSelectedUserStore } from '../store/selectedUserStore';
 const spoolHistoryColumns = [
   { key: 'executed', label: 'Выполнено', visible: true, sortable: true },
   { key: 'user_id', label: 'USER ID', visible: true, sortable: true },
-  { key: 'event', label: 'event', visible: true, sortable: true },
+  { key: 'event', label: 'Событие', visible: true, sortable: true },
   { 
     key: 'title', 
-    label: 'title', 
+    label: 'Название', 
     visible: true, 
     sortable: false,
-    render: (value: any) => value?.title || '-'
+    render: (value: any, row: any) => row?.event?.title || '-'
   },
   { 
     key: 'status', 
