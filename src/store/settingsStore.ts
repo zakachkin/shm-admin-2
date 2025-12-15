@@ -9,7 +9,7 @@ interface SettingsState {
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
-      showHelp: true,
+      showHelp: false,
       
       setShowHelp: (show) => {
         set({ showHelp: show });

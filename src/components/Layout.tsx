@@ -31,6 +31,7 @@ import {
   Moon,
   Monitor,
   TrendingUp,
+  Wrench,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useBrandingStore } from '../store/brandingStore';
@@ -53,7 +54,7 @@ const navigation: MenuItem[] = [
   { 
     name: 'Аналитика', 
     href: '/analytics', 
-    icon: Home 
+    icon: TrendingUp 
   },
   { 
     name: 'Пользователи', 
@@ -100,6 +101,12 @@ const navigation: MenuItem[] = [
     children: [
       { name: 'Шаблоны', href: '/templates' },
       { name: 'Конфигурация', href: '/config' },
+    ]
+  },
+  { 
+    name: 'Другие настройки', 
+    icon: Wrench,
+    children: [
       { name: 'Брендинг', href: '/branding' },
       { name: 'Внешний вид', href: '/appearance' },
       { name: 'Кеширование', href: '/cache' },
