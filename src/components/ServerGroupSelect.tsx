@@ -76,7 +76,7 @@ export default function ServerGroupSelect({
               });
             }
           })
-          .catch(err => )
+          .catch(() => {})
           .finally(() => setLoadingGroup(false));
       } else if (!found && loading) {
         setLoadingGroup(true);

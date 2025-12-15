@@ -281,7 +281,7 @@ export default function PromoCreateModal({
           <TemplateSelect
             value={formData.template_id}
             onChange={(id, template) => handleChange('template_id', id)}
-            onTemplateUpdated={() => }
+            onTemplateUpdated={() => {}}
             readonly={false}
             className="flex-1"
           />

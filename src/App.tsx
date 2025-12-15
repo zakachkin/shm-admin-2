@@ -26,6 +26,7 @@ import Identities from './pages/Identities';
 import SpoolHistory from './pages/SpoolHistory';
 import Branding from './pages/Branding';
 import Appearance from './pages/Appearance';
+import CacheSettings from './pages/CacheSettings';
 import SHMCloud from './pages/SHMCloud';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -118,6 +119,7 @@ function App() {
           <Route path="config" element={<Config />} />
           <Route path="branding" element={<Branding />} />
           <Route path="appearance" element={<Appearance />} />
+          <Route path="cache" element={<CacheSettings />} />
           {}
         </Route>
       </Routes>

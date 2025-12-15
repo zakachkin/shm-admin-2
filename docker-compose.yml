@@ -5,15 +5,16 @@ services:
     restart: always
     environment:
       SHM_HOST: http://api
-      DB_NAME: ${MYSQL_DATABASE}
-      DB_USER: ${MYSQL_USER}
-      DB_PASS: ${MYSQL_PASS}
-      DB_HOST: ${MYSQL_HOST}
-      DB_PORT: ${MYSQL_PORT}
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER:-shm}
+      MYSQL_PASS: ${MYSQL_PASS}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-shm}
       REDIS_HOST: redis
       REDIS_PORT: 6379
     depends_on:
       - api
       - mysql
+      - redis
     ports:
       - "8080:80"

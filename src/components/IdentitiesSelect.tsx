@@ -82,7 +82,7 @@ export default function IdentitiesSelect({
               });
             }
           })
-          .catch(err => )
+          .catch(() => {})
           .finally(() => setLoadingIdentity(false));
       } else if (!found && loading) {
         setLoadingIdentity(true);

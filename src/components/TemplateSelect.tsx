@@ -97,7 +97,7 @@ export default function TemplateSelect({
           setAllTemplates(templates);
           setItems(templates);
         })
-        .catch(err => )
+        .catch(() => {})
         .finally(() => setLoading(false));
     }
   }, [viewMode, allTemplates.length]);
@@ -118,7 +118,7 @@ export default function TemplateSelect({
         const templates = Array.isArray(data) ? data : [];
         setItems(templates);
       })
-      .catch(err => )
+      .catch(() => {})
       .finally(() => {
         setLoading(false);
         onLoadingChange?.(false);

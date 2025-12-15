@@ -97,6 +97,7 @@ const navigation: MenuItem[] = [
       { name: 'Конфигурация', href: '/config' },
       { name: 'Брендинг', href: '/branding' },
       { name: 'Внешний вид', href: '/appearance' },
+      { name: 'Кеширование', href: '/cache' },
     ]
   },
 ];

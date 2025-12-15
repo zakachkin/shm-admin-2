@@ -163,7 +163,7 @@ function Branding() {
                 value={formData.logoUrl}
                 onChange={handleChange}
                 className="input"
-                placeholder="https:
+                placeholder="https://example.com/logo.png"
               />
               <p className="text-xs mt-1" style={{ color: 'var(--theme-content-text-muted)' }}>
                 Оставьте пустым для использования иконки по умолчанию

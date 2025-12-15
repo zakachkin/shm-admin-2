@@ -10,11 +10,11 @@ const app = express();
 const PORT = process.env.BACKEND_PORT || 3001;
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'mysql',
-  port: parseInt(process.env.DB_PORT || '3306'),
-  user: process.env.DB_USER || 'shm',
-  password: process.env.DB_PASS || '',
-  database: process.env.DB_NAME || 'shm',
+  host: process.env.MYSQL_HOST || 'mysql',
+  port: parseInt(process.env.MYSQL_PORT || '3306'),
+  user: process.env.MYSQL_USER || 'shm',
+  password: process.env.MYSQL_PASS || '',
+  database: process.env.MYSQL_NAME || 'shm',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -23,24 +23,42 @@ const pool = mysql.createPool({
 let mysqlConnected = false;
 
 const redis = new Redis({
-  host: process.env.REDIS_HOST || 'localhost',
+  host: process.env.REDIS_HOST || 'redis',
   port: parseInt(process.env.REDIS_PORT || '6379'),
   password: process.env.REDIS_PASSWORD || undefined,
   retryStrategy: (times) => {
-    if (times > 3) {
+    if (times > 10) {
+      console.error('[Redis] Max retry attempts reached, giving up');
       return null;
     }
-    return Math.min(times * 100, 3000);
+    const delay = Math.min(times * 100, 3000);
+    console.log(`[Redis] Retry attempt ${times}, waiting ${delay}ms`);
+    return delay;
   },
+  lazyConnect: false,
+  enableReadyCheck: true,
+  maxRetriesPerRequest: 3,
 });
 
 let redisConnected = false;
 
 redis.on('connect', () => {
+  console.log(`[Redis] Connected to ${process.env.REDIS_HOST || 'redis'}:${process.env.REDIS_PORT || '6379'}`);
   redisConnected = true;
 });
 
-redis.on('error', () => {
+redis.on('ready', () => {
+  console.log('[Redis] Ready to accept commands');
+  redisConnected = true;
+});
+
+redis.on('error', (err) => {
+  console.error('[Redis] Error:', err.message);
+  redisConnected = false;
+});
+
+redis.on('close', () => {
+  console.log('[Redis] Connection closed');
   redisConnected = false;
 });
 
@@ -55,6 +73,7 @@ const DEFAULT_BRANDING = {
 
 async function initDatabase() {
   try {
+    console.log(`[MySQL] Connecting to ${process.env.MYSQL_HOST || 'mysql'}:${process.env.MYSQL_PORT || '3306'}/${process.env.DB_NAME || 'shm'}`);
     const connection = await pool.getConnection();
     
     await connection.execute(`
@@ -81,7 +100,9 @@ async function initDatabase() {
     
     connection.release();
     mysqlConnected = true;
+    console.log('[MySQL] Connected and initialized');
   } catch (error) {
+    console.error('[MySQL] Connection failed:', error.message);
     mysqlConnected = false;
   }
 }
@@ -91,6 +112,13 @@ initDatabase();
 app.use(cors());
 app.use(express.json());
 
+console.log('[Backend] Starting server...');
+console.log('[Backend] Environment:');
+console.log(`  - MYSQL_HOST: ${process.env.MYSQL_HOST || 'mysql'}`);
+console.log(`  - DB_NAME: ${process.env.DB_NAME || 'shm'}`);
+console.log(`  - REDIS_HOST: ${process.env.REDIS_HOST || 'redis'}`);
+console.log(`  - PORT: ${PORT}`);
+
 const CACHE_PREFIX = 'shm-admin:cache:';
 const BRANDING_CACHE_KEY = 'shm-admin:branding';
 
@@ -99,8 +127,13 @@ app.get('/api/branding', async (req, res) => {
     if (redisConnected) {
       const cached = await redis.get(BRANDING_CACHE_KEY);
       if (cached) {
+        console.log('[Branding] Cache hit');
         return res.json(JSON.parse(cached));
+      } else {
+        console.log('[Branding] Cache miss');
       }
+    } else {
+      console.log('[Branding] Redis not connected, skipping cache');
     }
     
     if (mysqlConnected) {
@@ -114,14 +147,17 @@ app.get('/api/branding', async (req, res) => {
         
         if (redisConnected) {
           await redis.setex(BRANDING_CACHE_KEY, 3600, JSON.stringify(branding));
+          console.log('[Branding] Cached for 3600s');
         }
         
         return res.json(branding);
       }
     }
     
+    console.log('[Branding] Using default branding');
     res.json(DEFAULT_BRANDING);
   } catch (error) {
+    console.error('[Branding] Error:', error.message);
     res.json(DEFAULT_BRANDING);
   }
 });
@@ -279,12 +315,19 @@ app.delete('/api/cache', async (req, res) => {
 });
 
 app.get('/api/health', async (req, res) => {
-  res.json({
+  const health = {
     status: 'ok',
     mysql: mysqlConnected,
     redis: redisConnected,
     timestamp: new Date().toISOString(),
-  });
+  };
+  
+  console.log('[Health] Check:', JSON.stringify(health));
+  res.json(health);
 });
 
-app.listen(PORT);
+app.listen(PORT, () => {
+  console.log(`[Backend] Server listening on port ${PORT}`);
+  console.log(`[Backend] MySQL: ${mysqlConnected ? 'connected' : 'disconnected'}`);
+  console.log(`[Backend] Redis: ${redisConnected ? 'connected' : 'disconnected'}`);
+});
