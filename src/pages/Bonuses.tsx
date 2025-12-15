@@ -40,8 +40,9 @@ function Bonuses() {
     setLoading(true);
     let url = `/shm/v1/admin/user/bonus?limit=${l}&offset=${o}`;
     
-    if (Object.keys(f).length > 0) {
-      url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
+    const combinedFilters = { ...f, ...externalFilters };
+    if (Object.keys(combinedFilters).length > 0) {
+      url += `&filter=${encodeURIComponent(JSON.stringify(combinedFilters))}`;
     }
     
     if (sf && sd) {
@@ -55,11 +56,11 @@ function Bonuses() {
       })
       .catch(() => setData([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [externalFilters]);
 
   useEffect(() => {
     fetchData(limit, offset, filters, sortField, sortDirection);
-  }, [limit, offset, filters, sortField, sortDirection]);
+  }, [limit, offset, filters, sortField, sortDirection, fetchData]);
 
   const handlePageChange = (newLimit: number, newOffset: number) => {
     setLimit(newLimit);
@@ -83,7 +84,7 @@ function Bonuses() {
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <h2 className="text-xl font-bold">Бонусы</h2>
@@ -102,8 +103,9 @@ function Bonuses() {
           Добавить
         </button>
       </div>
-      <DataTable
-        columns={bonusColumns}
+      <div className="flex-1 overflow-hidden">
+        <DataTable
+          columns={bonusColumns}
         data={data}
         loading={loading}
         total={total}
@@ -118,7 +120,8 @@ function Bonuses() {
         onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
         storageKey="bonuses"
         externalFilters={externalFilters}
-      />
+        />
+      </div>
       <BonusModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

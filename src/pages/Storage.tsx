@@ -38,8 +38,9 @@ function Storage() {
     setLoading(true);
     let url = `/shm/v1/admin/storage/manage?limit=${l}&offset=${o}`;
     
-    if (Object.keys(f).length > 0) {
-      url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
+    const combinedFilters = { ...f, ...externalFilters };
+    if (Object.keys(combinedFilters).length > 0) {
+      url += `&filter=${encodeURIComponent(JSON.stringify(combinedFilters))}`;
     }
     
     if (sf && sd) {
@@ -53,11 +54,11 @@ function Storage() {
       })
       .catch(() => setData([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [externalFilters]);
 
   useEffect(() => {
     fetchData(limit, offset, filters, sortField, sortDirection);
-  }, [limit, offset, filters, sortField, sortDirection]);
+  }, [limit, offset, filters, sortField, sortDirection, fetchData]);
 
   const handlePageChange = (newLimit: number, newOffset: number) => {
     setLimit(newLimit);
@@ -81,13 +82,14 @@ function Storage() {
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <div className="flex items-center mb-4">
         <h2 className="text-xl font-bold">Хранилище</h2>
         <Help content="<b>Хранилище</b>: данные пользователей, сохраненные в key-value формате." />
       </div>
-      <DataTable
-        columns={storageColumns}
+      <div className="flex-1 overflow-hidden">
+        <DataTable
+          columns={storageColumns}
         data={data}
         loading={loading}
         total={total}
@@ -102,7 +104,8 @@ function Storage() {
         onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
         storageKey="storage"
         externalFilters={externalFilters}
-      />
+        />
+      </div>
       <StorageModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

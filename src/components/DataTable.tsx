@@ -113,7 +113,6 @@ function DataTable({
   onFilterChange,
   sortField,
   sortDirection,
-  height = '500px',
   storageKey,
   externalFilters
 }: DataTableProps) {
@@ -147,7 +146,7 @@ function DataTable({
   }, [cacheKey, settings.enabled, getCached, needsBackgroundRefresh, onRefresh]);
   
   useEffect(() => {
-    if (!loading && data && data.length > 0 && cacheKey && settings.enabled) {
+    if (!loading && data !== undefined && cacheKey && settings.enabled) {
       setCache(cacheKey, data);
       setCachedData(data);
       
@@ -155,11 +154,14 @@ function DataTable({
         setIsBackgroundRefresh(false);
         backgroundRefreshRef.current = false;
       }
+    } else if (!loading && data !== undefined) {
+      // Если кеширование выключено, очищаем cachedData
+      setCachedData(null);
     }
-  }, [data, loading, cacheKey, setCache, isBackgroundRefresh]);
+  }, [data, loading, cacheKey, setCache, isBackgroundRefresh, settings.enabled]);
   
-  const displayData = cachedData && !loading ? cachedData : data;
-  const isShowingCached = cachedData && !loading && !isBackgroundRefresh;
+  const displayData = cachedData !== null && !loading ? cachedData : data;
+  const isShowingCached = cachedData !== null && !loading && !isBackgroundRefresh;
   
   const [columns, setColumns] = useState<Column[]>(() => {
     const defaultColumns = initialColumns.map(col => ({ 
@@ -442,7 +444,7 @@ function DataTable({
 
   return (
     <div 
-      className="rounded-lg overflow-hidden"
+      className="rounded-lg overflow-hidden flex flex-col h-full"
       style={{ 
         backgroundColor: 'var(--theme-card-bg)',
         border: '1px solid var(--theme-card-border)',
@@ -610,16 +612,15 @@ function DataTable({
       {}
       <div 
         ref={tableRef}
-        className="overflow-auto"
+        className="overflow-auto flex-1"
         style={{ 
-          height,
           backgroundColor: 'var(--theme-table-bg)',
         }}
       >
         <table className="w-full" style={{ minWidth: 'max-content' }}>
           <thead 
             className="sticky top-0 z-10"
-            style={{ backgroundColor: 'var(--theme-table-header-bg)' }}
+            style={{ backgroundColor: 'var(--theme-header-bg)' }}
           >
             {}
             <tr>

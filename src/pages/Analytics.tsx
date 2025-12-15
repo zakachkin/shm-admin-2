@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   TrendingUp,
   DollarSign,
@@ -24,6 +24,7 @@ import {
 import Help from '../components/Help';
 import { StatCard, StatCardGrid, ChartCard, MetricRow, EmptyState } from '../components/analytics';
 import { AreaLineChart, BarChart, MultiLineChart } from '../components/charts';
+import { useCacheStore } from '../store/cacheStore';
 import {
   fetchPaymentStats,
   fetchUserServiceStats,
@@ -47,7 +48,10 @@ import {
 type TimePeriod = 7 | 14 | 30 | 90 | 'month';
 
 function Analytics() {
+  const { settings, get: getCached, set: setCache, needsBackgroundRefresh } = useCacheStore();
   const [loading, setLoading] = useState(true);
+  const [isBackgroundRefresh, setIsBackgroundRefresh] = useState(false);
+  const backgroundRefreshRef = useRef(false);
   const [period, setPeriod] = useState<TimePeriod>('month');
   const [paymentStats, setPaymentStats] = useState<PaymentStats | null>(null);
   const [userServiceStats, setUserServiceStats] = useState<UserServiceStats | null>(null);
@@ -60,8 +64,37 @@ function Analytics() {
   const [topCustomers, setTopCustomers] = useState<TopCustomer[]>([]);
   const [mrrStats, setMrrStats] = useState<MRRStats | null>(null);
 
-  const fetchAllData = async () => {
-    setLoading(true);
+  const cacheKey = `analytics_${period}`;
+
+  const fetchAllData = async (forceRefresh = false) => {
+    if (!forceRefresh && settings.enabled) {
+      const cached = getCached(cacheKey);
+      if (cached) {
+        setPaymentStats(cached.paymentStats);
+        setUserServiceStats(cached.userServiceStats);
+        setUserStats(cached.userStats);
+        setRevenueStats(cached.revenueStats);
+        setTaskStats(cached.taskStats);
+        setTopServices(cached.topServices);
+        setServerStats(cached.serverStats);
+        setFinancialMetrics(cached.financialMetrics);
+        setTopCustomers(cached.topCustomers);
+        setMrrStats(cached.mrrStats);
+        setLoading(false);
+
+        if (needsBackgroundRefresh(cacheKey) && !backgroundRefreshRef.current) {
+          backgroundRefreshRef.current = true;
+          setIsBackgroundRefresh(true);
+          fetchAllData(true);
+        }
+        return;
+      }
+    }
+
+    if (!isBackgroundRefresh) {
+      setLoading(true);
+    }
+    
     try {
       const [
         payments,
@@ -87,6 +120,19 @@ function Analytics() {
         fetchMRRStats(),
       ]);
 
+      const data = {
+        paymentStats: payments,
+        userServiceStats: userServices,
+        userStats: users,
+        revenueStats: revenue,
+        taskStats: tasks,
+        topServices: services,
+        serverStats: servers,
+        financialMetrics: financial,
+        topCustomers: customers,
+        mrrStats: mrr,
+      };
+
       setPaymentStats(payments);
       setUserServiceStats(userServices);
       setUserStats(users);
@@ -97,6 +143,15 @@ function Analytics() {
       setFinancialMetrics(financial);
       setTopCustomers(customers);
       setMrrStats(mrr);
+
+      if (settings.enabled) {
+        setCache(cacheKey, data);
+      }
+
+      if (isBackgroundRefresh) {
+        setIsBackgroundRefresh(false);
+        backgroundRefreshRef.current = false;
+      }
     } catch (error) {
     } finally {
       setLoading(false);
@@ -104,7 +159,8 @@ function Analytics() {
   };
 
   useEffect(() => {
-    fetchAllData();
+    backgroundRefreshRef.current = false;
+    fetchAllData(false);
   }, [period]);
 
   const periodButtons: { value: TimePeriod; label: string }[] = [
@@ -126,11 +182,34 @@ function Analytics() {
     <div>
       {}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
           <h2 className="text-xl font-bold">Аналитика</h2>
           <Help content="<b>Аналитика</b>: детальная статистика и визуализация данных системы." />
+          {settings.enabled && !loading && !isBackgroundRefresh && getCached(cacheKey) && (
+            <span 
+              className="text-xs px-2 py-1 rounded-full flex items-center gap-1"
+              style={{ 
+                backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                color: 'var(--theme-primary-color)',
+                border: '1px solid rgba(34, 211, 238, 0.3)',
+              }}
+              title="Данные загружены из кеша"
+            >
+              <Activity className="w-3 h-3" />
+              Кеш
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-3">
+          {}
+          <button
+            onClick={() => fetchAllData(true)}
+            disabled={loading}
+            className="btn-icon"
+            title="Обновить данные"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
           {}
           <div className="flex rounded-lg overflow-hidden border" style={{ borderColor: 'var(--theme-card-border)' }}>
             {periodButtons.map((btn) => (
@@ -153,7 +232,7 @@ function Analytics() {
           </div>
           {}
           <button
-            onClick={fetchAllData}
+            onClick={() => fetchAllData(true)}
             disabled={loading}
             className="btn-secondary flex items-center gap-2"
           >
