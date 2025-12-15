@@ -1,6 +1,3 @@
-const BACKEND_URL = 'http://localhost:3001';
-
-// Типы из старого analyticsApi.ts
 export interface PaymentStats {
   total: number;
   count: number;
@@ -96,7 +93,7 @@ export interface AnalyticsData {
  * Загружает все данные аналитики за указанный период одним запросом
  */
 export async function fetchAnalytics(period: 7 | 14 | 30 | 90 | 'month' = 'month'): Promise<AnalyticsData> {
-  const response = await fetch(`${BACKEND_URL}/api/analytics?period=${period}`);
+  const response = await fetch(`/api/analytics?period=${period}`);
   
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);

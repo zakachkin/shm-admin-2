@@ -1,5 +1,3 @@
-const BACKEND_URL = (import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3001';
-
 export interface AnalyticsStats {
   totalUsers: number;
   totalServices: number;
@@ -109,7 +107,7 @@ export interface DashboardAnalytics {
 
 export async function fetchDashboardAnalytics(period: number = 7): Promise<DashboardAnalytics> {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/dashboard/analytics?period=${period}`);
+    const response = await fetch(`/api/dashboard/analytics?period=${period}`);
     
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
