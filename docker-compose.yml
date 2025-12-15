@@ -1,24 +1,19 @@
 services:
-  # Example: Add this to your existing docker-compose with api service
   admin-2:
     image: "bkeenke/shm-admin-2:latest"
     pull_policy: always
     restart: always
     environment:
-      SHM_HOST: http://api  # Points to your api container
-      # Backend database connections
-      MYSQL_HOST: mysql
-      MYSQL_PORT: 3306
-      MYSQL_USER: ${MYSQL_USER:-shm}
-      MYSQL_PASS: ${MYSQL_PASS}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-shm}
+      SHM_HOST: http://api
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASS}
+      DB_HOST: ${MYSQL_HOST}
+      DB_PORT: ${MYSQL_PORT}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      # SHM_BASE_PATH: /admin  # Optional: if you want to serve from /admin path
     depends_on:
       - api
       - mysql
     ports:
-      - "8080:80"  # Expose on port 8080
-    networks:
-      - default
+      - "8080:80"
