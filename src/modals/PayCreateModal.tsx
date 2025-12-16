@@ -49,7 +49,7 @@ export default function PayCreateModal({
       toast.error('Выберите платёжную систему');
       return;
     }
-    if (!formData.money || Number(formData.money) <= 0) {
+    if (!formData.money || Number(formData.money) === 0) {
       toast.error('Введите сумму платежа');
       return;
     }
@@ -161,7 +161,6 @@ export default function PayCreateModal({
             value={formData.money}
             onChange={(e) => handleChange('money', e.target.value)}
             step="0.01"
-            min="0"
             placeholder="0.00"
             className="flex-1 px-3 py-2 text-sm rounded border"
             style={inputStyles}

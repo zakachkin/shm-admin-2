@@ -18,6 +18,7 @@ export default function PromoCreateModal({
   const [formData, setFormData] = useState<Record<string, any>>({
     expire: '',
     id: '',
+    code: '',
     template_id: '',
     settings: {
       reusable: 0,
@@ -35,6 +36,7 @@ export default function PromoCreateModal({
       setFormData({
         expire: '',
         id: '',
+        code: '',
         template_id: '',
         settings: {
           reusable: 0,
@@ -60,6 +62,11 @@ export default function PromoCreateModal({
   };
 
   const handleSave = async () => {
+    if (!formData.template_id) {
+      toast.error('Выберите шаблон');
+      return;
+    }
+    
     if (formData.settings.reusable === 1) {
       if (!formData.code) {
         toast.error('Введите код промокода');
@@ -125,7 +132,7 @@ export default function PromoCreateModal({
       </button>
       <button
         onClick={handleSave}
-        disabled={saving}
+        disabled={saving || !formData.template_id}
         className="px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50 btn-success"
         style={{
           backgroundColor: 'var(--accent-primary)',
@@ -204,8 +211,8 @@ export default function PromoCreateModal({
               </label>
               <input
                 type="text"
-                value={formData.id}
-                onChange={(e) => handleChange('id', e.target.value)}
+                value={formData.code}
+                onChange={(e) => handleChange('code', e.target.value)}
                 placeholder="PROMO"
                 className="flex-1 px-3 py-2 text-sm rounded border"
                 style={inputStyles}
@@ -276,7 +283,7 @@ export default function PromoCreateModal({
         {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
-            Шаблон
+            Шаблон *
           </label>
           <TemplateSelect
             value={formData.template_id}

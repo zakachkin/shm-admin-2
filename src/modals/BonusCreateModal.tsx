@@ -43,7 +43,7 @@ export default function BonusCreateModal({
       toast.error('Выберите пользователя');
       return;
     }
-    if (!formData.bonus || Number(formData.bonus) <= 0) {
+    if (!formData.bonus || Number(formData.bonus) === 0) {
       toast.error('Введите сумму бонуса');
       return;
     }
@@ -131,7 +131,6 @@ export default function BonusCreateModal({
             value={formData.bonus}
             onChange={(e) => handleChange('bonus', e.target.value)}
             step="0.01"
-            min="0"
             placeholder="0.00"
             className="flex-1 px-3 py-2 text-sm rounded border"
             style={inputStyles}
