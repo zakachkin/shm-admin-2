@@ -2,8 +2,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import DataTable, { SortDirection } from '../components/DataTable';
 import Help from '../components/Help';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
-import { TemplateModal, TemplateCreateModal } from '../modals';
-import { Plus } from 'lucide-react';
+import { TemplateModal, TemplateCreateModal, TemplateUploadModal } from '../modals';
+import { Plus, Upload } from 'lucide-react';
 
 const templateColumns = [
   { key: 'id', label: 'Имя шаблона', visible: true, sortable: true },
@@ -21,6 +21,7 @@ function Templates() {
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
@@ -75,18 +76,28 @@ function Templates() {
           <h2 className="text-xl font-bold">Шаблоны</h2>
           <Help content="<b>Шаблоны</b>: список шаблонов для событий и уведомлений." />
         </div>
-        <button
-          onClick={() => setCreateModalOpen(true)}
-          className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
-          title="Создать шаблон"
-          style={{
-            backgroundColor: 'var(--accent-primary)',
-            color: 'var(--accent-text)',
-          }}
-        >
-          <Plus className="w-4 h-4" />
-          Добавить
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setUploadModalOpen(true)}
+            className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-success"
+            title="Загрузить из файла"
+          >
+            <Upload className="w-4 h-4" />
+            Загрузить из файла
+          </button>
+          <button
+            onClick={() => setCreateModalOpen(true)}
+            className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
+            title="Создать шаблон"
+            style={{
+              backgroundColor: 'var(--accent-primary)',
+              color: 'var(--accent-text)',
+            }}
+          >
+            <Plus className="w-4 h-4" />
+            Добавить
+          </button>
+        </div>
       </div>
       <DataTable
         columns={templateColumns}
@@ -125,6 +136,17 @@ function Templates() {
       <TemplateCreateModal
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
+        onSave={async (data) => {
+          await shm_request(`/shm/v1/admin/template`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+          });
+          fetchData(limit, offset, filters, sortField, sortDirection);
+        }}
+      />
+      <TemplateUploadModal
+        open={uploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
         onSave={async (data) => {
           await shm_request(`/shm/v1/admin/template`, {
             method: 'PUT',

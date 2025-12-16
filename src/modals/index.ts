@@ -15,6 +15,7 @@ export { default as PromoModal } from './PromoModal';
 export { default as PromoCreateModal } from './PromoCreateModal';
 export { default as TemplateModal } from './TemplateModal';
 export { default as TemplateCreateModal } from './TemplateCreateModal';
+export { TemplateUploadModal } from './TemplateUploadModal';
 export { default as ServerGroupModal } from './ServerGroupModal';
 export { default as ServerGroupCreateModal } from './ServerGroupCreateModal';
 export { default as IdentityModal } from './IdentityModal';

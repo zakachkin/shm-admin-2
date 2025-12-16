@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from '../components/Modal';
-import { Save, X, Trash2, Play, Maximize2, Minimize2, FileText } from 'lucide-react';
+import { Save, X, Trash2, Play, Maximize2, Minimize2, FileText, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Editor from '@monaco-editor/react';
 import JsonEditor from '../components/JsonEditor';
@@ -311,6 +311,32 @@ export default function TemplateModal({
     }
   };
 
+  const handleDownload = async () => {
+    if (!formData.id) return;
+
+    setLoading(true);
+    try {
+      const response = await shm_request(`/shm/v1/admin/template?id=${formData.id}`, {
+        method: 'GET',
+      });
+      const templateData = response.data?.[0] || response.data;
+      const content = templateData.data || '';
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${formData.id}.tpl`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error('Ошибка загрузки шаблона');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!onDelete || !formData.id) return;
 
@@ -486,6 +512,19 @@ export default function TemplateModal({
         )}
       </div>
       <div className="flex gap-2">
+        <button
+          onClick={handleDownload}
+          disabled={saving || !formData.id || isAdd}
+          className="px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50 btn-success"
+          style={{
+            backgroundColor: 'var(--theme-button-info-bg)',
+            color: 'var(--theme-button-info-text)',
+            border: '1px solid var(--theme-button-info-border)',
+          }}
+        >
+          <Download className="w-4 h-4" />
+          Скачать
+        </button>
         <button
           onClick={handleSaveAndTest}
           disabled={saving || !formData.id || isAdd}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import DataTable, { SortDirection } from '../components/DataTable';
 import { UserModal, UserCreateModal, UserChangePasswordModal} from '../modals';
 import Help from '../components/Help';
@@ -103,6 +104,33 @@ function Users() {
   const handleChangePasswordOpen = () => {
     setChangePasswordModalOpen(true);
   };
+  
+  const handleCliLogin = async () => {
+    if (!selectedRow?.user_id) {
+      toast.error('Не удалось получить user_id');
+      return;
+    }
+    
+    try {
+      const configRes = await shm_request('/shm/v1/admin/config/cli');
+      const { data: configItems } = normalizeListResponse(configRes);
+      
+      if (!configItems || configItems.length === 0) {
+        toast.error('Не удалось получить URL');
+        return;
+      }
+      
+      const cliUrl = configItems[0].url;
+      const sessionRes = await shm_request('/shm/v1/admin/user/session', {
+        method: 'PUT',
+        body: JSON.stringify({ user_id: selectedRow.user_id }),
+      });
+      const sessionId = sessionRes.id;
+      window.open(`${cliUrl}/shm/user/auth.cgi?session_id=${sessionId}`, '_blank');
+    } catch (error) {
+      toast.error('Не удалось открыть ссылку');
+    }
+  };
 
   const handleSaveNew = async (userData: any) => {
     await shm_request('/shm/v1/admin/user', {
@@ -180,6 +208,7 @@ function Users() {
         onSave={handleSaveEdit}
         onDelete={handleDelete}
         onChangePassword={handleChangePasswordOpen}
+        onCliLogin={handleCliLogin}
         onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
       />
 

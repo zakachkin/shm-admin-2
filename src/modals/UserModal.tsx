@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
-import { Save, Trash2, X, Key, Plus } from 'lucide-react';
+import { Save, Trash2, X, Key, Plus, User } from 'lucide-react';
 import toast from 'react-hot-toast';
 import JsonEditor from '../components/JsonEditor';
 import PayCreateModal from './PayCreateModal';
@@ -15,6 +15,7 @@ interface UserModalProps {
   onSave: (data: Record<string, any>) => void | Promise<void>;
   onDelete?: () => void | Promise<void>;
   onChangePassword?: () => void;
+  onCliLogin?: () => void;
   onRefresh?: () => void | Promise<void>;
 }
 
@@ -25,6 +26,7 @@ export default function UserModal({
   onSave,
   onDelete,
   onChangePassword,
+  onCliLogin,
   onRefresh,
 }: UserModalProps) {
   const [formData, setFormData] = useState<Record<string, any>>({});
@@ -108,6 +110,18 @@ export default function UserModal({
         )}
       </div>
       <div className="flex gap-2">
+          <button
+            onClick={onCliLogin}
+            className="px-4 py-2 rounded flex items-center gap-2 btn-primary"
+            style={{
+              backgroundColor: 'var(--theme-button-secondary-bg)',
+              color: 'var(--theme-button-secondary-text)',
+              border: '1px solid var(--theme-button-secondary-border)',
+            }}
+          >
+            <User className="w-4 h-4" />
+            В кабинет
+          </button>
         {onChangePassword && (
           <button
             onClick={onChangePassword}
