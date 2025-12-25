@@ -129,7 +129,7 @@ export default function TemplateTestModal({
             value={usi}
             onChange={(e) => setUsi(e.target.value)}
             className="flex-1 px-3 py-2 text-sm rounded border"
-            style={inputStyles}
+            style={{ ...inputStyles, resize: 'both', overflow: 'auto' }}
             placeholder="Введите USI (опционально)"
           />
         </div>
@@ -165,7 +165,7 @@ export default function TemplateTestModal({
             readOnly
             rows={14}
             className="flex-1 px-3 py-2 text-sm rounded border font-mono"
-            style={inputStyles}
+            style={{ ...inputStyles, resize: 'both', overflow: 'auto' }}
             placeholder="Результат рендера появится здесь..."
           />
         </div>
@@ -173,4 +173,5 @@ export default function TemplateTestModal({
     </Modal>
   );
 }
+
 

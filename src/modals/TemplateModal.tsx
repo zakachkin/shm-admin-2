@@ -175,6 +175,45 @@ export default function TemplateModal({
       setActiveTabId(newTab.id);
     }
   }, [open, data?.id]);
+  useEffect(() => {
+    if (!activeTabId) return;
+    const activeTab = tabs.find(t => t.id === activeTabId);
+    if (!activeTab) return;
+
+    if (activeTab.id.startsWith('new-')) {
+      if (formData.is_add !== 1 || formData.id !== activeTab.template?.id || formData.data !== activeTab.template?.data) {
+        setFormData({ ...activeTab.template, is_add: 1 });
+        detectLanguage(activeTab.template?.data || '');
+      }
+      return;
+    }
+
+    const tabTemplate = activeTab.template || {};
+    if (Object.prototype.hasOwnProperty.call(tabTemplate, 'data')) {
+      if (formData.id !== tabTemplate.id || formData.data !== tabTemplate.data) {
+        setFormData({ ...tabTemplate, is_add: 0 });
+        detectLanguage(tabTemplate.data || '');
+      }
+      return;
+    }
+
+    if (!tabTemplate.id) {
+      return;
+    }
+
+    setLoading(true);
+    shm_request(`/shm/v1/admin/template?id=${tabTemplate.id}`)
+      .then(res => {
+        const templateData = res.data?.[0] || res.data;
+        setFormData({ ...templateData, is_add: 0 });
+        detectLanguage(templateData.data || '');
+        setTabs(prev => prev.map(t => t.id === activeTabId ? { ...t, template: templateData } : t));
+      })
+      .catch(() => {
+        toast.error('Не удалось загрузить шаблон');
+      })
+      .finally(() => setLoading(false));
+  }, [activeTabId, tabs]);
 
   const detectLanguage = (content: string) => {
     if (!content) {
@@ -1102,3 +1141,4 @@ export default function TemplateModal({
     </>
   );
 }
+
