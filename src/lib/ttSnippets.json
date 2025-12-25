@@ -1,0 +1,1838 @@
+﻿{
+  "block": {
+    "prefix": "block",
+    "body": "{{ BLOCK ${1:name} }}\n   ${2:block...}\n{{ END }}\n",
+    "description": "BLOCK"
+  },
+  "call": {
+    "prefix": "call",
+    "body": "{{ CALL ${1:expr} }}\n",
+    "description": "CALL"
+  },
+  "def": {
+    "prefix": "def",
+    "body": "{{ DEFAULT ${1:var} = ${2:expr} }}\n",
+    "description": "DEFAULT"
+  },
+  "end": {
+    "prefix": "end",
+    "body": "{{ END }}\n",
+    "description": "END"
+  },
+  "for": {
+    "prefix": "for",
+    "body": "{{ FOR ${1:item} IN ${2:list...} }}\n   ${3:block...}\n{{ END }}\n",
+    "description": "FOR"
+  },
+  "for1": {
+    "prefix": "{{ for}}",
+    "body": "{{ FOR ${1:item} IN ${2:list...} }}\n   ${3:block...}\n{{ END ",
+    "description": "FOR"
+  },
+  "for2": {
+    "prefix": "{{for}}",
+    "body": "{{ FOR ${1:item} IN ${2:list...} }}\n   ${3:block...}\n{{ END ",
+    "description": "FOR"
+  },
+  "get": {
+    "prefix": "get",
+    "body": "{{ GET ${1:expr} }}\n",
+    "description": "GET"
+  },
+  "ifelse": {
+    "prefix": "ifelse",
+    "body": "{{ IF ${1:expr} }}\n   ${2:block...}\n{{ ELSE }}\n   ${3:block...}\n{{ END }}\n",
+    "description": "IF ELSE"
+  },
+  "ifs": {
+    "prefix": "ifs",
+    "body": "{{ IF ${1:expr} }}\n   ${2:block...}\n{{ ELSIF ${3:expr} }}\n   ${4:block...}\n{{ ELSE }}\n   ${5:block...}\n{{ END }}\n",
+    "description": "IF ELSIF ELSE"
+  },
+  "ifelsif": {
+    "prefix": "ifelsif",
+    "body": "{{ IF ${1:expr} }}\n   ${2:block...}\n{{ ELSIF ${3:expr} }}\n   ${4:block...}\n{{ END }}\n",
+    "description": "IF ELSIF"
+  },
+  "if": {
+    "prefix": "if",
+    "body": "{{ IF ${1:expr} }}\n   ${3:block...}\n{{ END }}\n",
+    "description": "IF"
+  },
+  "if1": {
+    "prefix": "{{ if}}",
+    "body": "{{ IF ${1:expr} }}\n   ${3:block...}\n{{ END ",
+    "description": "IF"
+  },
+  "if2": {
+    "prefix": "{{if}}",
+    "body": "{{ IF ${1:expr} }}\n   ${3:block...}\n{{ END ",
+    "description": "IF"
+  },
+  "ins": {
+    "prefix": "ins",
+    "body": "{{ INSERT ${1:template} }}\n",
+    "description": "INSERT"
+  },
+  "inca": {
+    "prefix": "inca",
+    "body": "{{ INCLUDE ${1:template} ${2:args...} }}\n",
+    "description": "INCLUDE args"
+  },
+  "inc": {
+    "prefix": "inc",
+    "body": "{{ INCLUDE ${1:template} }}\n",
+    "description": "INCLUDE"
+  },
+  "macro": {
+    "prefix": "macro",
+    "body": "{{ MACRO ${1:name}\n         ${2:directive}\n}}\n",
+    "description": "MACRO"
+  },
+  "proca": {
+    "prefix": "proca",
+    "body": "{{ PROCESS ${1:template} ${2:args...} }}\n",
+    "description": "PROCESS args"
+  },
+  "proc": {
+    "prefix": "proc",
+    "body": "{{ PROCESS ${1:template} }}\n",
+    "description": "PROCESS"
+  },
+  "set": {
+    "prefix": "set",
+    "body": "{{ SET ${1:var} = ${2:expr} }}\n",
+    "description": "SET"
+  },
+  "switch": {
+    "prefix": "switch",
+    "body": "{{ SWITCH ${1:expr} }}\n{{   CASE ${2:value1} }}\n          ${3:block...}\n{{   CASE ${4:value2} }}\n          ${5:block...}\n{{   CASE # default case }}\n          ${6:block...}\n{{ END }}\n",
+    "description": "SWITCH"
+  },
+  "use": {
+    "prefix": "use",
+    "body": "{{ USE ${1:plugin}(${2:args}) }}\n",
+    "description": "USE"
+  },
+  "wrapa": {
+    "prefix": "wrapa",
+    "body": "{{ WRAPPER ${1:template} ${2:args...} }}\n   ${3:content...}\n{{ END }}\n",
+    "description": "WRAPPER args"
+  },
+  "wrap": {
+    "prefix": "wrap",
+    "body": "{{ WRAPPER ${1:template} }}\n   ${3:content...}\n{{ END }}\n",
+    "description": "WRAPPER"
+  },
+  "text": {
+    "prefix": [
+      "text",
+      "TEXT"
+    ],
+    "body": "{{ TEXT = BLOCK }}\n   ${2:text...}\n{{ END #TEXT }}\n",
+    "description": "TEXT"
+  },
+  "for_us": {
+    "prefix": "for us in user.us.items",
+    "body": "{{ FOR us IN user.us.items }}\n   ${3:block...}\n{{ END }}",
+    "description": "Р¦РёРєР» РґР»СЏ РїРµСЂРµР±РѕСЂР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… СѓСЃР»СѓРі FOR us IN user.us.items"
+  },
+  "for_user": {
+    "prefix": "for user in user.items",
+    "body": "{{ FOR user IN user.items }}\n   ${3:block...}\n{{ END }}",
+    "description": "Р¦РёРєР» РґР»СЏ РїРµСЂРµР±РѕСЂР° РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ FOR user IN user.items"
+  },
+  "for_us_": {
+    "prefix": "for us in u.us.items",
+    "body": "{{ FOR us IN u.us.items }}\n   ${3:block...}\n{{ END }}",
+    "description": "Р¦РёРєР» РґР»СЏ РїРµСЂРµР±РѕСЂР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… СѓСЃР»СѓРі  FOR us IN u.us.items"
+  },
+  "for_u": {
+    "prefix": "for u in user.items",
+    "body": "{{ FOR u IN user.items }}\n   ${3:block...}\n{{ END }}",
+    "description": "Р¦РёРєР» РґР»СЏ РїРµСЂРµР±РѕСЂР° РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ FOR u IN user.items"
+  },
+  "chunk(size)": {
+    "prefix": [
+      "chunk(size).join(',')",
+      "tt_method - chunk"
+    ],
+    "body": "chunk(${1:size}).join('${2:,}')",
+    "description": "Р Р°Р·Р±РёРІР°РµС‚ Р·РЅР°С‡РµРЅРёРµ РЅР° СЃРїРёСЃРѕРє С‡Р°СЃС‚РµР№ РѕРїСЂРµРґРµР»РµРЅРЅРѕРіРѕ СЂР°Р·РјРµСЂР°"
+  },
+  "collapse": {
+    "prefix": [
+      "collapse",
+      "tt_method - collapse"
+    ],
+    "body": "collapse",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ С‚РµРєСЃС‚, РІ РєРѕС‚РѕСЂРѕРј СѓРґР°Р»РµРЅС‹ РІСЃРµ РЅР°С‡Р°Р»СЊРЅС‹Рµ Рё РєРѕРЅРµС‡РЅС‹Рµ РїСЂРѕР±РµР»С‹, Р° РІСЃРµ РІРЅСѓС‚СЂРµРЅРЅРёРµ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё РїСЂРѕР±РµР»РѕРІ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅС‹ РІ РѕРґРёРЅ РїСЂРѕР±РµР»"
+  },
+  "defined": {
+    "prefix": [
+      "defined",
+      "tt_method - defined"
+    ],
+    "body": "defined",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё Р·РЅР°С‡РµРЅРёРµ РѕРїСЂРµРґРµР»РµРЅРѕ РёР»Рё РµСЃР»Рё СЃРїРёСЃРѕРє РѕРїСЂРµРґРµР»РµРЅ."
+  },
+  "dquote": {
+    "prefix": [
+      "dquote",
+      "tt_method - dquote"
+    ],
+    "body": "dquote",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ С‚РµРєСЃС‚ СЃ Р»СЋР±С‹РјРё СЃРёРјРІРѕР»Р°РјРё РґРІРѕР№РЅС‹С… РєР°РІС‹С‡РµРє, СЌРєСЂР°РЅРёСЂРѕРІР°РЅРЅС‹РјРё РїСЂРµС„РёРєСЃРѕРј РѕР±СЂР°С‚РЅРѕР№ РєРѕСЃРѕР№ С‡РµСЂС‚С‹. Р›СЋР±С‹Рµ СЃРёРјРІРѕР»С‹ РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё РІ С‚РµРєСЃС‚Рµ Р±СѓРґСѓС‚ Р·Р°РјРµРЅРµРЅС‹ РЅР° \"\\n\""
+  },
+  "hash": {
+    "prefix": [
+      "hash",
+      "tt_method - hash"
+    ],
+    "body": "hash",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РєР°Рє СЃСЃС‹Р»РєСѓ РЅР° С…СЌС€, СЃРѕРґРµСЂР¶Р°С‰СѓСЋ РѕРґРЅСѓ Р·Р°РїРёСЃСЊ СЃ РєР»СЋС‡РѕРј, СѓРєР°Р·С‹РІР°СЋС‰РёРј РЅР° РёСЃС…РѕРґРЅРѕРµ СЃРєР°Р»СЏСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ. РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ СѓРїСЂРѕС‰РµРЅРёСЏ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РґР°РЅРЅС‹С… РІ СЂР°Р·РЅС‹Рµ С„РѕСЂРјР°С‚С‹.\n\nРўР°РєР¶Рµ РјРѕР¶РµС‚ РІРѕР·РІСЂР°С‰Р°С‚СЊ СЃСЃС‹Р»РєСѓ РЅР° С…СЌС€-РјР°СЃСЃРёРІ, СЃРѕСЃС‚РѕСЏС‰СѓСЋ РёР· СЌР»РµРјРµРЅС‚РѕРІ СЃРїРёСЃРєР°, РіРґРµ С‡РµС‚РЅС‹Рµ СЌР»РµРјРµРЅС‚С‹ (0, 2, 4 Рё С‚.Рґ.) СЃС‚Р°РЅРѕРІСЏС‚СЃСЏ РєР»СЋС‡Р°РјРё, Р° РЅРµС‡РµС‚РЅС‹Рµ (1, 3, 5 Рё С‚.Рґ.) вЂ” Р·РЅР°С‡РµРЅРёСЏРјРё."
+  },
+  "lcfirst": {
+    "prefix": [
+      "lcfirst",
+      "tt_method - lcfirst"
+    ],
+    "body": "lcfirst",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ С‚РµРєСЃС‚, РІ РєРѕС‚РѕСЂРѕРј РїРµСЂРІР°СЏ Р±СѓРєРІР° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅР° РІ РЅРёР¶РЅРёР№ СЂРµРіРёСЃС‚СЂ."
+  },
+  "length": {
+    "prefix": [
+      "length",
+      "tt_method - length"
+    ],
+    "body": "length",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ РґР»РёРЅСѓ СЃС‚СЂРѕРєРѕРІРѕРіРѕ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ СЌР»РµРјРµРЅС‚Р°:"
+  },
+  "empty": {
+    "prefix": [
+      "empty",
+      "tt_method - empty"
+    ],
+    "body": "empty",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё СЃС‚СЂРѕРєР° РїСѓСЃС‚Р°. Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё С…РµС€ РїСѓСЃС‚ РёР»Рё РµСЃР»Рё СЃРїРёСЃРѕРє РїСѓСЃС‚."
+  },
+  "lower": {
+    "prefix": [
+      "lower",
+      "tt_method - lower"
+    ],
+    "body": "lower",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ С‚РµРєСЃС‚ РІ РЅРёР¶РЅРµРј СЂРµРіРёСЃС‚СЂРµ"
+  },
+  "match(pattern, global)": {
+    "prefix": [
+      "match('pattern')",
+      "tt_method - match"
+    ],
+    "body": "match('${1:pattern}')",
+    "description": "Р’С‹РїРѕР»РЅСЏРµС‚ СЃРѕРїРѕСЃС‚Р°РІР»РµРЅРёРµ СЂРµРіСѓР»СЏСЂРЅРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ СЃРѕ СЃС‚СЂРѕРєРѕР№, РёСЃРїРѕР»СЊР·СѓСЏ С€Р°Р±Р»РѕРЅ, РїРµСЂРµРґР°РЅРЅС‹Р№ РІ РєР°С‡РµСЃС‚РІРµ Р°СЂРіСѓРјРµРЅС‚Р°. Р•СЃР»Рё С€Р°Р±Р»РѕРЅ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ СЃС‚СЂРѕРєРµ, С‚Рѕ РјРµС‚РѕРґ РІРѕР·РІСЂР°С‰Р°РµС‚ СЃСЃС‹Р»РєСѓ РЅР° СЃРїРёСЃРѕРє РІСЃРµС… СЃС‚СЂРѕРє, Р·Р°С…РІР°С‡РµРЅРЅС‹С… РІ СЃРєРѕР±РєР°С… РІ С€Р°Р±Р»РѕРЅРµ. Р•СЃР»Рё С€Р°Р±Р»РѕРЅ РЅРµ СЃРѕРІРїР°РґР°РµС‚, С‚Рѕ РјРµС‚РѕРґ РІРѕР·РІСЂР°С‰Р°РµС‚ false."
+  },
+  "repeat(n)": {
+    "prefix": [
+      "repeat(number_of_times)",
+      "tt_method - repeat"
+    ],
+    "body": "repeat(${1:number_of_times})",
+    "description": "РџРѕРІС‚РѕСЂСЏРµС‚ СЃС‚СЂРѕРєСѓ СѓРєР°Р·Р°РЅРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°Р·."
+  },
+  "replace(search, replace)": {
+    "prefix": [
+      "replace('pattern', 'string')",
+      "tt_method - replace"
+    ],
+    "body": "replace('${1:pattern}', '${2:string}')",
+    "description": "Р—Р°РјРµРЅСЏРµС‚ РІСЃРµ РІС…РѕР¶РґРµРЅРёСЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ С€Р°Р±Р»РѕРЅР° (СЂРµРіСѓР»СЏСЂРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ Perl) РґСЂСѓРіРёРј С‚РµРєСЃС‚РѕРј."
+  },
+  "remove(pattern)": {
+    "prefix": [
+      "remove('pattern')",
+      "tt_method - remove"
+    ],
+    "body": "remove('${1:pattern}')",
+    "description": "Р’С‹РІРѕРґРёС‚ СЃС‚СЂРѕРєСѓ, РІ РєРѕС‚РѕСЂРѕР№ СѓРґР°Р»РµРЅС‹ РІСЃРµ РІС…РѕР¶РґРµРЅРёСЏ С€Р°Р±Р»РѕРЅР° (Р·Р°РґР°РЅРѕ РєР°Рє СЂРµРіСѓР»СЏСЂРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ Perl)."
+  },
+  "search(pattern)": {
+    "prefix": [
+      "search('pattern')",
+      "tt_method - search"
+    ],
+    "body": "search('${1:pattern}')",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё СЃС‚СЂРѕРєР° СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ С€Р°Р±Р»РѕРЅСѓ СЂРµРіСѓР»СЏСЂРЅРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ."
+  },
+  "size": {
+    "prefix": [
+      "size",
+      "tt_method - size"
+    ],
+    "body": "size",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ РєРѕР»РёС‡РµСЃС‚РІРѕ РїР°СЂ РєР»СЋС‡/Р·РЅР°С‡РµРЅРёРµ РІ С…СЌС€Рµ. Р’РѕР·РІСЂР°С‰Р°РµС‚ СЂР°Р·РјРµСЂ СЃРїРёСЃРєР° (РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ). Р”Р»СЏ СЃРєР°Р»СЏСЂРЅС‹С… Р·РЅР°С‡РµРЅРёР№ РІСЃРµРіРґР° РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ 1."
+  },
+  "split(pattern)": {
+    "prefix": [
+      "split(':')",
+      "tt_method - split"
+    ],
+    "body": "split('${1::}')",
+    "description": "РСЃРїРѕР»СЊР·СѓРµС‚ С„СѓРЅРєС†РёСЋ Perl split(), С‡С‚РѕР±С‹ СЂР°Р·Р±РёС‚СЊ СЃС‚СЂРѕРєСѓ РЅР° СЃРїРёСЃРѕРє СЃС‚СЂРѕРє."
+  },
+  "substr(offset, length, replacement)": {
+    "prefix": [
+      "substr(offset, length, replacement)",
+      "tt_method - substr"
+    ],
+    "body": "substr(${1:offset}, ${2:length}, '${3:string}')",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ РїРѕРґСЃС‚СЂРѕРєСѓ, РЅР°С‡РёРЅР°СЋС‰СѓСЋСЃСЏ СЃ РїРѕР·РёС†РёРё offset, РґР»РёРЅРѕР№ length СЃРёРјРІРѕР»РѕРІ. Р•СЃР»Рё РґР»РёРЅР° РЅРµ СѓРєР°Р·Р°РЅР°, РІРѕР·РІСЂР°С‰Р°РµС‚ РІРµСЃСЊ РѕСЃС‚Р°С‚РѕРє СЃС‚СЂРѕРєРё. Р•СЃР»Рё Р·Р°РґР°РЅ replace, РјРµС‚РѕРґ Р·Р°РјРµРЅСЏРµС‚ С‡Р°СЃС‚СЊ СЃС‚СЂРѕРєРё СѓРєР°Р·Р°РЅРЅС‹Рј Р·РЅР°С‡РµРЅРёРµРј Рё РІРѕР·РІСЂР°С‰Р°РµС‚ СЃС‚Р°СЂСѓСЋ РїРѕРґСЃС‚СЂРѕРєСѓ."
+  },
+  "squote": {
+    "prefix": [
+      "squote",
+      "tt_method - squote"
+    ],
+    "body": "squote",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ С‚РµРєСЃС‚, СЃРѕРґРµСЂР¶Р°С‰РёР№ РІСЃРµ СЃРёРјРІРѕР»С‹ РѕРґРёРЅР°СЂРЅС‹С… РєР°РІС‹С‡РµРє, СЌРєСЂР°РЅРёСЂРѕРІР°РЅРЅС‹Рµ РїСЂРµС„РёРєСЃРѕРј РІ РІРёРґРµ РѕР±СЂР°С‚РЅРѕР№ РєРѕСЃРѕР№ С‡РµСЂС‚С‹."
+  },
+  "trim": {
+    "prefix": [
+      "trim",
+      "tt_method - trim"
+    ],
+    "body": "trim",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ С‚РµРєСЃС‚, РІ РєРѕС‚РѕСЂРѕРј СѓРґР°Р»РµРЅС‹ РІСЃРµ РЅР°С‡Р°Р»СЊРЅС‹Рµ Рё РєРѕРЅРµС‡РЅС‹Рµ РїСЂРѕР±РµР»С‹."
+  },
+  "ucfirst": {
+    "prefix": [
+      "ucfirst",
+      "tt_method - ucfirst"
+    ],
+    "body": "ucfirst",
+    "description": "РџСЂРµРѕР±СЂР°Р·СѓРµС‚ РїРµСЂРІСѓСЋ Р±СѓРєРІСѓ С‚РµРєСЃС‚Р° РІ РІРµСЂС…РЅРёР№ СЂРµРіРёСЃС‚СЂ."
+  },
+  "upper": {
+    "prefix": [
+      "upper",
+      "tt_method - upper"
+    ],
+    "body": "upper",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ С‚РµРєСЃС‚ РІ РІРµСЂС…РЅРµРј СЂРµРіРёСЃС‚СЂРµ."
+  },
+  "keys": {
+    "prefix": [
+      "keys",
+      "tt_method - keys"
+    ],
+    "body": "keys",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РєР»СЋС‡РµР№ РІ С…СЌС€Рµ. РџРѕСЂСЏРґРѕРє РЅРµРѕРїСЂРµРґРµР»С‘РЅ, РЅРѕ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ РїРѕСЂСЏРґРєСѓ Р·РЅР°С‡РµРЅРёР№."
+  },
+  "join": {
+    "prefix": [
+      "join(', ')",
+      "tt_method - join"
+    ],
+    "body": "join('${1:, }')",
+    "description": "РћР±СЉРµРґРёРЅСЏРµС‚ СЌР»РµРјРµРЅС‚С‹ СЃРїРёСЃРєР° РІ РѕРґРЅСѓ СЃС‚СЂРѕРєСѓ СЃ СЂР°Р·РґРµР»РёС‚РµР»РµРј, СѓРєР°Р·Р°РЅРЅС‹Рј РІ Р°СЂРіСѓРјРµРЅС‚Рµ."
+  },
+  "items": {
+    "prefix": [
+      "items",
+      "tt_method - items"
+    ],
+    "body": "items",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РєР»СЋС‡РµР№ Рё Р·РЅР°С‡РµРЅРёР№, СЂР°Р·РІРµСЂРЅСѓС‚С‹Р№ РІ РѕРґРёРЅ РѕР±С‰РёР№ СЃРїРёСЃРѕРє."
+  },
+  "pairs": {
+    "prefix": [
+      "pairs",
+      "tt_method - pairs"
+    ],
+    "body": "pairs",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РїР°СЂ РєР»СЋС‡-Р·РЅР°С‡РµРЅРёРµ, РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Р№ РїРѕ РєР»СЋС‡Р°Рј."
+  },
+  "list": {
+    "prefix": [
+      "list",
+      "tt_method - list"
+    ],
+    "body": "list",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРѕРґРµСЂР¶РёРјРѕРµ С…РµС€Р° РІ РІРёРґРµ СЃРїРёСЃРєР°."
+  },
+  "sort": {
+    "prefix": [
+      "sort",
+      "tt_method - sort"
+    ],
+    "body": "sort",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РєР»СЋС‡РµР№, РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹С… РІ Р°Р»С„Р°РІРёС‚РЅРѕРј РїРѕСЂСЏРґРєРµ."
+  },
+  "sort()": {
+    "prefix": [
+      "sort()",
+      "tt_method - sort()"
+    ],
+    "body": "sort('${1:key}')",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РєР»СЋС‡РµР№, РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹С… РІ Р°Р»С„Р°РІРёС‚РЅРѕРј РїРѕСЂСЏРґРєРµ. Р’С‹ С‚Р°РєР¶Рµ РјРѕР¶РµС‚Рµ СѓРєР°Р·Р°С‚СЊ РЅРµСЃРєРѕР»СЊРєРѕ РєР»СЋС‡РµР№ СЃРѕСЂС‚РёСЂРѕРІРєРё."
+  },
+  "nsort": {
+    "prefix": [
+      "nsort",
+      "tt_method - nsort"
+    ],
+    "body": "nsort",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РєР»СЋС‡РµР№, РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹С… РїРѕ РЅРѕРјРµСЂР°Рј (numerically sorted)."
+  },
+  "nsort()": {
+    "prefix": [
+      "nsort()",
+      "tt_method - nsort()"
+    ],
+    "body": "nsort('${1:key}')",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РєР»СЋС‡РµР№, РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹С… РїРѕ РЅРѕРјРµСЂР°Рј (numerically sorted). Р’С‹ С‚Р°РєР¶Рµ РјРѕР¶РµС‚Рµ СѓРєР°Р·Р°С‚СЊ РЅРµСЃРєРѕР»СЊРєРѕ РєР»СЋС‡РµР№ СЃРѕСЂС‚РёСЂРѕРІРєРё."
+  },
+  "import": {
+    "prefix": [
+      "import(hash)",
+      "tt_method - import"
+    ],
+    "body": "import(${1:hash})",
+    "description": "РРјРїРѕСЂС‚РёСЂСѓРµС‚ СЃРѕРґРµСЂР¶РёРјРѕРµ РґСЂСѓРіРѕРіРѕ С…СЌС€-РјР°СЃСЃРёРІ РІ С‚РµРєСѓС‰РёР№ С…СЌС€-РјР°СЃСЃРёРІ. РњРѕР¶РµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ РґР»СЏ РґРѕР±Р°РІР»РµРЅРёСЏ СЌР»РµРјРµРЅС‚РѕРІ РёР· РѕРґРЅРѕРіРѕ РёР»Рё РЅРµСЃРєРѕР»СЊРєРёС… СЃРїРёСЃРєРѕРІ РІ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёР№ СЃРїРёСЃРѕРє."
+  },
+  "defined()": {
+    "prefix": [
+      "defined(somekey)",
+      "tt_method - defined()"
+    ],
+    "body": "defined('${1:somekey}')",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ true РёР»Рё false, РїСЂРѕРІРµСЂСЏСЏ, РѕРїСЂРµРґРµР»РµРЅ Р»Рё СЌР»РµРјРµРЅС‚ РІ С…РµС€Рµ РёР»Рё СЃРїРёСЃРєРµ, СѓРєР°Р·Р°РЅРЅС‹Р№ РєР»СЋС‡РѕРј РёР»Рё РїРѕР·РёС†РёРµР№."
+  },
+  "exists": {
+    "prefix": [
+      "exists(somekey)",
+      "tt_method - exists"
+    ],
+    "body": "exists('${1:somekey}')",
+    "description": "РџСЂРѕРІРµСЂСЏРµС‚ СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёРµ РєР»СЋС‡Р° РІ С…СЌС€Рµ Рё РІРѕР·РІСЂР°С‰Р°РµС‚ true РёР»Рё false."
+  },
+  "delete": {
+    "prefix": [
+      "delete('foo', 'bar')",
+      "tt_method - delete"
+    ],
+    "body": "delete('${1:foo}', '${2:bar}')",
+    "description": "РЈРґР°Р»СЏРµС‚ РѕРґРёРЅ РёР»Рё РЅРµСЃРєРѕР»СЊРєРѕ СЌР»РµРјРµРЅС‚РѕРІ РёР· С…СЌС€Р°."
+  },
+  "first": {
+    "prefix": [
+      "first",
+      "tt_method - first"
+    ],
+    "body": "first",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ РїРµСЂРІС‹Р№ СЌР»РµРјРµРЅС‚ РІ СЃРїРёСЃРєРµ."
+  },
+  "first(n)": {
+    "prefix": [
+      "first(n)",
+      "tt_method - first"
+    ],
+    "body": "first(${1:n})",
+    "description": "Р•СЃР»Рё РїРµСЂРµРґР°РЅ С‡РёСЃР»РѕРІРѕР№ Р°СЂРіСѓРјРµРЅС‚ n, РІРѕР·РІСЂР°С‰Р°РµС‚ РїРµСЂРІС‹Рµ n СЌР»РµРјРµРЅС‚РѕРІ РІ СЃРїРёСЃРєРµ."
+  },
+  "last": {
+    "prefix": [
+      "last",
+      "tt_method - last"
+    ],
+    "body": "last",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ РїРѕСЃР»РµРґРЅРёР№ СЌР»РµРјРµРЅС‚ РІ СЃРїРёСЃРєРµ."
+  },
+  "last(n)": {
+    "prefix": [
+      "last(n)",
+      "tt_method - last"
+    ],
+    "body": "last(${1:n})",
+    "description": "Р•СЃР»Рё РїРµСЂРµРґР°РЅ С‡РёСЃР»РѕРІРѕР№ Р°СЂРіСѓРјРµРЅС‚ n, РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕСЃР»РµРґРЅРёРµ n СЌР»РµРјРµРЅС‚РѕРІ."
+  },
+  "max": {
+    "prefix": [
+      "max",
+      "tt_method - max"
+    ],
+    "body": "max",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ РЅРѕРјРµСЂ РёРЅРґРµРєСЃР° (СЂР°Р·РјРµСЂ СЃРїРёСЃРєР° РјРёРЅСѓСЃ РµРґРёРЅРёС†Р°)."
+  },
+  "reverse": {
+    "prefix": [
+      "reverse",
+      "tt_method - reverse"
+    ],
+    "body": "reverse",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ СЌР»РµРјРµРЅС‚С‹ СЃРїРёСЃРєР° РІ РѕР±СЂР°С‚РЅРѕРј РїРѕСЂСЏРґРєРµ."
+  },
+  "grep": {
+    "prefix": [
+      "grep('^https:')",
+      "tt_method - grep"
+    ],
+    "body": "grep('${1:^https:}')",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє СЌР»РµРјРµРЅС‚РѕРІ, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёС… СѓРєР°Р·Р°РЅРЅРѕРјСѓ С€Р°Р±Р»РѕРЅСѓ СЂРµРіСѓР»СЏСЂРЅРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ."
+  },
+  "push(item)": {
+    "prefix": [
+      "push(item)",
+      "tt_method - push"
+    ],
+    "body": "push(${1:foo})",
+    "description": "Р”РѕР±Р°РІР»СЏРµС‚ СЌР»РµРјРµРЅС‚ РёР»Рё СЌР»РµРјРµРЅС‚С‹ РІ РєРѕРЅРµС† СЃРїРёСЃРєР°."
+  },
+  "unshift(item)": {
+    "prefix": [
+      "unshift(item)",
+      "tt_method - unshift"
+    ],
+    "body": "unshift(${1:foo})",
+    "description": "Р”РѕР±Р°РІР»СЏРµС‚ СЌР»РµРјРµРЅС‚ РёР»Рё СЌР»РµРјРµРЅС‚С‹ РІ РЅР°С‡Р°Р»Рѕ СЃРїРёСЃРєР°."
+  },
+  "shift": {
+    "prefix": [
+      "shift",
+      "tt_method - shift"
+    ],
+    "body": "shift",
+    "description": "РЈРґР°Р»СЏРµС‚ РїРµСЂРІС‹Р№ СЌР»РµРјРµРЅС‚ РёР· СЃРїРёСЃРєР° Рё РІРѕР·РІСЂР°С‰Р°РµС‚ РµРіРѕ."
+  },
+  "pop": {
+    "prefix": [
+      "pop",
+      "tt_method - pop"
+    ],
+    "body": "pop",
+    "description": "РЈРґР°Р»СЏРµС‚ РїРѕСЃР»РµРґРЅРёР№ СЌР»РµРјРµРЅС‚ РёР· СЃРїРёСЃРєР° Рё РІРѕР·РІСЂР°С‰Р°РµС‚ РµРіРѕ."
+  },
+  "unique": {
+    "prefix": [
+      "unique",
+      "tt_method - unique"
+    ],
+    "body": "unique",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє СѓРЅРёРєР°Р»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ РІ СЃРїРёСЃРєРµ РІ С‚РѕРј Р¶Рµ РїРѕСЂСЏРґРєРµ, С‡С‚Рѕ Рё РІ РёСЃС…РѕРґРЅРѕРј СЃРїРёСЃРєРµ."
+  },
+  "merge": {
+    "prefix": [
+      "merge(list_two, list_three)",
+      "tt_method - merge"
+    ],
+    "body": "merge(${1:list_two}, ${2:list_three})",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ РѕР±СЉРµРґРёРЅС‘РЅРЅС‹Р№ СЃРїРёСЃРѕРє РёР· РЅСѓР»СЏ РёР»Рё Р±РѕР»РµРµ РґСЂСѓРіРёС… СЃРїРёСЃРєРѕРІ."
+  },
+  "slice(from, to)": {
+    "prefix": [
+      "slice(from, to)",
+      "tt_method - slice"
+    ],
+    "body": "slice(${1:from}, ${2:to})",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ С‡Р°СЃС‚СЊ СЌР»РµРјРµРЅС‚РѕРІ СЃРїРёСЃРєР° РјРµР¶РґСѓ РіСЂР°РЅРёС†Р°РјРё, РїРµСЂРµРґР°РЅРЅС‹РјРё РІ РєР°С‡РµСЃС‚РІРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ. РСЃС…РѕРґРЅС‹Р№ СЃРїРёСЃРѕРє РЅРµ РёР·РјРµРЅСЏРµС‚СЃСЏ."
+  },
+  "splice(offset, length, list)": {
+    "prefix": [
+      "splice(offset, length, list)",
+      "tt_method - splice"
+    ],
+    "body": "splice(${1:offset}, ${2:length}, ${3:list})",
+    "description": "РџРѕР·РІРѕР»СЏРµС‚ РІС‹Р±РѕСЂРѕС‡РЅРѕ СѓРґР°Р»РёС‚СЊ Рё/РёР»Рё Р·Р°РјРµРЅРёС‚СЊ СЌР»РµРјРµРЅС‚С‹ РІ СЃРїРёСЃРєРµ. РЈРґР°Р»СЏРµС‚ length СЌР»РµРјРµРЅС‚РѕРІ, РЅР°С‡РёРЅР°СЏ СЃ РїРѕР·РёС†РёРё offset, Рё Р·Р°РјРµРЅСЏРµС‚ РёС… СЌР»РµРјРµРЅС‚Р°РјРё РёР· РїСЂРµРґРѕСЃС‚Р°РІР»РµРЅРЅРѕРіРѕ СЃРїРёСЃРєР°."
+  },
+  "item(0)": {
+    "prefix": [
+      "item(0)",
+      "tt_method - item"
+    ],
+    "body": "item(${1:0})",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ СЌР»РµРјРµРЅС‚ РёР· СЃРїРёСЃРєР°, РёСЃРїРѕР»СЊР·СѓСЏ РёРЅРґРµРєСЃ, РїРµСЂРµРґР°РЅРЅС‹Р№ РІ РєР°С‡РµСЃС‚РІРµ Р°СЂРіСѓРјРµРЅС‚Р°."
+  },
+  "user.id()": {
+    "prefix": "user.id()",
+    "body": "user.id( $1 )",
+    "description": "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ (СѓСЃС‚Р°РЅРѕРІРёС‚СЊ)"
+  },
+  "u.id()": {
+    "prefix": "u.id()",
+    "body": "u.id( $1 )",
+    "description": "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ (СѓСЃС‚Р°РЅРѕРІРёС‚СЊ)"
+  },
+  "user.id": {
+    "prefix": "user.id",
+    "body": "user.id ",
+    "description": "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ (РїРѕР»СѓС‡РёС‚СЊ)"
+  },
+  "u.id": {
+    "prefix": "u.id",
+    "body": "u.id ",
+    "description": "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ (РїРѕР»СѓС‡РёС‚СЊ)"
+  },
+  "user.switch": {
+    "prefix": "user.switch()",
+    "body": "user.switch( $1 ) ",
+    "description": "РџРµСЂРµРєР»СЋС‡РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РЅР° СѓРєР°Р·Р°РЅРЅРѕРіРѕ (СЃРјРµРЅР° РєРѕРЅС‚РµРєСЃС‚Р°)"
+  },
+  "u.switch": {
+    "prefix": "u.switch()",
+    "body": "u.switch( $1 ) ",
+    "description": "РџРµСЂРµРєР»СЋС‡РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РЅР° СѓРєР°Р·Р°РЅРЅРѕРіРѕ (СЃРјРµРЅР° РєРѕРЅС‚РµРєСЃС‚Р°)"
+  },
+  "user.balance": {
+    "prefix": "user.balance",
+    "body": "user.balance ",
+    "description": "Р‘Р°Р»Р°РЅСЃ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "u.balance": {
+    "prefix": "u.balance",
+    "body": "u.balance ",
+    "description": "Р‘Р°Р»Р°РЅСЃ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "user.full_name": {
+    "prefix": "user.full_name",
+    "body": "user.full_name ",
+    "description": "Р¤РРћ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "u.full_name": {
+    "prefix": "u.full_name",
+    "body": "u.full_name ",
+    "description": "Р¤РРћ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "user.login": {
+    "prefix": "user.login",
+    "body": "user.login ",
+    "description": "Р›РѕРіРёРЅ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "u.login": {
+    "prefix": "u.login",
+    "body": "u.login ",
+    "description": "Р›РѕРіРёРЅ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "user.credit": {
+    "prefix": "user.credit",
+    "body": "user.credit ",
+    "description": "РљСЂРµРґРёС‚РЅС‹Р№ Р»РёРјРёС‚ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "u.credit": {
+    "prefix": "u.credit",
+    "body": "u.credit ",
+    "description": "РљСЂРµРґРёС‚РЅС‹Р№ Р»РёРјРёС‚ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "user.dogovor": {
+    "prefix": "user.dogovor",
+    "body": "user.dogovor ",
+    "description": "Р”РѕРіРѕРІРѕСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "u.dogovor": {
+    "prefix": "u.dogovor",
+    "body": "u.dogovor ",
+    "description": "Р”РѕРіРѕРІРѕСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "user.settings": {
+    "prefix": "user.settings",
+    "body": "user.settings.",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ settings РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "u.settings": {
+    "prefix": "u.settings",
+    "body": "u.settings.",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ settings РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "user.get_bonus": {
+    "prefix": "user.get_bonus",
+    "body": "user.get_bonus ",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ РєРѕР»-РІРѕ Р±РѕРЅСѓСЃРѕРІ"
+  },
+  "u.get_bonus": {
+    "prefix": "u.get_bonus",
+    "body": "u.get_bonus ",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ РєРѕР»-РІРѕ Р±РѕРЅСѓСЃРѕРІ"
+  },
+  "user.income_percent": {
+    "prefix": "user.income_percent",
+    "body": "user.income_percent ",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ РїСЂРѕС†РµРЅС‚ РїР°СЂС‚РЅРµСЂСЃРєРёС… Р±РѕРЅСѓСЃРѕРІ"
+  },
+  "u.income_percent": {
+    "prefix": "u.income_percent",
+    "body": "u.income_percent ",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ РїСЂРѕС†РµРЅС‚ РїР°СЂС‚РЅРµСЂСЃРєРёС… Р±РѕРЅСѓСЃРѕРІ"
+  },
+  "user.add_bonus": {
+    "prefix": "user.add_bonus( amount, 'comment' )",
+    "body": "user.add_bonus( ${1:amount},'${2:comment}' ) ",
+    "description": "РќР°С‡РёСЃР»РµРЅРёРµ Р±РѕРЅСѓСЃРѕРІ"
+  },
+  "u.add_bonus": {
+    "prefix": "u.add_bonus( amount, 'comment' )",
+    "body": "u.add_bonus( ${1:amount},'${2:comment}' ) ",
+    "description": "РќР°С‡РёСЃР»РµРЅРёРµ Р±РѕРЅСѓСЃРѕРІ"
+  },
+  "user.set_settings": {
+    "prefix": "user.set_settings({ 'key' => value })",
+    "body": "user.set_settings({ '${1:key}' => ${2:value} }) ",
+    "description": "РЎРѕС…СЂР°РЅРёС‚СЊ РІ settings РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїСЂРѕРёР·РІРѕР»СЊРЅС‹Рµ РґР°РЅРЅС‹Рµ"
+  },
+  "u.set_settings": {
+    "prefix": "u.set_settings({ 'key' => value })",
+    "body": "u.set_settings({ '${1:key}' => ${2:value} }) ",
+    "description": "РЎРѕС…СЂР°РЅРёС‚СЊ РІ settings РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїСЂРѕРёР·РІРѕР»СЊРЅС‹Рµ РґР°РЅРЅС‹Рµ"
+  },
+  "user.gen_session.id": {
+    "prefix": "user.gen_session.id",
+    "body": "user.gen_session.id ",
+    "description": "Р¤СѓРЅРєС†РёСЏ РґР»СЏ РіРµРЅРµСЂР°С†РёРё РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° СЃРµСЃСЃРёРё"
+  },
+  "u.gen_session.id": {
+    "prefix": "u.gen_session.id",
+    "body": "u.gen_session.id ",
+    "description": "Р¤СѓРЅРєС†РёСЏ РґР»СЏ РіРµРЅРµСЂР°С†РёРё РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° СЃРµСЃСЃРёРё"
+  },
+  "user.pays": {
+    "prefix": "user.pays",
+    "body": "user.pays ",
+    "description": "РЎСЃС‹Р»РєР° РЅР° РїР»Р°С‚РµР¶Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "u.pays": {
+    "prefix": "u.pays",
+    "body": "u.pays ",
+    "description": "РЎСЃС‹Р»РєР° РЅР° РїР»Р°С‚РµР¶Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "user.pays.forecast": {
+    "prefix": "user.pays.forecast( days = 3, blocked = 0 )",
+    "body": "user.pays.forecast( days = 3, blocked = 0 ) ",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ JSON РїСЂРѕРіРЅРѕР·Р° РѕРїР»Р°С‚ СѓСЃР»СѓРі. days - РєРѕР»-РІРѕ РґРЅРµР№ РґР»СЏ РїСЂРѕРіРЅРѕР·Р° (3 РґРЅСЏ РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ), blocked - СѓС‡РёС‚С‹РІР°С‚СЊ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅРЅС‹Рµ СѓСЃР»СѓРіРё (0 - РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ РќР•Рў, 1 - Р”Рђ)"
+  },
+  "u.pays.forecast": {
+    "prefix": "u.pays.forecast( days = 3, blocked = 0 )",
+    "body": "u.pays.forecast( days = 3, blocked = 0 ) ",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ JSON РїСЂРѕРіРЅРѕР·Р° РѕРїР»Р°С‚ СѓСЃР»СѓРі. days - РєРѕР»-РІРѕ РґРЅРµР№ РґР»СЏ РїСЂРѕРіРЅРѕР·Р° (3 РґРЅСЏ РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ), blocked - СѓС‡РёС‚С‹РІР°С‚СЊ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅРЅС‹Рµ СѓСЃР»СѓРіРё (0 - РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ РќР•Рў, 1 - Р”Рђ)"
+  },
+  "user.delete": {
+    "prefix": "user.delete",
+    "body": "user.delete ",
+    "description": "РЈРґР°Р»РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ (СЃ РЅСѓР»РµРІС‹Рј Р±Р°Р»Р°РЅСЃРѕРј, Р±РµР· СѓСЃР»СѓРі)"
+  },
+  "u.delete": {
+    "prefix": "u.delete",
+    "body": "u.delete ",
+    "description": "РЈРґР°Р»РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ (СЃ РЅСѓР»РµРІС‹Рј Р±Р°Р»Р°РЅСЃРѕРј, Р±РµР· СѓСЃР»СѓРі)"
+  },
+  "user.delete_force": {
+    "prefix": "user.delete(force = 1)",
+    "body": "user.delete( force = 1 ) ",
+    "description": "РџСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕРµ СѓРґР°Р»РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ (СЃ СѓСЃР»СѓРіР°РјРё Рё/РёР»Рё Р±Р°Р»Р°РЅСЃРѕРј), Р±РµР· РІС‹РїРѕР»РЅРµРЅРёСЏ С€Р°Р±Р»РѕРЅРѕРІ РїРѕ СЃРѕР±С‹С‚РёСЋ"
+  },
+  "u.delete_force": {
+    "prefix": "u.delete(force = 1)",
+    "body": "u.delete( force = 1 ) ",
+    "description": "РџСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕРµ СѓРґР°Р»РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ (СЃ СѓСЃР»СѓРіР°РјРё Рё/РёР»Рё Р±Р°Р»Р°РЅСЃРѕРј), Р±РµР· РІС‹РїРѕР»РЅРµРЅРёСЏ С€Р°Р±Р»РѕРЅРѕРІ РїРѕ СЃРѕР±С‹С‚РёСЋ"
+  },
+  "user.partner_id": {
+    "prefix": "user.partner_id",
+    "body": "user.partner_id ",
+    "description": "РџР°СЂС‚РЅРµСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "u.partner_id": {
+    "prefix": "u.partner_id",
+    "body": "u.partner_id ",
+    "description": "РџР°СЂС‚РЅРµСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "user.referrals_count": {
+    "prefix": "user.referrals_count",
+    "body": "user.referrals_count ",
+    "description": "РљРѕР»РёС‡РµСЃС‚РІРѕ СЂРµС„РµСЂР°Р»РѕРІ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "u.referrals_count": {
+    "prefix": "u.referrals_count",
+    "body": "u.referrals_count ",
+    "description": "РљРѕР»РёС‡РµСЃС‚РІРѕ СЂРµС„РµСЂР°Р»РѕРІ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "user.list_for_api": {
+    "prefix": "user.list_for_api",
+    "body": "user.list_for_api( 'admin', 1) ",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ РІСЃРµС… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"
+  },
+  "u.list_for_api": {
+    "prefix": "u.list_for_api",
+    "body": "u.list_for_api( 'admin', 1) ",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ РІСЃРµС… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"
+  },
+  "user.items": {
+    "prefix": "user.items",
+    "body": "user.items",
+    "description": "РЎРїРёСЃРѕРє РѕР±СЉРµРєС‚РѕРІ РІСЃРµС… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"
+  },
+  "u.items": {
+    "prefix": "u.items",
+    "body": "u.items ",
+    "description": "РЎРїРёСЃРѕРє РѕР±СЉРµРєС‚РѕРІ РІСЃРµС… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"
+  },
+  "user.us.items": {
+    "prefix": "user.us.items",
+    "body": "user.us.items",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ РІСЃРµ СѓСЃР»СѓРіРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "u.us.items": {
+    "prefix": "u.us.items",
+    "body": "u.us.items ",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ РІСЃРµ СѓСЃР»СѓРіРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "user.has_payments": {
+    "prefix": "user.has_payments",
+    "body": "user.has_payments",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Р±С‹Р» С…РѕС‚СЏ Р±С‹ РѕРґРёРЅ РїР»Р°С‚РµР¶"
+  },
+  "u.has_payments": {
+    "prefix": "u.has_payments",
+    "body": "u.has_payments",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Р±С‹Р» С…РѕС‚СЏ Р±С‹ РѕРґРёРЅ РїР»Р°С‚РµР¶"
+  },
+  "user.has_withdraws": {
+    "prefix": "user.has_withdraws",
+    "body": "user.has_withdraws",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Р±С‹Р»Рѕ С…РѕС‚СЏ Р±С‹ РѕРґРЅРѕ СЃРїРёСЃР°РЅРёРµ"
+  },
+  "u.has_withdraws": {
+    "prefix": "u.has_withdraws",
+    "body": "u.has_withdraws",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Р±С‹Р»Рѕ С…РѕС‚СЏ Р±С‹ РѕРґРЅРѕ СЃРїРёСЃР°РЅРёРµ"
+  },
+  "user.us.has_services": {
+    "prefix": "user.us.has_services",
+    "body": "user.us.has_services",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РµСЃС‚СЊ СѓСЃР»СѓРіРё, 0, РµСЃР»Рё РЅРµС‚ СѓСЃР»СѓРі"
+  },
+  "u.us.has_services": {
+    "prefix": "u.us.has_services",
+    "body": "u.us.has_services",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РµСЃС‚СЊ СѓСЃР»СѓРіРё"
+  },
+  "user.us.has_services_active": {
+    "prefix": "user.us.has_services_active",
+    "body": "user.us.has_services_active",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РµСЃС‚СЊ СѓСЃР»СѓРіРё РІ СЃС‚Р°С‚СѓСЃРµ ACTIVE"
+  },
+  "u.us.has_services_active": {
+    "prefix": "u.us.has_services_active",
+    "body": "u.us.has_services_active",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РµСЃС‚СЊ СѓСЃР»СѓРіРё РІ СЃС‚Р°С‚СѓСЃРµ ACTIVE"
+  },
+  "user.us.has_services_block": {
+    "prefix": "user.us.has_services_block",
+    "body": "user.us.has_services_block",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РµСЃС‚СЊ СѓСЃР»СѓРіРё РІ СЃС‚Р°С‚СѓСЃРµ BLOCK"
+  },
+  "u.us.has_services_block": {
+    "prefix": "u.us.has_services_block",
+    "body": "u.us.has_services_block",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РµСЃС‚СЊ СѓСЃР»СѓРіРё РІ СЃС‚Р°С‚СѓСЃРµ BLOCK"
+  },
+  "user.us.has_services_unpaid": {
+    "prefix": "user.us.has_services_unpaid",
+    "body": "user.us.has_services_unpaid",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РµСЃС‚СЊ СѓСЃР»СѓРіРё РІ СЃС‚Р°С‚СѓСЃРµ UNPAID"
+  },
+  "u.us.has_services_unpaid": {
+    "prefix": "u.us.has_services_unpaid",
+    "body": "u.us.has_services_unpaid",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РµСЃС‚СЊ СѓСЃР»СѓРіРё РІ СЃС‚Р°С‚СѓСЃРµ UNPAID"
+  },
+  "user.us.has_services_progress": {
+    "prefix": "user.us.has_services_progress",
+    "body": "user.us.has_services_progress",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РµСЃС‚СЊ СѓСЃР»СѓРіРё РІ СЃС‚Р°С‚СѓСЃРµ PROGRESS"
+  },
+  "u.us.has_services_progress": {
+    "prefix": "u.us.has_services_progress",
+    "body": "u.us.has_services_progress",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РµСЃС‚СЊ СѓСЃР»СѓРіРё РІ СЃС‚Р°С‚СѓСЃРµ PROGRESS"
+  },
+  "user.telegram.profile(profile).send": {
+    "prefix": "user.telegram.profile().send",
+    "body": "user.telegram.profile( 'telegram_bot' ).send( sendMessage = {  } )",
+    "description": "РћС‚РїСЂР°РІРєР° СЃРѕРѕР±С‰РµРЅРёСЏ С‚РµРєСѓС‰РµРјСѓ РєР»РёРµРЅС‚Сѓ РІ С‚РµР»РµРіСЂР°Рј  РІ СѓРєР°Р·Р°РЅРЅС‹Р№ РїСЂРѕС„РёР»СЊ, С‚СЂР°РЅСЃРїРѕСЂС‚ Local"
+  },
+  "u.telegram.profile(profile).send": {
+    "prefix": "u.telegram.profile().send",
+    "body": "u.telegram.profile( 'telegram_bot' ).send( sendMessage = {  } )",
+    "description": "РћС‚РїСЂР°РІРєР° СЃРѕРѕР±С‰РµРЅРёСЏ С‚РµРєСѓС‰РµРјСѓ РєР»РёРµРЅС‚Сѓ РІ С‚РµР»РµРіСЂР°Рј  РІ СѓРєР°Р·Р°РЅРЅС‹Р№ РїСЂРѕС„РёР»СЊ, С‚СЂР°РЅСЃРїРѕСЂС‚ Local"
+  },
+  "user.telegram.send": {
+    "prefix": "user.telegram.send",
+    "body": "user.telegram.send( sendMessage = {  } )",
+    "description": "РћС‚РїСЂР°РІРєР° СЃРѕРѕР±С‰РµРЅРёСЏ С‚РµРєСѓС‰РµРјСѓ РєР»РёРµРЅС‚Сѓ РІ С‚РµР»РµРіСЂР°Рј, С‚СЂР°РЅСЃРїРѕСЂС‚ Local"
+  },
+  "u.telegram.send": {
+    "prefix": "u.telegram.send",
+    "body": "u.telegram.send( sendMessage = {  } )",
+    "description": "РћС‚РїСЂР°РІРєР° СЃРѕРѕР±С‰РµРЅРёСЏ С‚РµРєСѓС‰РµРјСѓ РєР»РёРµРЅС‚Сѓ РІ С‚РµР»РµРіСЂР°Рј, С‚СЂР°РЅСЃРїРѕСЂС‚ Local"
+  },
+  "user.spool.add": {
+    "prefix": "user.spool.add( content )",
+    "body": "user.spool.add( content )",
+    "description": "Р”РѕР±Р°РІРёС‚СЊ Р·Р°РґР°С‡Сѓ РґР»СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "u.spool.add": {
+    "prefix": "u.spool.add( content )",
+    "body": "u.spool.add( content )",
+    "description": "Р”РѕР±Р°РІРёС‚СЊ Р·Р°РґР°С‡Сѓ РґР»СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "user.spool.items": {
+    "prefix": "user.spool.items",
+    "body": "user.spool.items",
+    "description": "РЎРїРёСЃРѕРє РѕР±СЉРµРєС‚РѕРІ Р·Р°РґР°С‡ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "u.spool.items": {
+    "prefix": "u.spool.items",
+    "body": "u.spool.items",
+    "description": "РЎРїРёСЃРѕРє РѕР±СЉРµРєС‚РѕРІ Р·Р°РґР°С‡ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "user.make_event('EVENT')": {
+    "prefix": "user.make_event()",
+    "body": "user.make_event('${1:EVENT}')",
+    "description": "Р’С‹РїРѕР»РЅРёС‚СЊ РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕ СЃРѕР±С‹С‚РёРµ РґР»СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ, РЅР°РїСЂРёРјРµСЂ: user.make_event( 'forecast' )"
+  },
+  "u.make_event('EVENT')": {
+    "prefix": "u.make_event()",
+    "body": "user.make_event( '${1:EVENT}' )",
+    "description": "Р’С‹РїРѕР»РЅРёС‚СЊ РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕ СЃРѕР±С‹С‚РёРµ РґР»СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ, РЅР°РїСЂРёРјРµСЂ: u.make_event( 'forecast' )"
+  },
+  "user.comment": {
+    "prefix": "user.comment",
+    "body": "user.comment ",
+    "description": "РљРѕРјРјРµРЅС‚Р°СЂРёР№ РІ РєР°СЂС‚РѕС‡РєРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "u.comment": {
+    "prefix": "u.comment",
+    "body": "u.comment ",
+    "description": "РљРѕРјРјРµРЅС‚Р°СЂРёР№ РІ РєР°СЂС‚РѕС‡РєРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "us.id()": {
+    "prefix": "us.id()",
+    "body": "us.id( $1 )",
+    "description": "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё (СѓСЃС‚Р°РЅРѕРІРёС‚СЊ)"
+  },
+  "us.id": {
+    "prefix": "us.id",
+    "body": "us.id",
+    "description": "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё (РїРѕР»СѓС‡РёС‚СЊ)"
+  },
+  "us.name": {
+    "prefix": "us.name",
+    "body": "us.name ",
+    "description": "РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё"
+  },
+  "us.created": {
+    "prefix": "us.created",
+    "body": "us.created ",
+    "description": "Р”Р°С‚Р° СЃРѕР·РґР°РЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё"
+  },
+  "us.expire": {
+    "prefix": "us.expire",
+    "body": "us.expire ",
+    "description": "Р”Р°С‚Р° РёСЃС‚РµС‡РµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё"
+  },
+  "us.status": {
+    "prefix": "us.status",
+    "body": "us.status ",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ СЃС‚Р°С‚СѓСЃ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё"
+  },
+  "us.status('STATUS')": {
+    "prefix": "us.status()",
+    "body": "us.status( '${1:STATUS}' ) ",
+    "description": "РР·РјРµРЅРёС‚СЊ СЃС‚Р°С‚СѓСЃ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё, С‡С‚РѕР±С‹ РїСЂРё СЌС‚РѕРј РІС‹РїРѕР»РЅРёР»РѕСЃСЊ СЃРѕР±С‹С‚РёРµ: CHANGED"
+  },
+  "us.status_before": {
+    "prefix": "us.status_before",
+    "body": "us.status_before ",
+    "description": "РџСЂРµРґС‹РґСѓС‰РёР№ РЎС‚Р°С‚СѓСЃ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё"
+  },
+  "us.last_event": {
+    "prefix": "us.last_event",
+    "body": "us.last_event ",
+    "description": "РџРѕСЃР»РµРґРЅРµРµ СЃРѕР±С‹С‚РёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё"
+  },
+  "us.service_id": {
+    "prefix": "us.service_id",
+    "body": "us.service_id ",
+    "description": "ID СѓСЃР»СѓРіРё РІ РєР°С‚Р°Р»РѕРіРµ СѓСЃР»СѓРі"
+  },
+  "us.settings": {
+    "prefix": "us.settings",
+    "body": "us.settings.",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ РїР°СЂР°РјРµС‚СЂС‹ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё"
+  },
+  "us.set_settings": {
+    "prefix": "us.set_settings({ 'key' => value })",
+    "body": "us.set_settings({ '${1:key}' => ${2:value} }) ",
+    "description": "РЎРѕС…СЂР°РЅРёС‚СЊ РІ settings СѓСЃР»СѓРіРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїСЂРѕРёР·РІРѕР»СЊРЅС‹Рµ РґР°РЅРЅС‹Рµ"
+  },
+  "us.set": {
+    "prefix": "us.set( 'FIELD', 'VALUE' )",
+    "body": "us.set( '${1:FIELD}', ${2:'VALUE'} ) ",
+    "description": "РЈСЃС‚Р°РЅРѕРІРєР° РїРѕР»СЏ FIELD РІ Р·РЅР°С‡РµРЅРёРµ VALUE. РџСЂРёРјРµСЂ: us.set('next', 123)"
+  },
+  "us.child_by_category": {
+    "prefix": "us.child_by_category",
+    "body": "us.child_by_category( ${1:CATEGORY} ) ",
+    "description": "РЎСЃС‹Р»РєР° РЅР° РґРѕС‡РµСЂРЅСЋСЋ СѓСЃР»СѓРіСѓ РѕРїСЂРµРґРµР»РµРЅРЅРѕР№ РєР°С‚РµРіРѕСЂРёРё"
+  },
+  "us.change(finish_active = 1)": {
+    "prefix": "us.change( service_id = N, finish_active = 1 )",
+    "body": "us.change( service_id = ${1:N}, finish_active = 1 ) ",
+    "description": "РњРµС‚РѕРґ СЃРјРµРЅС‹ С‚Р°СЂРёС„Р° СЃ Р·Р°РІРµСЂС€РµРЅРёРµРј СѓСЃР»СѓРіРё, РіРґРµ N РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РЅРѕРІРѕР№ СѓСЃР»СѓРіРё"
+  },
+  "us.change(finish_active = 0)": {
+    "prefix": "us.change( service_id = N, finish_active = 0 )",
+    "body": "us.change( service_id = ${1:N}, finish_active = 0 ) ",
+    "description": "РњРµС‚РѕРґ СЃРјРµРЅС‹ С‚Р°СЂРёС„Р° Р‘Р•Р— Р·Р°РІРµСЂС€РµРЅРёСЏ СѓСЃР»СѓРіРё, РіРґРµ N РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РЅРѕРІРѕР№ СѓСЃР»СѓРіРё"
+  },
+  "us.touch": {
+    "prefix": "us.touch",
+    "body": "us.touch ",
+    "description": "Р­С‚РѕР№ РєРѕРјР°РЅРґРѕР№, РјС‹ РїСЂРѕСЃРёРј Р±РёР»Р»РёРЅРі 'РїРѕСЃРјРѕС‚СЂРµС‚СЊ' РЅР° СѓСЃР»СѓРіСѓ Рё СЃРґРµР»Р°С‚СЊ СЃ РЅРµР№ С‡С‚Рѕ-РЅРёР±СѓРґСЊ, РµСЃР»Рё СЌС‚Рѕ С‚СЂРµР±СѓРµС‚СЃСЏ (Р°РєС‚РёРІРёСЂРѕРІР°С‚СЊ, СЂР°Р·Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ, РїСЂРѕРґР»РёС‚СЊ Рё С‚.Рї.). Р­С‚Рѕ РЅРµ СЂР°Р±РѕС‚Р°РµС‚ РґР»СЏ СѓСЃР»СѓРі РІ СЃС‚Р°С‚СѓСЃРµ PROGRESS Рё РґР»СЏ СѓРґР°Р»РµРЅРЅС‹С… СѓСЃР»СѓРі"
+  },
+  "us.make_commands_by_event('EVENT')": {
+    "prefix": "us.make_commands_by_event('EVENT')",
+    "body": "us.make_commands_by_event( '${1:EVENT}' ) ",
+    "description": "РџСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕ РІС‹РїРѕР»РЅРёС‚СЊ СЃРѕР±С‹С‚РёРµ. РќСѓР¶РЅРѕ РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕ РїРµСЂРµРІРµСЃС‚Рё СѓСЃР»СѓРіСѓ РІ СЃС‚Р°С‚СѓСЃ PROGRESS Рё Р·Р°С‚РµРј РІС‹РїРѕР»РЅРёС‚СЊ РЅСѓР¶РЅРѕРµ СЃРѕР±С‹С‚РёРµ, РїСЂРёРјРµСЂ: us.set( status = 'PROGRESS'), Р·Р°С‚РµРј us.make_commands_by_event( 'CREATE' )"
+  },
+  "us.finish('money_back', 1)": {
+    "prefix": "us.finish('money_back', 1)",
+    "body": "us.finish( 'money_back', ${1:1} ) ",
+    "description": "Р—Р°РІРµСЂС€РµРЅРёРµ СѓСЃР»СѓРіРё СЃ РІРѕР·РІСЂР°С‚РѕРј СЃСЂРµРґСЃС‚РІ (Р±РёР»Р»РёРЅРі РїСЂРѕРґР»РёС‚ РёР»Рё Р·Р°Р±Р»РѕРєРёСЂСѓРµС‚ СѓСЃР»СѓРіСѓ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РЅР°Р»РёС‡РёСЏ СЃСЂРµРґСЃС‚РІ)"
+  },
+  "us.finish('money_back', 0)": {
+    "prefix": "us.finish('money_back', 0)",
+    "body": "us.finish( 'money_back', ${1:0} ) ",
+    "description": "Р—Р°РІРµСЂС€РµРЅРёРµ СѓСЃР»СѓРіРё Р‘Р•Р— РІРѕР·РІСЂР°С‚Р° СЃСЂРµРґСЃС‚РІ (Р±РёР»Р»РёРЅРі РїСЂРѕРґР»РёС‚ РёР»Рё Р·Р°Р±Р»РѕРєРёСЂСѓРµС‚ СѓСЃР»СѓРіСѓ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РЅР°Р»РёС‡РёСЏ СЃСЂРµРґСЃС‚РІ)"
+  },
+  "us.block": {
+    "prefix": "us.block",
+    "body": "us.block ",
+    "description": "РџСЂРёРЅСѓРґРёС‚РµР»СЊРЅР°СЏ Р±Р»РѕРєРёСЂРѕРІРєР° СѓСЃР»СѓРіРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "us.activate": {
+    "prefix": "us.activate",
+    "body": "us.activate ",
+    "description": "РђРєС‚РёРІР°С†РёСЏ СѓСЃР»СѓРіРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїРѕСЃР»Рµ Р±Р»РѕРєРёСЂРѕРІРєРё"
+  },
+  "us.delete": {
+    "prefix": "us.delete",
+    "body": "us.delete ",
+    "description": "РЈРґР°Р»РµРЅРёРµ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅРЅРѕР№ СѓСЃР»СѓРіРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "us.gen_store_pass": {
+    "prefix": "us.gen_store_pass",
+    "body": "us.gen_store_pass ",
+    "description": "РЎРїРµС†РёР°Р»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ РіРµРЅРµСЂР°С†РёРё Рё СЃРѕС…СЂР°РЅРµРЅРёСЏ РїР°СЂРѕР»СЏ РІ settings"
+  },
+  "us.parent": {
+    "prefix": "us.parent",
+    "body": "us.parent.",
+    "description": "РЎСЃС‹Р»РєР° РЅР° СЂРѕРґРёС‚РµР»СЊСЃРєСѓСЋ СѓСЃР»СѓРіСѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "us.top_parent": {
+    "prefix": "us.top_parent",
+    "body": "us.top_parent.",
+    "description": "РЎСЃС‹Р»РєР° РЅР° СЃР°РјСѓСЋ РІРµСЂС…РЅСЋСЋ СѓСЃР»СѓРіСѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "us.service": {
+    "prefix": "us.service",
+    "body": "us.service.",
+    "description": "РЎСЃС‹Р»РєР° РЅР° РєР°С‚Р°Р»РѕРі СѓСЃР»СѓРі"
+  },
+  "us.withdraw": {
+    "prefix": "us.withdraw",
+    "body": "us.withdraw.",
+    "description": "РЎСЃС‹Р»РєР° РЅР° СЃРїРёСЃР°РЅРёРµ СѓСЃР»СѓРіРё"
+  },
+  "us.withdraw_id": {
+    "prefix": "us.withdraw_id",
+    "body": "us.withdraw_id.",
+    "description": "ID РїРѕСЃР»РµРґРЅРµРіРѕ СЃРїРёСЃР°РЅРёРµ СѓСЃР»СѓРіРё"
+  },
+  "us.wd": {
+    "prefix": "us.wd",
+    "body": "us.wd.",
+    "description": "РЎСЃС‹Р»РєР° РЅР° СЃРїРёСЃР°РЅРёРµ СѓСЃР»СѓРіРё"
+  },
+  "us.list_for_api": {
+    "prefix": "us.list_for_api",
+    "body": "us.list_for_api( $1 ) ",
+    "description": "РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° СѓСЃР»СѓРі РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "us.get_user_id": {
+    "prefix": "us.get_user_id",
+    "body": "us.get_user_id",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ id РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РёР· СѓСЃР»СѓРіРё"
+  },
+  "us.is_paid": {
+    "prefix": "us.is_paid",
+    "body": "us.is_paid",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё СѓСЃР»СѓРіР° РѕРїР»Р°С‡РµРЅР°"
+  },
+  "us.has_expired": {
+    "prefix": "us.has_expired",
+    "body": "us.has_expired",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё СЃСЂРѕРє РґРµР№СЃС‚РІРёСЏ СѓСЃР»СѓРіРё РёСЃС‚РµРє"
+  },
+  "us.auto_bill": {
+    "prefix": "us.auto_bill",
+    "body": "us.auto_bill",
+    "description": "РЎРѕСЃС‚РѕСЏРЅРёРµ Р±РёР»Р»РёРЅРіР°, 1 - РІРєР»СЋС‡РµРЅ"
+  },
+  "service.id": {
+    "prefix": "service.id",
+    "body": "service.id ",
+    "description": "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё (РїРѕР»СѓС‡РёС‚СЊ)"
+  },
+  "service.id()": {
+    "prefix": "service.id()",
+    "body": "service.id( $1 )",
+    "description": "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё (СѓСЃС‚Р°РЅРѕРІРёС‚СЊ)"
+  },
+  "service.name": {
+    "prefix": "service.name",
+    "body": "service.name ",
+    "description": "РќР°Р·РІР°РЅРёРµ СѓСЃР»СѓРіРё"
+  },
+  "service.cost": {
+    "prefix": "service.cost",
+    "body": "service.cost ",
+    "description": "Р‘Р°Р·РѕРІР°СЏ СЃС‚РѕРёРјРѕСЃС‚СЊ СѓСЃР»СѓРіРё"
+  },
+  "service.period": {
+    "prefix": "service.period",
+    "body": "service.period ",
+    "description": "РџРµСЂРёРѕРґ СѓСЃР»СѓРіРё"
+  },
+  "service.category": {
+    "prefix": "service.category",
+    "body": "service.category ",
+    "description": "РљР°С‚РµРіРѕСЂРёСЏ СѓСЃР»СѓРіРё"
+  },
+  "service.server": {
+    "prefix": "service.server",
+    "body": "service.server",
+    "description": "РЎСЃС‹Р»РєР° РЅР° СЃРµСЂРІРµСЂ СѓСЃР»СѓРіРё"
+  },
+  "service.id.N.name": {
+    "prefix": "service.id(N).name",
+    "body": "service.id(${1:N}).name ",
+    "description": "РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СѓСЃР»СѓРіРё c РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј N"
+  },
+  "service.id.N.FIELD": {
+    "prefix": "service.id(N).FIELD",
+    "body": "service.id( ${1:N} ).${2:FIELD}",
+    "description": "РџРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРёР·РІРѕР»СЊРЅРѕРіРѕ РїРѕР»СЏ СѓСЃР»СѓРіРё c РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј N"
+  },
+  "service.api_price_list": {
+    "prefix": "service.api_price_list",
+    "body": "service.api_price_list( $1 )",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ РјР°СЃСЃРёРІ СѓСЃР»СѓРі РёР· РєР°С‚Р°Р»РѕРіР°"
+  },
+  "service.settings": {
+    "prefix": "service.settings",
+    "body": "service.settings",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ settings СѓСЃР»СѓРіРё"
+  },
+  "service.set_settings": {
+    "prefix": "service.set_settings({ 'key' => value })",
+    "body": "service.set_settings({ '${1:key}' => ${2:value} }) ",
+    "description": "РЎРѕС…СЂР°РЅРёС‚СЊ РІ settings СѓСЃР»СѓРіРё РїСЂРѕРёР·РІРѕР»СЊРЅС‹Рµ РґР°РЅРЅС‹Рµ"
+  },
+  "service.withdraw": {
+    "prefix": "service.withdraw",
+    "body": "service.withdraw.",
+    "description": "РЎСЃС‹Р»РєР° РЅР° РѕР±СЉРµРєС‚ СЃРїРёСЃР°РЅРёСЏ"
+  },
+  "service.create_for_api": {
+    "prefix": "service.create_for_api( 'service_id', N, 'check_allow_to_order', 1 )",
+    "body": "service.create_for_api( 'service_id', ${1:N}, 'check_allow_to_order', 1 ) ",
+    "description": "Р РµРіРёСЃС‚СЂРёСЂСѓРµС‚ СѓСЃР»СѓРіСѓ РєР»РёРµРЅС‚Сѓ СЃ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј N"
+  },
+  "service.list_for_api": {
+    "prefix": "service.list_for_api",
+    "body": "service.list_for_api()",
+    "description": "РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° СѓСЃР»СѓРі РёР· РєР°С‚Р°Р»РѕРіР°"
+  },
+  "wd.id": {
+    "prefix": "wd.id",
+    "body": "wd.id ",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ id СЃРїРёСЃР°РЅРёСЏ"
+  },
+  "wd.id()": {
+    "prefix": "wd.id()",
+    "body": "wd.id( $1 )",
+    "description": "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ id СЃРїРёСЃР°РЅРёСЏ"
+  },
+  "wd.create_date": {
+    "prefix": "wd.create_date",
+    "body": "wd.create_date ",
+    "description": "Р”Р°С‚Р° СЃРѕР·РґР°РЅРёСЏ СЃРїРёСЃР°РЅРёСЏ"
+  },
+  "wd.withdraw_date": {
+    "prefix": "wd.withdraw_date",
+    "body": "wd.withdraw_date ",
+    "description": "Р”Р°С‚Р° СЃРїРёСЃР°РЅРёСЏ СЃРїРёСЃР°РЅРёСЏ"
+  },
+  "wd.cost": {
+    "prefix": "wd.cost",
+    "body": "wd.cost ",
+    "description": "РЎСѓРјРјР° СЃРїРёСЃР°РЅРёСЏ"
+  },
+  "wd.discount": {
+    "prefix": "wd.discount",
+    "body": "wd.discount ",
+    "description": "РЎРєРёРґРєР°"
+  },
+  "wd.bonus": {
+    "prefix": "wd.bonus",
+    "body": "wd.bonus ",
+    "description": "РљРѕР»РёС‡РµСЃС‚РІРѕ Р±РѕРЅСѓСЃРѕРІ"
+  },
+  "wd.months": {
+    "prefix": "wd.months",
+    "body": "wd.months ",
+    "description": "РџРµСЂРёРѕРґ СѓСЃР»СѓРіРё"
+  },
+  "wd.total": {
+    "prefix": "wd.total",
+    "body": "wd.total ",
+    "description": "РС‚РѕРіРѕРІР°СЏ СЃС‚РѕРёРјРѕСЃС‚СЊ"
+  },
+  "wd.service_id": {
+    "prefix": "wd.service_id",
+    "body": "wd.service_id ",
+    "description": "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РєР°С‚Р°Р»РѕРіР° СѓСЃР»СѓРі"
+  },
+  "wd.user_service_id": {
+    "prefix": "wd.user_service_id",
+    "body": "wd.user_service_id ",
+    "description": "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СѓСЃР»СѓРіРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "wd.qnt": {
+    "prefix": "wd.qnt",
+    "body": "wd.qnt ",
+    "description": "РљРѕР»РёС‡РµСЃС‚РІРѕ РµРґРёРЅРёС† С‚РѕРІР°СЂР°"
+  },
+  "wd.paid": {
+    "prefix": "wd.paid",
+    "body": "wd.paid",
+    "description": "РњРµС‚РѕРґ РІРѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё СЃРїРёСЃР°РЅРёРµ РѕРїР»Р°С‡РµРЅРѕ"
+  },
+  "wd.unpaid": {
+    "prefix": "wd.unpaid",
+    "body": "wd.unpaid",
+    "description": "РњРµС‚РѕРґ РІРѕР·РІСЂР°С‰Р°РµС‚ 1, РµСЃР»Рё СЃРїРёСЃР°РЅРёРµ РќР• РѕРїР»Р°С‡РµРЅРѕ"
+  },
+  "wd.list_for_api": {
+    "prefix": "wd.list_for_api",
+    "body": "wd.list_for_api( $1 ) ",
+    "description": "РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° СЃРїРёСЃР°РЅРёР№"
+  },
+  "pay.id": {
+    "prefix": "pay.id",
+    "body": "pay.id ",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ id РїР»Р°С‚РµР¶Р°"
+  },
+  "pay.id()": {
+    "prefix": "pay.id()",
+    "body": "pay.id( $1 ) ",
+    "description": "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ id РїР»Р°С‚РµР¶Р°"
+  },
+  "pay.date": {
+    "prefix": "pay.date",
+    "body": "pay.date ",
+    "description": "Р”Р°С‚Р° Рё РІСЂРµРјСЏ РїР»Р°С‚РµР¶Р°"
+  },
+  "pay.money": {
+    "prefix": "pay.money",
+    "body": "pay.money ",
+    "description": "РЎСѓРјРјР° РїР»Р°С‚РµР¶Р°"
+  },
+  "pay.pay_system_id": {
+    "prefix": "pay.pay_system_id",
+    "body": "pay.pay_system_id ",
+    "description": "РРјСЏ РїР»Р°С‚РµР¶РЅРѕР№ СЃРёСЃС‚РµРјС‹"
+  },
+  "pay.comment": {
+    "prefix": "pay.comment",
+    "body": "pay.comment ",
+    "description": "РљРѕРјРјРµРЅС‚Р°СЂРёР№ Рє РїР»Р°С‚РµР¶Сѓ"
+  },
+  "pay.last": {
+    "prefix": "pay.last",
+    "body": "pay.last ",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ СЃСЃС‹Р»РєСѓ РЅР° РїРѕСЃР»РµРґРЅРёР№ РїР»Р°С‚РµР¶"
+  },
+  "pay.forecast": {
+    "prefix": "pay.forecast( days = 3, blocked = 0 )",
+    "body": "pay.forecast( days = 3, blocked = 0 ) ",
+    "description": "Р’РѕР·РІСЂР°С‰Р°РµС‚ JSON РїСЂРѕРіРЅРѕР·Р° РѕРїР»Р°С‚ СѓСЃР»СѓРі. days - РєРѕР»-РІРѕ РґРЅРµР№ РґР»СЏ РїСЂРѕРіРЅРѕР·Р° (3 РґРЅСЏ РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ), blocked - СѓС‡РёС‚С‹РІР°С‚СЊ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅРЅС‹Рµ СѓСЃР»СѓРіРё (0 - РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ РќР•Рў, 1 - Р”Рђ)"
+  },
+  "pay.paysystems": {
+    "prefix": "pay.paysystems",
+    "body": "pay.paysystems ",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє РїР»Р°С‚РµР¶РЅС‹С… СЃРёСЃС‚РµРј"
+  },
+  "pay.list_for_api": {
+    "prefix": "pay.list_for_api",
+    "body": "pay.list_for_api( $1 ) ",
+    "description": "РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РїР»Р°С‚РµР¶РµР№"
+  },
+  "bonus.list_for_api": {
+    "prefix": "bonus.list_for_api",
+    "body": "bonus.list_for_api( $1 ) ",
+    "description": "РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° Р±РѕРЅСѓСЃРѕРІ"
+  },
+  "sg.id": {
+    "prefix": "sg.id",
+    "body": "sg.id",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ id РіСЂСѓРїРїС‹ СЃРµСЂРІРµСЂРѕРІ"
+  },
+  "sg.id()": {
+    "prefix": "sg.id()",
+    "body": "sg.id( $1 )",
+    "description": "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ id РіСЂСѓРїРїС‹ СЃРµСЂРІРµСЂРѕРІ"
+  },
+  "sg.name": {
+    "prefix": "sg.name",
+    "body": "sg.name",
+    "description": "РРјСЏ РіСЂСѓРїРїС‹ СЃРµСЂРІРµСЂРѕРІ"
+  },
+  "sg.type": {
+    "prefix": "sg.type",
+    "body": "sg.type",
+    "description": "РЎРїРѕСЃРѕР± РІС‹Р±РѕСЂР° СЃРµСЂРІРµСЂРѕРІ (random,by-one,evenly)"
+  },
+  "sg.transport": {
+    "prefix": "sg.transport",
+    "body": "sg.transport",
+    "description": "РўСЂР°РЅСЃРїРѕСЂС‚ РіСЂСѓРїРїС‹ (local,ssh,httpвЂ¦)"
+  },
+  "sg.settings": {
+    "prefix": "sg.settings",
+    "body": "sg.settings",
+    "description": "settings РіСЂСѓРїРїС‹ СЃРµСЂРІРµСЂРѕРІ"
+  },
+  "sg.set_settings": {
+    "prefix": "sg.set_settings({ 'key' => value })",
+    "body": "sg.set_settings({ '${1:key}' => ${2:value} }) ",
+    "description": "РЎРѕС…СЂР°РЅРёС‚СЊ РІ settings РіСЂСѓРїРїС‹ СЃРµСЂРІРµСЂРѕРІ РїСЂРѕРёР·РІРѕР»СЊРЅС‹Рµ РґР°РЅРЅС‹Рµ"
+  },
+  "sg.list_for_api": {
+    "prefix": "sg.list_for_api",
+    "body": "sg.list_for_api( $1 )",
+    "description": "РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РіСЂСѓРїРї СЃРµСЂРІРµСЂРѕРІ"
+  },
+  "server.server_id": {
+    "prefix": "server.server_id",
+    "body": "server.server_id",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ id СЃРµСЂРІРµСЂР°"
+  },
+  "server.id()": {
+    "prefix": "server.id()",
+    "body": "server.id( $1 )",
+    "description": "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ id СЃРµСЂРІРµСЂР°"
+  },
+  "server.name": {
+    "prefix": "server.name",
+    "body": "server.name ",
+    "description": "РРјСЏ СЃРµСЂРІРµСЂР°"
+  },
+  "server.host": {
+    "prefix": "server.host",
+    "body": "server.host ",
+    "description": "Host СЃРµСЂРІРµСЂР°"
+  },
+  "server.transport": {
+    "prefix": "server.transport",
+    "body": "server.transport",
+    "description": "РўСЂР°РЅСЃРїРѕСЂС‚ СЃРµСЂРІРµСЂР°"
+  },
+  "server.settings": {
+    "prefix": "server.settings",
+    "body": "server.settings",
+    "description": "settings СЃРµСЂРІРµСЂР°"
+  },
+  "server.settings.template_id": {
+    "prefix": "server.settings.template_id",
+    "body": "server.settings.template_id",
+    "description": "РЁР°Р±Р»РѕРЅ РІ РЅР°СЃС‚СЂРѕР№РєР°С… СЃРµСЂРІРµСЂР°"
+  },
+  "server.settings.max_services": {
+    "prefix": "server.settings.max_services",
+    "body": "server.settings.max_services",
+    "description": "Р›РёРјРёС‚ СѓСЃР»СѓРі РІ РЅР°СЃС‚СЂРѕР№РєР°С… СЃРµСЂРІРµСЂР°"
+  },
+  "server.settings.key_id": {
+    "prefix": "server.settings.key_id",
+    "body": "server.settings.key_id",
+    "description": "ID РєР»СЋС‡Р° РІ РЅР°СЃС‚СЂРѕР№РєР°С… СЃРµСЂРІРµСЂР°"
+  },
+  "server.set_settings": {
+    "prefix": "server.set_settings({ 'key' => value })",
+    "body": "server.set_settings({ '${1:key}' => ${2:value} }) ",
+    "description": "РЎРѕС…СЂР°РЅРёС‚СЊ РІ settings СЃРµСЂРІРµСЂР° РїСЂРѕРёР·РІРѕР»СЊРЅС‹Рµ РґР°РЅРЅС‹Рµ"
+  },
+  "server.group": {
+    "prefix": "server.group",
+    "body": "server.group",
+    "description": "РЎСЃС‹Р»РєР° РЅР° РіСЂСѓРїРїСѓ СЃРµСЂРІРµСЂР°"
+  },
+  "server.services_count": {
+    "prefix": "server.services_count",
+    "body": "server.services_count",
+    "description": "РљРѕР»РёС‡РµСЃС‚РІРѕ СѓСЃР»СѓРі РЅР° СЃРµСЂРІРµСЂРµ"
+  },
+  "server.weight": {
+    "prefix": "server.weight",
+    "body": "server.weight",
+    "description": "Р’РµСЃ СЃРµСЂРІРµСЂР° РІ РіСЂСѓРїРїРµ"
+  },
+  "server.enabled": {
+    "prefix": "server.enabled",
+    "body": "server.enabled",
+    "description": "1 - РІРєР»СЋС‡РµРЅ, 0 - РІС‹РєР»СЋС‡РµРЅ"
+  },
+  "server.servers_by_group_id": {
+    "prefix": "server.servers_by_group_id()",
+    "body": "server.servers_by_group_id( $1 )",
+    "description": "РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° СЃРµСЂРІРµСЂРѕРІ РёР· РіСЂСѓРїРїС‹ N"
+  },
+  "server.list_for_api": {
+    "prefix": "list_for_api()",
+    "body": "list_for_api( $1 ) ",
+    "description": "РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° СЃРµСЂРІРµСЂРѕРІ"
+  },
+  "spool.id": {
+    "prefix": "spool.id",
+    "body": "spool.id",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ id Р·Р°РґР°С‡Рё РёР· РѕС‡РµСЂРµРґРё"
+  },
+  "spool.id($1)": {
+    "prefix": "spool.id()",
+    "body": "spool.id(${1:id})",
+    "description": "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ id Р·Р°РґР°С‡Рё РёР· РѕС‡РµСЂРµРґРё"
+  },
+  "spool.created": {
+    "prefix": "spool.created",
+    "body": "spool.created",
+    "description": "Р”Р°С‚Р° Рё РІСЂРµРјСЏ СЃРѕР·РґР°РЅРёСЏ Р·Р°РґР°С‡Рё"
+  },
+  "spool.executed": {
+    "prefix": "spool.executed",
+    "body": "spool.executed",
+    "description": "Р”Р°С‚Р° Рё РІСЂРµРјСЏ РїРѕСЃР»РµРґРЅРµРіРѕ РІС‹РїРѕР»РЅРµРЅРёСЏ"
+  },
+  "spool.status": {
+    "prefix": "spool.status",
+    "body": "spool.status",
+    "description": "РЎС‚Р°С‚СѓСЃ РІС‹РїРѕР»РЅРµРЅРёСЏ РєРѕРјР°РЅРґС‹ (NEW, PAUSED ..)"
+  },
+  "spool.settings": {
+    "prefix": "spool.settings",
+    "body": "spool.settings",
+    "description": "РќР°СЃС‚СЂРѕР№РєРё Р·Р°РґР°С‡Рё (РѕР±СЉРµРєС‚)"
+  },
+  "spool.settings.template_id": {
+    "prefix": "spool.settings.template_id",
+    "body": "spool.settings.template_id",
+    "description": "РЁР°Р±Р»РѕРЅ РґР»СЏ РІС‹РїРѕР»РЅРµРЅРёСЏ Р·Р°РґР°С‡Рё"
+  },
+  "spool.settings.user_id": {
+    "prefix": "spool.settings.user_id",
+    "body": "spool.settings.user_id",
+    "description": "ID РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РґР»СЏ РІС‹РїРѕР»РЅРµРЅРёСЏ Р·Р°РґР°С‡Рё"
+  },
+  "spool.delayed": {
+    "prefix": "spool.delayed",
+    "body": "spool.delayed",
+    "description": "РћС‚Р»РѕР¶РµРЅР° (РІ СЃРµРєСѓРЅРґР°С…)"
+  },
+  "spool.user_service_id": {
+    "prefix": "spool.user_service_id",
+    "body": "spool.user_service_id",
+    "description": "ID РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё"
+  },
+  "spool.event": {
+    "prefix": "spool.event",
+    "body": "spool.event",
+    "description": "РЎРѕР±С‹С‚РёРµ (РѕР±СЉРµРєС‚)"
+  },
+  "spool.event.kind": {
+    "prefix": "spool.event.kind",
+    "body": "spool.event.kind",
+    "description": "Р’РёРґ СЃРѕР±С‹С‚РёСЏ (РЅР°РїСЂРёРјРµСЂ Jobs)"
+  },
+  "spool.event.period": {
+    "prefix": "spool.event.period",
+    "body": "spool.event.period",
+    "description": "РџРµСЂРёРѕРґ РІС‹РїРѕР»РЅРµРЅРёСЏ РІ СЃРµРєСѓРЅРґР°С… (86400 вЂ” СЂР°Р· РІ СЃСѓС‚РєРё)"
+  },
+  "spool.event.method": {
+    "prefix": "spool.event.method",
+    "body": "spool.event.method",
+    "description": "РњРµС‚РѕРґ (job_users, job_make_forecasts ..)"
+  },
+  "spool.event.title": {
+    "prefix": "spool.event.title",
+    "body": "spool.event.title",
+    "description": "РќР°Р·РІР°РЅРёРµ СЃРѕР±С‹С‚РёСЏ РґР»СЏ Р·Р°РґР°С‡Рё"
+  },
+  "spool.event.server_gid": {
+    "prefix": "spool.event.server_gid",
+    "body": "spool.event.server_gid",
+    "description": "Р“СЂСѓРїРїР° СЃРµСЂРІРµСЂРѕРІ РґР»СЏ Р·Р°РґР°С‡Рё"
+  },
+  "spool.response": {
+    "prefix": "spool.response",
+    "body": "spool.response",
+    "description": "Р РµР·СѓР»СЊС‚Р°С‚ РІС‹РїРѕР»РЅРµРЅРёСЏ"
+  },
+  "spool.prio": {
+    "prefix": "spool.prio",
+    "body": "spool.prio",
+    "description": "РџСЂРёРѕСЂРёС‚РµС‚ РєРѕРјР°РЅРґС‹"
+  },
+  "spool.user_id": {
+    "prefix": "spool.user_id",
+    "body": "spool.user_id",
+    "description": "ID РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"
+  },
+  "spool.add": {
+    "prefix": "spool.add",
+    "body": "spool.add",
+    "description": "Р”РѕР±Р°РІРёС‚СЊ Р·Р°РґР°С‡Сѓ РІ РѕС‡РµСЂРµРґСЊ"
+  },
+  "spool.delete": {
+    "prefix": "spool.delete",
+    "body": "spool.delete",
+    "description": "РЈРґР°Р»РёС‚СЊ Р·Р°РґР°С‡Сѓ РёР· РѕС‡РµСЂРµРґРё"
+  },
+  "config": {
+    "prefix": "config",
+    "body": "config.${1:NAME}",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ РґР°РЅРЅС‹Рµ NAME РёР· РєРѕРЅС„РёРіСѓСЂР°С†РёРё"
+  },
+  "storage.save": {
+    "prefix": "storage.save( NAME, DATA )",
+    "body": "storage.save( ${1:NAME}, ${2:DATA} ) ",
+    "description": "РЎРѕС…СЂР°РЅРёС‚СЊ РґР°РЅРЅС‹Рµ DATA РІ С…СЂР°РЅРёР»РёС‰Рµ СЃ РєР»СЋС‡РѕРј NAME"
+  },
+  "storage.load": {
+    "prefix": "storage.load( NAME )",
+    "body": "storage.load( ${1:NAME} )",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ РґР°РЅРЅС‹Рµ РёР· С…СЂР°РЅРёР»РёС‰Р° СЃ РєР»СЋС‡РѕРј NAME"
+  },
+  "storage.read": {
+    "prefix": "storage.read( 'name', NAME )",
+    "body": "storage.read( 'name', ${1:NAME} )",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ РґР°РЅРЅС‹Рµ РёР· С…СЂР°РЅРёР»РёС‰Р°"
+  },
+  "storage.del": {
+    "prefix": "storage.del( NAME )",
+    "body": "storage.dele( ${1:NAME} ) ",
+    "description": "РЈРґР°Р»РёС‚СЊ РґР°РЅРЅС‹Рµ РёР· С…СЂР°РЅРёР»РёС‰Р° СЃ РєР»СЋС‡РѕРј NAME"
+  },
+  "storage.list_for_api": {
+    "prefix": "storage.list_for_api",
+    "body": "storage.list_for_api( $1 )",
+    "description": "РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РґР°РЅРЅС‹С…"
+  },
+  "tpl.id": {
+    "prefix": "tpl.id",
+    "body": "tpl.id",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ id С€Р°Р±Р»РѕРЅР°"
+  },
+  "tpl.id().parse": {
+    "prefix": [
+      "tpl.id(TEMPLATE).parse( 'usi', USI )",
+      "parse"
+    ],
+    "body": "tpl.id( ${1:TEMPLATE} ).parse( 'usi', ${2:USI} )",
+    "description": "Р’С‹РїРѕР»РЅРёС‚СЊ С€Р°Р±Р»РѕРЅ СЃ РёРјРµРЅРµРј NAME РґР»СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ СѓСЃР»СѓРіРё СЃ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј usi"
+  },
+  "tpl.data": {
+    "prefix": "tpl.data",
+    "body": "tpl.data",
+    "description": "Р”Р°РЅРЅС‹Рµ С€Р°Р±Р»РѕРЅР°"
+  },
+  "tpl.settings": {
+    "prefix": "tpl.settings",
+    "body": "tpl.settings",
+    "description": "РџРѕР»СѓС‡РёС‚СЊ settings С€Р°Р±Р»РѕРЅР°"
+  },
+  "task": {
+    "prefix": "task",
+    "body": "task",
+    "description": "Р Р°Р±РѕС‚Р° СЃ Р·Р°РґР°С‡Р°РјРё"
+  },
+  "task.answer": {
+    "prefix": "task.answer( status = SUCCESS, msg = 'string' )",
+    "body": "task.answer( status = ${1:SUCCESS}, msg = '${2:string}' )",
+    "description": "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ СЃС‚Р°С‚СѓСЃ (SUCCESS, STUCK, FAIL) Рё СЃРѕРѕР±С‰РµРЅРёРµ Р·Р°РґР°С‡Рё"
+  },
+  "telegram.bot": {
+    "prefix": "telegram.bot( TEMPLATE, CMD, ARGS )",
+    "body": "telegram.bot( ${1:TEMPLATE}, ${2:CMD}, ${3:ARGS} ) ",
+    "description": "Р’С‹РїРѕР»РЅРёС‚СЊ CMD СЃ Р°СЂРіСѓРјРµРЅС‚Р°РјРё ARGS РёР· С€Р°Р±Р»РѕРЅР° TEMPLATE"
+  },
+  "tg_api(answerCallbackQuery)": {
+    "prefix": [
+      "answerCallbackQuery",
+      "tg_api"
+    ],
+    "body": [
+      "{{ tg_api( \"answerCallbackQuery\" = {",
+      "     \"show_alert\" = \"true\"",
+      "     \"callback_query_id\" = callback_query.id",
+      "     \"text\" = \"${1:TEXT}\"",
+      "  })",
+      "}}"
+    ],
+    "description": "Р‘Р»РѕРє answerCallbackQuery"
+  },
+  "tg_api(deleteMessage)": {
+    "prefix": [
+      "deleteMessage",
+      "tg_api"
+    ],
+    "body": "{{ tg_api( deleteMessage = { message_id = message.message_id } ) }}",
+    "description": "Р‘Р»РѕРє deleteMessage"
+  },
+  "tg_api(editMessageText)": {
+    "prefix": [
+      "editMessageText",
+      "tg_api"
+    ],
+    "body": [
+      "{{ tg_api( \"editMessageText\" = {",
+      "    \"message_id\" = message.message_id",
+      "    \"parse_mode\" = \"HTML\"",
+      "    \"disable_notification\" = \"true\"",
+      "    \"text\" = \"${1:TEXT}\"",
+      "    \"reply_markup\" = {",
+      "        \"inline_keyboard\" = [",
+      "            [{",
+      "               \"text\" = \"${2:button1_text}\"",
+      "               \"callback_data\" = \"${3:button1_cb}\"",
+      "            }]",
+      "            [{",
+      "                \"text\" = \"${4:button2_text}\"",
+      "                \"callback_data\" = \"${5:button2_cb}\"",
+      "            }]",
+      "        ]}",
+      "   })",
+      "}}"
+    ],
+    "description": "Р‘Р»РѕРє editMessageText"
+  },
+  "tg_api(sendMessage)": {
+    "prefix": [
+      "sendMessage",
+      "tg_api"
+    ],
+    "body": [
+      "{{ tg_api( \"sendMessage\" = {",
+      "    \"parse_mode\" = \"HTML\"",
+      "    \"text\" = \"${1:TEXT}\"",
+      "    \"reply_markup\" = {",
+      "        \"inline_keyboard\" = [",
+      "            [{",
+      "               \"text\" = \"${2:button1_text}\"",
+      "               \"callback_data\" = \"${3:button1_cb}\"",
+      "            }]",
+      "            [{",
+      "                \"text\" = \"${4:button2_text}\"",
+      "                \"callback_data\" = \"${5:button2_cb}\"",
+      "            }]",
+      "        ]}",
+      "   })",
+      "}}"
+    ],
+    "description": "Р‘Р»РѕРє sendMessage"
+  },
+  "misc.uuid_gen": {
+    "prefix": "misc.uuid_gen",
+    "body": "misc.uuid_gen",
+    "description": "Р“РµРЅРµСЂРёСЂСѓРµС‚ СѓРЅРёРєР°Р»СЊРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ UUID"
+  },
+  "misc.passgen()": {
+    "prefix": "misc.passgen(N)",
+    "body": "misc.passgen(${1:10})",
+    "description": "Р“РµРЅРµСЂРёСЂСѓРµС‚ СЃС‚СЂРѕРєСѓ РїР°СЂРѕР»СЏ СЃ Р·Р°РґР°РЅРЅС‹Рј РєРѕР»РёС‡РµСЃС‚РІРѕРј Р·РЅР°РєРѕРІ N"
+  },
+  "misc.string_to_utime()": {
+    "prefix": "misc.string_to_utime()",
+    "body": "misc.string_to_utime(${1:string})",
+    "description": "РџРµСЂРµРІРѕРґРёС‚ СЃС‚СЂРѕРєСѓ РґР°С‚С‹ РІ Unix-РІСЂРµРјРµРЅРЅСѓСЋ РѕС‚РјРµС‚РєСѓ (UNIXTIME)"
+  },
+  "misc.utime_to_string()": {
+    "prefix": "misc.utime_to_string(${1:timestamp})",
+    "body": "misc.utime_to_string(${1:timestamp})",
+    "description": "РџРµСЂРµРІРѕРґРёС‚ РІСЂРµРјРµРЅРЅСѓСЋ РѕС‚РјРµС‚РєСѓ UNIXTIME РІ С‡РёС‚Р°РµРјСѓСЋ СЃС‚СЂРѕРєСѓ РґР°С‚С‹"
+  },
+  "misc.add_date_time()": {
+    "prefix": "misc.add_date_time()",
+    "body": "misc.add_date_time(${1:created}, ${2:day} = ${3:1})",
+    "description": "РџСЂРёР±Р°РІР»СЏРµС‚ СѓРєР°Р·Р°РЅРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р»РµС‚, РјРµСЃСЏС†РµРІ, РґРЅРµР№ Рё С‚.Рґ. Рє СѓРєР°Р·Р°РЅРЅРѕР№ РґР°С‚Рµ ( year, month, day, hour, min, sec). Р”Р»СЏ РІС‹С‡РёС‚Р°РЅРёСЏ РёСЃРїРѕР»СЊР·СѓР№С‚Рµ '-', РЅР°РїСЂРёРјРµСЂ: month = -6"
+  },
+  "misc.now": {
+    "prefix": "misc.now",
+    "body": "misc.now",
+    "description": "РўРµРєСѓС‰Р°СЏ СЃРёСЃС‚РµРјРЅР°СЏ РґР°С‚Р°"
+  },
+  "misc.start_of_month()": {
+    "prefix": "misc.start_of_month()",
+    "body": "misc.start_of_month(${1:date})",
+    "description": "РџСЂРёРІРѕРґРёС‚ СѓРєР°Р·Р°РЅРЅСѓСЋ РґР°С‚Сѓ Рє РЅР°С‡Р°Р»Сѓ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ РјРµСЃСЏС†Р° (РїРµСЂРІРѕРµ С‡РёСЃР»Рѕ)"
+  },
+  "misc.end_of_month()": {
+    "prefix": "misc.end_of_month()",
+    "body": "misc.end_of_month(${1:date})",
+    "description": "РџСЂРёРІРѕРґРёС‚ СѓРєР°Р·Р°РЅРЅСѓСЋ РґР°С‚Сѓ Рє РєРѕРЅС†Сѓ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ РјРµСЃСЏС†Р° (РїРѕСЃР»РµРґРЅРµРµ С‡РёСЃР»Рѕ)"
+  },
+  "misc.days_in_months()": {
+    "prefix": "misc.days_in_months()",
+    "body": "misc.days_in_months(${1:date})",
+    "description": "РљРѕР»РёС‡РµСЃС‚РІРѕ РґРЅРµР№ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ РјРµСЃСЏС†Р°"
+  },
+  "misc.parse_period()": {
+    "prefix": "misc.parse_period()",
+    "body": "misc.parse_period(${1:1.2203}).${2:months}",
+    "description": "РџРѕРґСЂРѕР±РЅС‹Р№ РІС‹РІРѕРґ Р·РЅР°С‡РµРЅРёР№ РїРµСЂРёРѕРґР° СѓСЃР»СѓРіРё (.months, .days, .hours)"
+  },
+  "misc.parse_date()": {
+    "prefix": "misc.parse_date()",
+    "body": "misc.parse_date(${1:date}).${2:month}",
+    "description": "РџРѕРґСЂРѕР±РЅС‹Р№ РІС‹РІРѕРґ Р·РЅР°С‡РµРЅРёР№ РґР°С‚С‹ (.year, .month, .day, .hour, .min, .sec)"
+  },
+  "misc.html_escape": {
+    "prefix": "misc.html_escape()",
+    "body": "misc.html_escape(${1:str})",
+    "description": "Р—Р°РјРµРЅСЏРµС‚ HTML СЃРёРјРІРѕР»С‹: & => &amp;, < => &lt;, > => &gt;, / => '&#x2F;' Рё РєР°РІС‹С‡РєРё "
+  },
+  "fromJson": {
+    "prefix": "fromJson( data )",
+    "body": "fromJson( ${1:data} ) ",
+    "description": "РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Json РІ РѕР±СЉРµРєС‚"
+  },
+  "toJson": {
+    "prefix": "toJson()",
+    "body": "toJson( $1 )",
+    "description": "РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РѕР±СЉРµРєС‚Р° РІ JSON"
+  },
+  "fromBase64Url": {
+    "prefix": "fromBase64Url( 'Base64Url' )",
+    "body": "fromBase64Url( '${1:Base64Url}' ) ",
+    "description": "Р Р°СЃРєРѕРґРёСЂРѕРІР°РЅРёРµ РёР· Base64Url"
+  },
+  "toBase64Url": {
+    "prefix": "toBase64Url( 'string' )",
+    "body": "toBase64Url( '${1:string}' ) ",
+    "description": "РљРѕРґРёСЂРѕРІР°РЅРёРµ РІ Base64Url"
+  },
+  "dump": {
+    "prefix": "dump(var)",
+    "body": "dump( ${1:data} ) ",
+    "description": "Р”РµР±Р°Рі Р·РЅР°С‡РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅС‹С…"
+  },
+  "request.headers": {
+    "prefix": [
+      "request.headers",
+      "headers"
+    ],
+    "body": "request.headers ",
+    "description": "Р—Р°РіРѕР»РѕРІРєРё Р·Р°РїСЂРѕСЃР°"
+  },
+  "request.params": {
+    "prefix": [
+      "request.params",
+      "params"
+    ],
+    "body": "request.params ",
+    "description": "Р”Р°РЅРЅС‹Рµ Р·Р°РїСЂРѕСЃР°"
+  },
+  "filter": {
+    "prefix": "filter( key = value )",
+    "body": "filter( ${1:key} = ${2:value} ) ",
+    "description": "РџСЂРёРјРµСЂ: {{ nopaid_block2  = user.us.filter( status = [ 'NOT PAID', 'BLOCK' ] ).items }}"
+  },
+  "where": {
+    "prefix": "where = { key = value }",
+    "body": "where = { ${1:key} = ${2:value} } ",
+    "description": "РџСЂРёРјРµСЂ: {{ nopaid_block = user.us.items( where =  { status = [ 'NOT PAID', 'BLOCK' ] } ) }}"
+  },
+  "toQueryString": {
+    "prefix": "toQueryString()",
+    "body": "toQueryString( $1 )",
+    "description": "РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РѕР±СЉРµРєС‚РѕРІ РІ Query string"
+  },
+  "event_name": {
+    "prefix": "event_name",
+    "body": "event_name ",
+    "description": "РќР°Р·РІР°РЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЃРѕР±С‹С‚РёСЏ"
+  },
+  "list_for_api": {
+    "prefix": "list_for_api",
+    "body": "list_for_api($1)",
+    "description": "РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєРѕРІ РґР°РЅРЅС‹С… РёР· РѕР±СЉРµРєС‚Р°"
+  },
+  "spool.history.clean": {
+    "prefix": "spool.history.clean( days = 30 )",
+    "body": "spool.history.clean( days = 30 )",
+    "description": "РЈРґР°Р»РёС‚СЊ РІСЃСЋ РёСЃС‚РѕСЂРёСЋ Р·Р°РґР°С‡ СЃС‚Р°СЂС€Рµ СѓРєР°Р·Р°РЅРЅС‹С… РґРЅРµР№ (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 30 РґРЅРµР№)"
+  },
+  "http.get()": {
+    "prefix": "http.get()",
+    "body": "http.get( ${1:'URL'}, 'headers',headers )",
+    "description": "GET Р·Р°РїСЂРѕСЃ, headers = {'Authorization' => token }"
+  },
+  "http.post()": {
+    "prefix": "http.post()",
+    "body": "http.post( ${1:'URL'}, 'content_type','application/json', 'headers',headers, 'content',content )",
+    "description": "POST Р·Р°РїСЂРѕСЃ, headers = {'Authorization' => token }, content = { username = 'user' _ us.id }"
+  },
+  "http.put()": {
+    "prefix": "http.put()",
+    "body": "http.put( ${1:'URL'}, 'content_type','application/json', 'headers',headers, 'content',content )",
+    "description": "PUT Р·Р°РїСЂРѕСЃ, headers = {'Authorization' => token }, content = { username = 'user' _ us.id }"
+  },
+  "http.delete()": {
+    "prefix": "http.delete()",
+    "body": "http.delete( ${1:'URL'}, 'content_type','application/json', 'headers',headers, 'content',content )",
+    "description": "DELETE Р·Р°РїСЂРѕСЃ, headers = {'Authorization' => token }, content = { username = 'user' _ us.id }"
+  },
+  "http.patch()": {
+    "prefix": "http.patch()",
+    "body": "http.patch( ${1:'URL'}, 'content_type','application/json', 'headers',headers, 'content',content )",
+    "description": "PATCH Р·Р°РїСЂРѕСЃ"
+  },
+  "http.options()": {
+    "prefix": "http.options()",
+    "body": "http.options( ${1:'URL'} )",
+    "description": "OPTIONS Р·Р°РїСЂРѕСЃ"
+  },
+  "comment": {
+    "prefix": [
+      "comment",
+      "a",
+      "//"
+    ],
+    "body": "{{# ${1:comment} }}",
+    "description": "РљРѕРјРјРµРЅС‚Р°СЂРёР№ РІ РєРѕРґРµ {{# РєРѕРјРјРµРЅС‚Р°СЂРёР№ }}"
+  },
+  ".set( 'FIELD', 'VALUE' )": {
+    "prefix": "set( 'FIELD', 'VALUE' )",
+    "body": "set( '${1:FIELD}', ${2:'VALUE'} ) ",
+    "description": "РЈСЃС‚Р°РЅРѕРІРєР° РїРѕР»СЏ FIELD РІ Р·РЅР°С‡РµРЅРёРµ VALUE. РџСЂРёРјРµСЂ: server.set('services_count', 123), РёР·РјРµРЅРµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° СѓСЃР»СѓРі РЅР° СЃРµСЂРІРµСЂРµ"
+  }
+}

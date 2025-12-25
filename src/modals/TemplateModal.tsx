@@ -9,6 +9,7 @@ import TemplateTestModal from './TemplateTestModal';
 import { shm_request } from '../lib/shm_request';
 import { useThemeStore } from '../store/themeStore';
 import TemplateSidebar from '../components/TemplateEditor/TemplateSidebar';
+import { registerTTCompletion } from '../lib/ttMonaco';
 
 interface TemplateModalProps {
   open: boolean;
@@ -882,8 +883,9 @@ export default function TemplateModal({
                           lineNumbers: 'on',
                           folding: true,
                         }}
-                        onMount={(editor) => {
+                        onMount={(editor, monaco) => {
                           editorRef.current = editor;
+                          registerTTCompletion(monaco);
                         }}
                       />
                     </div>
@@ -1008,8 +1010,9 @@ export default function TemplateModal({
                   lineNumbers: 'on',
                   folding: true,
                 }}
-                onMount={(editor) => {
+                onMount={(editor, monaco) => {
                   editorRef.current = editor;
+                  registerTTCompletion(monaco);
                 }}
               />
             </div>
