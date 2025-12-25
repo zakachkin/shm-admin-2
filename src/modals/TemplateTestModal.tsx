@@ -106,7 +106,7 @@ export default function TemplateTestModal({
       resizable={true}
       footer={renderFooter()}
     >
-      <div className="space-y-4 flex flex-col h-full">
+      <div className="space-y-4">
         {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -130,7 +130,7 @@ export default function TemplateTestModal({
             value={usi}
             onChange={(e) => setUsi(e.target.value)}
             className="flex-1 px-3 py-2 text-sm rounded border"
-            style={{ ...inputStyles, resize: 'none' }}
+            style={inputStyles}
             placeholder="Введите USI (опционально)"
           />
         </div>
@@ -157,16 +157,17 @@ export default function TemplateTestModal({
         </div>
 
         {}
-        <div className="flex items-start gap-3 flex-1 min-h-0">
+        <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Результат
           </label>
           <textarea
             value={renderResult}
             readOnly
-            className="flex-1 h-full px-3 py-2 text-sm rounded border font-mono"
-            style={inputStyles}
-              placeholder="Результат рендера появится здесь..."
+            rows={14}
+            className="flex-1 px-3 py-2 text-sm rounded border font-mono"
+            style={{ ...inputStyles, resize: 'none' }}
+            placeholder="Результат рендера появится здесь..."
           />
         </div>
       </div>
