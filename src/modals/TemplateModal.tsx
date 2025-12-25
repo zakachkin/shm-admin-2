@@ -322,6 +322,7 @@ export default function TemplateModal({
       if (savedFormData !== formData) {
         setFormData(savedFormData);
       }
+      window.dispatchEvent(new CustomEvent('templateSaved', { detail: { template: savedFormData } }));
       
       if (activeTabId) {
         setTabs(prev => prev.map(t => 
@@ -353,6 +354,7 @@ export default function TemplateModal({
       if (savedFormData !== formData) {
         setFormData(savedFormData);
       }
+      window.dispatchEvent(new CustomEvent('templateSaved', { detail: { template: savedFormData } }));
       if (activeTabId) {
         setTabs(prev => prev.map(t =>
           t.id === activeTabId ? {

@@ -36,8 +36,29 @@ export default function TemplateSidebar({
       }
     };
 
+    const handleTemplateSaved = (event: any) => {
+      const savedTemplate = event.detail?.template;
+      if (!savedTemplate?.id) {
+        return;
+      }
+
+      setTemplates(prev => {
+        const existingIndex = prev.findIndex(t => t.id === savedTemplate.id);
+        if (existingIndex !== -1) {
+          const next = [...prev];
+          next[existingIndex] = { ...next[existingIndex], ...savedTemplate };
+          return next;
+        }
+        return [savedTemplate, ...prev];
+      });
+    };
+
     window.addEventListener('templateDeleted', handleTemplateDeleted);
-    return () => window.removeEventListener('templateDeleted', handleTemplateDeleted);
+    window.addEventListener('templateSaved', handleTemplateSaved);
+    return () => {
+      window.removeEventListener('templateDeleted', handleTemplateDeleted);
+      window.removeEventListener('templateSaved', handleTemplateSaved);
+    };
   }, []);
 
   const loadTemplates = async () => {
