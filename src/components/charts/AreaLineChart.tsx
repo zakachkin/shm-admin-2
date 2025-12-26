@@ -36,7 +36,6 @@ export function AreaLineChart({
   const average = data.length > 0 
     ? data.reduce((sum, d) => sum + d.value, 0) / data.length 
     : 0;
-  const labelByDate = new Map(data.map((item) => [item.date, item.label || item.date]));
 
   if (!data || data.length === 0) {
     return (
@@ -66,13 +65,11 @@ export function AreaLineChart({
             />
           )}
           <XAxis
-            dataKey="date"
+            dataKey="label"
             axisLine={false}
             tickLine={false}
             tick={{ fill: 'var(--theme-content-text-muted)', fontSize: 11 }}
             interval="preserveStartEnd"
-            allowDuplicatedCategory={false}
-            tickFormatter={(value) => labelByDate.get(String(value)) || String(value)}
           />
           <YAxis
             axisLine={false}
@@ -89,7 +86,6 @@ export function AreaLineChart({
               color: 'var(--theme-content-text)',
             }}
             labelStyle={{ color: 'var(--theme-content-text-muted)' }}
-            labelFormatter={(value) => labelByDate.get(String(value)) || String(value)}
             formatter={(value: number) => [valueFormatter(value), title || 'Значение']}
             cursor={{ stroke: 'rgba(0, 0, 0, 0.3)', strokeWidth: 1, fill: 'rgba(0, 0, 0, 0.15)' }}
           />
