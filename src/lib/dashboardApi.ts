@@ -12,6 +12,8 @@ export interface DashboardAnalytics {
   revenue: {
     totalRevenue: number;
     totalWithdraws: number;
+    totalBonusWithdraws: number;
+    totalRefunds: number;
     netRevenue: number;
   };
   services: {
@@ -59,8 +61,20 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     const payments = paymentsRes ? normalizeListResponse(paymentsRes).data : [];
     const withdraws = withdrawsRes ? normalizeListResponse(withdrawsRes).data : [];
     
+    const getPaymentAmount = (payment: any) => {
+      const amount = parseFloat(payment.money || 0);
+      return Number.isFinite(amount) ? amount : 0;
+    };
+
     // Net revenue: manual payments included
-    const totalRevenue = payments.reduce((sum: number, p: any) => sum + parseFloat(p.money || 0), 0);
+    const totalRevenue = payments.reduce((sum: number, p: any) => {
+      const amount = getPaymentAmount(p);
+      return sum + (amount > 0 ? amount : 0);
+    }, 0);
+    const totalRefunds = payments.reduce((sum: number, p: any) => {
+      const amount = getPaymentAmount(p);
+      return sum + (amount < 0 ? Math.abs(amount) : 0);
+    }, 0);
     const totalWithdraws = withdraws.reduce((sum: number, w: any) => sum + parseFloat(w.cost || 0), 0);
     const totalBonusWithdraws = withdraws.reduce((sum: number, w: any) => sum + parseFloat(w.bonus || 0), 0);
     const activeUserServices = userServicesNew.filter((us: any) => us.status === 'ACTIVE' || us.status === 'active').length;
@@ -68,8 +82,12 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     // Группировка платежей по датам
     const paymentsByDate: Record<string, number> = {};
     payments.forEach((p: any) => {
+      const amount = getPaymentAmount(p);
+      if (amount <= 0) {
+        return;
+      }
       const date = p.date.split('T')[0];
-      paymentsByDate[date] = (paymentsByDate[date] || 0) + parseFloat(p.money || 0);
+      paymentsByDate[date] = (paymentsByDate[date] || 0) + amount;
     });
     
     // Статистика по статусам сервисов
@@ -92,6 +110,8 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
       revenue: {
         totalRevenue,
         totalWithdraws,
+        totalBonusWithdraws,
+        totalRefunds,
         netRevenue: totalRevenue - totalBonusWithdraws,
       },
       services: {

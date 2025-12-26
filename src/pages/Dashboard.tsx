@@ -12,6 +12,8 @@ import {
   RefreshCw,
   ArrowUpRight,
   ArrowDownRight,
+  Gift,
+  RotateCcw,
 } from 'lucide-react';
 import { StatCard, StatCardGrid, ChartCard } from '../components/analytics';
 import { AreaLineChart, BarChart } from '../components/charts';
@@ -187,7 +189,7 @@ function Dashboard() {
       </StatCardGrid>
 
       {/* Финансовые метрики */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mt-6">
         <StatCard
           title="Выручка (7 дней)"
           value={analytics ? formatMoney(analytics.revenue.totalRevenue) : '...'}
@@ -200,6 +202,20 @@ function Dashboard() {
           value={analytics ? formatMoney(analytics.revenue.totalWithdraws) : '...'}
           icon={ArrowDownRight}
           color="rose"
+          loading={loading}
+        />
+        <StatCard
+          title="Бонусы (7 дней)"
+          value={analytics ? formatMoney(analytics.revenue.totalBonusWithdraws) : '...'}
+          icon={Gift}
+          color="amber"
+          loading={loading}
+        />
+        <StatCard
+          title="Возвраты (7 дней)"
+          value={analytics ? formatMoney(analytics.revenue.totalRefunds) : '...'}
+          icon={RotateCcw}
+          color="cyan"
           loading={loading}
         />
         <StatCard
