@@ -59,15 +59,22 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     const payments = paymentsRes ? normalizeListResponse(paymentsRes).data : [];
     const withdraws = withdrawsRes ? normalizeListResponse(withdrawsRes).data : [];
     
-    // Net revenue: manual payments included
-    const totalRevenue = payments.reduce((sum: number, p: any) => sum + parseFloat(p.money || 0), 0);
+    // Фильтрация "реальных" платежей (без manual)
+    const realPayments = payments.filter((p: any) => 
+      p.pay_system_id && 
+      p.pay_system_id !== '' && 
+      p.pay_system_id !== '0' && 
+      p.pay_system_id.toLowerCase() !== 'manual'
+    );
+    
+    // Подсчеты
+    const totalRevenue = realPayments.reduce((sum: number, p: any) => sum + parseFloat(p.money || 0), 0);
     const totalWithdraws = withdraws.reduce((sum: number, w: any) => sum + parseFloat(w.cost || 0), 0);
-    const totalBonusWithdraws = withdraws.reduce((sum: number, w: any) => sum + parseFloat(w.bonus || 0), 0);
     const activeUserServices = userServicesNew.filter((us: any) => us.status === 'ACTIVE' || us.status === 'active').length;
     
     // Группировка платежей по датам
     const paymentsByDate: Record<string, number> = {};
-    payments.forEach((p: any) => {
+    realPayments.forEach((p: any) => {
       const date = p.date.split('T')[0];
       paymentsByDate[date] = (paymentsByDate[date] || 0) + parseFloat(p.money || 0);
     });
@@ -92,7 +99,7 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
       revenue: {
         totalRevenue,
         totalWithdraws,
-        netRevenue: totalRevenue - totalBonusWithdraws,
+        netRevenue: totalRevenue - totalWithdraws,
       },
       services: {
         byStatus: Object.entries(servicesByStatus).map(([name, value]) => ({ name, value })),
