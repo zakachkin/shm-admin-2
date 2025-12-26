@@ -13,18 +13,23 @@ server {
 
     location / {
         alias /app/;
-        index index.html;
         try_files $uri $uri/ /index.html;
     }
 
-    location /assets/ {
-        alias /app/assets/;
-        try_files $uri =404;
-        expires 30d;
+    location = /swagger {
+        return 301 /swagger/index.html;
     }
 
     if ($http_origin = '') {
         set $http_origin "*";
+    }
+
+    # Local backend API (branding, settings, cache)
+    location /api {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 
     location /shm {
@@ -50,6 +55,6 @@ server {
         proxy_set_header Host $host;
 
         proxy_pass http://shm.local/shm;
-        #proxy_cookie_path;
     }
+    error_page  404  /404.html;
 }
