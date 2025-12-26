@@ -9,7 +9,6 @@ import {
   TrendingUp,
   ArrowRight,
   DollarSign,
-  Plus,
   RefreshCw,
   ArrowUpRight,
   ArrowDownRight,
@@ -192,38 +191,38 @@ function Dashboard() {
       {/* Финансовые метрики */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mt-6">
         <StatCard
-          title="Пополнения (7 дней)"
+          title="Выручка (7 дней)"
           value={analytics ? formatMoney(analytics.revenue.totalRevenue) : '...'}
-          icon={Plus}
-          color="emerald"
-          loading={loading}
-        />
-        <StatCard
-          title="Выручка (списания)"
-          value={analytics ? formatMoney(analytics.revenue.totalWithdraws) : '...'}
-          icon={ArrowUpRight}
-          color="emerald"
-          loading={loading}
-        />
-        <StatCard
-          title="Бонусы"
-          value={analytics ? formatMoney(analytics.revenue.totalBonusWithdraws) : '...'}
-          icon={ArrowDownRight}
-          color="rose"
-          loading={loading}
-        />
-        <StatCard
-          title="Возвраты"
-          value={analytics ? formatMoney(analytics.revenue.totalRefunds) : '...'}
-          icon={ArrowDownRight}
-          color="rose"
-          loading={loading}
-        />
-        <StatCard
-          title="Чистая выручка"
-          value={analytics ? formatMoney(analytics.revenue.netRevenue) : '...'}
           icon={DollarSign}
           color="emerald"
+          loading={loading}
+        />
+        <StatCard
+          title="Списания (7 дней)"
+          value={analytics ? formatMoney(analytics.revenue.totalWithdraws) : '...'}
+          icon={ArrowDownRight}
+          color="rose"
+          loading={loading}
+        />
+        <StatCard
+          title="Бонусы (7 дней)"
+          value={analytics ? formatMoney(analytics.revenue.totalBonusWithdraws) : '...'}
+          icon={Gift}
+          color="amber"
+          loading={loading}
+        />
+        <StatCard
+          title="Возвраты (7 дней)"
+          value={analytics ? formatMoney(analytics.revenue.totalRefunds) : '...'}
+          icon={RotateCcw}
+          color="cyan"
+          loading={loading}
+        />
+        <StatCard
+          title="Операционная прибыль"
+          value={analytics ? formatMoney(analytics.revenue.netRevenue) : '...'}
+          icon={analytics && analytics.revenue.netRevenue >= 0 ? ArrowUpRight : ArrowDownRight}
+          color={analytics && analytics.revenue.netRevenue >= 0 ? 'emerald' : 'rose'}
           loading={loading}
         />
       </div>
