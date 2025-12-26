@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import SelectedUserDropdown from './SelectedUserDropdown';
 import {
@@ -8,25 +8,34 @@ import {
   Settings,
   LogOut,
   Menu,
+  X,
   ChevronRight,
   ChevronDown,
   Home,
   Cloud,
+  ListOrdered,
+  CreditCard,
+  Gift,
+  HardDrive,
+  Tag,
+  Calendar,
+  Layers,
+  Key,
+  Clock,
+  Archive,
   FileText,
+  Cog,
   Activity,
+  Palette,
   Sun,
   Moon,
   Monitor,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Send,
-  Star,
-  Github
+  TrendingUp,
+  Wrench,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useBrandingStore } from '../store/brandingStore';
 import { useThemeStore, ThemeMode } from '../store/themeStore';
-import { useSettingsStore } from '../store/settingsStore';
 import toast from 'react-hot-toast';
 import TemplateModal from '../modals/TemplateModal';
 import { shm_request } from '../lib/shm_request';
@@ -39,13 +48,13 @@ interface MenuItem {
 }
 
 const navigation: MenuItem[] = [
-  {
-    name: 'Главная',
-    href: '/',
-    icon: Home
+  { 
+    name: 'Главная', 
+    href: '/', 
+    icon: Home 
   },
-  {
-    name: 'Пользователи',
+  { 
+    name: 'Пользователи', 
     icon: Users,
     children: [
       { name: 'Список', href: '/users' },
@@ -58,16 +67,16 @@ const navigation: MenuItem[] = [
       { name: 'Промокоды', href: '/promo' },
     ]
   },
-  {
-    name: 'Услуги',
+  { 
+    name: 'Услуги', 
     icon: Package,
     children: [
       { name: 'Каталог', href: '/services' },
       { name: 'События', href: '/events' },
     ]
   },
-  {
-    name: 'Сервера',
+  { 
+    name: 'Сервера', 
     icon: Server,
     children: [
       { name: 'Список', href: '/servers' },
@@ -75,61 +84,64 @@ const navigation: MenuItem[] = [
       { name: 'Ключи', href: '/identities' },
     ]
   },
-  {
-    name: 'Задачи',
+  { 
+    name: 'Задачи', 
     icon: Activity,
     children: [
       { name: 'Текущие задачи', href: '/spool' },
       { name: 'Архив', href: '/spool-history' },
     ]
   },
-  {
-    name: 'Настройки',
+  { 
+    name: 'Настройки', 
     icon: Settings,
     children: [
       { name: 'Шаблоны', href: '/templates' },
-      { name: 'Конфигурация', href: '/configuration' },
+      { name: 'Конфигурация', href: '/config' },
+      { name: 'Swagger', href: '/swagger' },
     ]
   },
-  {
-    name: 'SHM Cloud',
-    href: '/cloud',
-    icon: Cloud
+  { 
+    name: 'Другие настройки', 
+    icon: Wrench,
+    children: [
+      { name: 'Брендинг', href: '/branding' },
+      { name: 'Внешний вид', href: '/appearance' },
+      { name: 'Кеширование', href: '/cache' },
+    ]
   },
 ];
 
 function ThemeToggle() {
   const { mode, setMode, resolvedTheme } = useThemeStore();
   const [isOpen, setIsOpen] = useState(false);
-
+  
   const themes: { value: ThemeMode; label: string; icon: any }[] = [
     { value: 'system', label: 'Системная', icon: Monitor },
     { value: 'light', label: 'Светлая', icon: Sun },
     { value: 'dark', label: 'Тёмная', icon: Moon },
   ];
-
+  
+  const currentTheme = themes.find(t => t.value === mode)!;
   const CurrentIcon = resolvedTheme === 'dark' ? Moon : Sun;
-
+  
   return (
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm transition-all"
-        style={{
-          color: 'var(--theme-content-text-muted)'
-        }}
+        className="btn-icon"
         title="Сменить тему"
       >
         <CurrentIcon className="w-5 h-5" />
       </button>
-
+      
       {isOpen && (
         <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setIsOpen(false)} 
           />
-          <div
+          <div 
             className="absolute right-0 top-full mt-2 z-50 w-40 rounded-lg shadow-lg border"
             style={{
               backgroundColor: 'var(--theme-card-bg)',
@@ -147,15 +159,15 @@ function ThemeToggle() {
                   }}
                   className="w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors first:rounded-t-lg last:rounded-b-lg"
                   style={{
-                    color: mode === theme.value
-                      ? 'var(--theme-primary-color)'
+                    color: mode === theme.value 
+                      ? 'var(--theme-primary-color)' 
                       : 'var(--theme-content-text-muted)',
-                    backgroundColor: mode === theme.value
-                      ? 'var(--theme-sidebar-item-active-bg)'
+                    backgroundColor: mode === theme.value 
+                      ? 'var(--theme-sidebar-item-active-bg)' 
                       : 'transparent',
                   }}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className="w-4 h-4" />
                   {theme.label}
                 </button>
               );
@@ -173,133 +185,27 @@ function Layout() {
   const { user, logout } = useAuthStore();
   const { branding, fetchBranding } = useBrandingStore();
   const { colors, applyTheme } = useThemeStore();
-  const { sidebarCollapsed, setSidebarCollapsed } = useSettingsStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [openMenus, setOpenMenus] = useState<string[]>(() => {
-    const activeMenu = navigation.find(item => 
-      item.children?.some(child => child.href === location.pathname)
-    );
-    return activeMenu ? [activeMenu.name] : [];
-  });
+  const [openMenus, setOpenMenus] = useState<string[]>(['Пользователи']);
   const [manuallyClosed, setManuallyClosed] = useState<string[]>([]);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const [menuPosition, setMenuPosition] = useState<{ top: number } | null>(null);
   const [selectedData, setSelectedData] = useState<any>(null);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
-  const [version, setVersion] = useState<string>('');
-  const [stars, setStars] = useState<number | null>(null);
-  const hoverTimeoutRef = useRef<number | null>(null);
-
-  const showSwagger = import.meta.env.VITE_SHOW_SWAGGER === 'true';
-  const menuItems = showSwagger
-    ? [...navigation, { name: 'Swagger', href: '/swagger', icon: FileText }]
-    : navigation;
 
   useEffect(() => {
     fetchBranding();
     applyTheme();
-    
-    // Кеш на 1 час (3600000 мс)
-    const CACHE_TTL = 3600000;
-    const CACHE_KEY_VERSION = 'github_shm_version';
-    const CACHE_KEY_STARS = 'github_shm_stars';
-    const CACHE_KEY_TIMESTAMP = 'github_shm_timestamp';
-
-    const getCachedData = (key: string) => {
-      try {
-        return localStorage.getItem(key);
-      } catch {
-        return null;
-      }
-    };
-
-    const setCachedData = (key: string, value: string) => {
-      try {
-        localStorage.setItem(key, value);
-      } catch {
-        // Игнорируем ошибки localStorage
-      }
-    };
-
-    const isCacheValid = () => {
-      const timestamp = getCachedData(CACHE_KEY_TIMESTAMP);
-      if (!timestamp) return false;
-      const age = Date.now() - parseInt(timestamp, 10);
-      return age < CACHE_TTL;
-    };
-
-    // Проверяем кеш
-    if (isCacheValid()) {
-      const cachedVersion = getCachedData(CACHE_KEY_VERSION);
-      const cachedStars = getCachedData(CACHE_KEY_STARS);
-      
-      if (cachedVersion) setVersion(cachedVersion);
-      if (cachedStars) setStars(parseInt(cachedStars, 10));
-    } else {
-      // Загрузка версии из GitHub tags
-      fetch('https://api.github.com/repos/danuk/shm/tags')
-        .then(res => res.json())
-        .then(data => {
-          const validTags = data.filter((tag: any) => tag.name !== 'delete');
-          if (validTags.length > 0) {
-            const newVersion = validTags[0].name;
-            setVersion(newVersion);
-            setCachedData(CACHE_KEY_VERSION, newVersion);
-            setCachedData(CACHE_KEY_TIMESTAMP, Date.now().toString());
-          }
-        })
-        .catch(() => {
-          const cachedVersion = getCachedData(CACHE_KEY_VERSION);
-          setVersion(cachedVersion || 'unknown');
-        });
-      
-      // Загрузка звезд с GitHub
-      fetch('https://api.github.com/repos/danuk/shm')
-        .then(res => res.json())
-        .then(data => {
-          const newStars = data.stargazers_count;
-          setStars(newStars);
-          setCachedData(CACHE_KEY_STARS, newStars.toString());
-        })
-        .catch(() => {
-          const cachedStars = getCachedData(CACHE_KEY_STARS);
-          setStars(cachedStars ? parseInt(cachedStars, 10) : null);
-        });
-    }
-    
     const handleOpenTemplate = (event: any) => {
       setSelectedData(event.detail);
       setTemplateModalOpen(true);
     };
 
     window.addEventListener('openTemplate', handleOpenTemplate);
-    return () => {
-      window.removeEventListener('openTemplate', handleOpenTemplate);
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
-    };
+    return () => window.removeEventListener('openTemplate', handleOpenTemplate);
   }, [fetchBranding, applyTheme]);
 
-  // Автоматическое открытие активного меню при изменении пути
   useEffect(() => {
-    const activeMenu = navigation.find(item => 
-      item.children?.some(child => child.href === location.pathname)
-    );
-    
-    if (activeMenu && !manuallyClosed.includes(activeMenu.name)) {
-      setOpenMenus(prev => {
-        if (!prev.includes(activeMenu.name)) {
-          return [...prev, activeMenu.name];
-        }
-        return prev;
-      });
-    }
-  }, [location.pathname, manuallyClosed]);
-
-  useEffect(() => {
-    document.title = branding.name;
+    document.title = branding.appTitle || branding.appName;
   }, [branding]);
 
   const handleLogout = () => {
@@ -309,7 +215,7 @@ function Layout() {
   };
 
   const isActive = (path: string) => location.pathname === path;
-
+  
   const isMenuActive = (item: MenuItem) => {
     if (item.href) return isActive(item.href);
     return item.children?.some(child => isActive(child.href));
@@ -318,20 +224,20 @@ function Layout() {
   const toggleMenu = (name: string) => {
     setOpenMenus(prev => {
       const isCurrentlyOpen = prev.includes(name);
-
+      
       if (isCurrentlyOpen) {
         setManuallyClosed(closed => [...closed, name]);
         return prev.filter(n => n !== name);
       } else {
         setManuallyClosed(closed => closed.filter(n => n !== name));
-
+        
         const activeMenus = navigation
-          .filter(item =>
-            item.children?.some(child => isActive(child.href)) &&
+          .filter(item => 
+            item.children?.some(child => isActive(child.href)) && 
             !manuallyClosed.includes(item.name)
           )
           .map(item => item.name);
-
+        
         return [name, ...activeMenus.filter(m => m !== name)];
       }
     });
@@ -340,7 +246,7 @@ function Layout() {
   const handleTemplateSave = async (templateData: any) => {
     try {
       const isNewTemplate = templateData?.is_add === 1 || templateData?.is_add === true;
-      const data = await shm_request('shm/v1/admin/template', {
+      const data = await shm_request('/shm/v1/admin/template', {
         method: isNewTemplate ? 'PUT' : 'POST',
         body: JSON.stringify(templateData)
       });
@@ -354,15 +260,15 @@ function Layout() {
 
   const handleTemplateDelete = async (id: string) => {
     try {
-      await shm_request(`shm/v1/admin/template?id=${id}`, {
+      await shm_request(`/shm/v1/admin/template?id=${id}`, {
         method: 'DELETE'
       });
       toast.success('Шаблон удален');
-
+      
       // Закрываем модал и сбрасываем выбранные данные
       setTemplateModalOpen(false);
       setSelectedData(null);
-
+      
       // Отправляем событие для обновления списка шаблонов
       window.dispatchEvent(new CustomEvent('templateDeleted', { detail: { id } }));
     } catch (error: any) {
@@ -381,177 +287,88 @@ function Layout() {
         />
       )}
 
-      {}<aside
-        className={`fixed inset-y-0 left-0 z-30 transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+      {}
+      <aside
+        className={`fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } ${
-          sidebarCollapsed ? 'lg:w-16' : 'lg:w-64'
-        } w-64`}
+        }`}
         style={{
           backgroundColor: 'var(--theme-sidebar-bg)',
           borderRight: '1px solid var(--theme-sidebar-border)',
         }}
       >
         <div className="flex flex-col h-full">
-          {/* Кнопка сворачивания сайдбара */}
-          <div className="hidden lg:flex items-center justify-between p-4" style={{ borderBottom: '1px solid var(--theme-sidebar-border)' }}>
-            {!sidebarCollapsed && (
-              <Link to="/"  className="flex items-center gap-2">
-                {branding.logoUrl ? (
-                  <img src={branding.logoUrl} alt="Logo" className="h-8 w-8 object-contain" />
-                ) : (
-                  <Settings className="w-6 h-6" style={{ color: 'var(--theme-primary-color)' }} />
-                )}
-                <span className="font-semibold text-lg" style={{ color: 'var(--theme-header-text)' }}>
-                  {branding.name}
-                </span>
-              </Link>
-            )}
+          {}
+          <div 
+            className="flex items-center justify-between h-16 px-4"
+            style={{ borderBottom: '1px solid var(--theme-sidebar-border)' }}
+          >
+            <Link to="/" className="flex items-center gap-3">
+              {branding.logoUrl ? (
+                <img src={branding.logoUrl} alt="Logo" className="w-8 h-8 object-contain" />
+              ) : (
+                <div 
+                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{ background: `linear-gradient(135deg, ${colors.primaryColor}, ${colors.primaryColorHover})` }}
+                >
+                  <Home className="w-5 h-5 text-white" />
+                </div>
+              )}
+              <span className="text-lg font-bold" style={{ color: 'var(--theme-header-text)' }}>
+                {branding.appName}
+              </span>
+            </Link>
             <button
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="p-2 rounded-lg transition-colors hover:bg-opacity-80"
+              className="lg:hidden"
               style={{ color: 'var(--theme-sidebar-text)' }}
-              title={sidebarCollapsed ? 'Развернуть сайдбар' : 'Свернуть сайдбар'}
+              onClick={() => setSidebarOpen(false)}
             >
-              {sidebarCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
+              <X className="w-6 h-6" />
             </button>
           </div>
 
-          {/* Navigation */}
+          {}
           <nav className="flex-1 overflow-y-auto py-4 px-2">
-            {menuItems.map((item) => {
+            {navigation.map((item) => {
               const Icon = item.icon;
               const active = isMenuActive(item);
               const isOpen = openMenus.includes(item.name);
-
+              
               if (item.href && !item.children) {
                 return (
                   <Link
                     key={item.name}
                     to={item.href}
-                    target={item.href === '/swagger' ? '_blank' : undefined}
-                    rel={item.href === '/swagger' ? 'noopener noreferrer' : undefined}
                     onClick={() => setSidebarOpen(false)}
                     className={`nav-item ${active ? 'active' : ''}`}
-                    style={{
-                      justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-                    }}
-                    title={sidebarCollapsed ? item.name : undefined}
                   >
                     <Icon className="w-5 h-5" />
-                    <span className={`flex-1 ${sidebarCollapsed ? 'lg:hidden' : ''}`}>{item.name}</span>
+                    <span className="flex-1">{item.name}</span>
                   </Link>
                 );
               }
-
+              
               return (
-                <div
-                  key={item.name}
-                  className="mb-1"
-                  onMouseEnter={(e) => {
-                    if (sidebarCollapsed) {
-                      if (hoverTimeoutRef.current) {
-                        clearTimeout(hoverTimeoutRef.current);
-                      }
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      setHoveredItem(item.name);
-                      setMenuPosition({ top: rect.top });
-                    }
-                  }}
-                  onMouseLeave={() => {
-                    if (sidebarCollapsed) {
-                      hoverTimeoutRef.current = window.setTimeout(() => {
-                        setHoveredItem(null);
-                        setMenuPosition(null);
-                      }, 150);
-                    }
-                  }}
-                >
+                <div key={item.name} className="mb-1">
                   <button
                     onClick={() => toggleMenu(item.name)}
                     className={`nav-item w-full`}
-                    style={{
+                    style={{ 
                       color: active ? 'var(--theme-sidebar-text-active)' : undefined,
                       borderLeft: active ? '2px solid var(--theme-primary-color)' : undefined,
-                      justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
                     }}
-                    title={sidebarCollapsed ? item.name : undefined}
                   >
                     <Icon className="w-5 h-5" />
-                    <span className={`flex-1 text-left ${sidebarCollapsed ? 'lg:hidden' : ''}`}>{item.name}</span>
-                    <span className={sidebarCollapsed ? 'lg:hidden' : ''}>
-                      {isOpen ? (
-                        <ChevronDown className="w-4 h-4" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4" />
-                      )}
-                    </span>
+                    <span className="flex-1 text-left">{item.name}</span>
+                    {isOpen ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4" />
+                    )}
                   </button>
-
-                  {/* Всплывающее подменю при свернутом сайдбаре */}
-                  {sidebarCollapsed && item.children && hoveredItem === item.name && menuPosition && (
-                    <div
-                      className="fixed z-[100] rounded-lg shadow-xl border py-2 min-w-[200px]"
-                      style={{
-                        backgroundColor: 'var(--theme-card-bg)',
-                        borderColor: 'var(--theme-card-border)',
-                        left: '64px',
-                        top: `${menuPosition.top}px`,
-                      }}
-                      onMouseEnter={() => {
-                        if (hoverTimeoutRef.current) {
-                          clearTimeout(hoverTimeoutRef.current);
-                        }
-                        setHoveredItem(item.name);
-                      }}
-                      onMouseLeave={() => {
-                        hoverTimeoutRef.current = window.setTimeout(() => {
-                          setHoveredItem(null);
-                          setMenuPosition(null);
-                        }, 150);
-                      }}
-                    >
-                      <div className="px-3 py-2 border-b font-semibold text-sm" style={{ borderColor: 'var(--theme-card-border)', color: 'var(--theme-content-text)' }}>
-                        {item.name}
-                      </div>
-                      <div className="max-h-[400px] overflow-y-auto">
-                        {item.children.map((child) => (
-                          <Link
-                            key={child.href}
-                            to={child.href}
-                            onClick={() => {
-                              setSidebarOpen(false);
-                              setHoveredItem(null);
-                              setMenuPosition(null);
-                            }}
-                            className="block px-4 py-2 text-sm transition-colors"
-                            style={{
-                              color: isActive(child.href)
-                                ? 'var(--theme-sidebar-text-active)'
-                                : 'var(--theme-content-text)',
-                              backgroundColor: isActive(child.href)
-                                ? 'var(--theme-sidebar-item-active-bg)'
-                                : 'transparent',
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-item-hover-bg)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = isActive(child.href)
-                                ? 'var(--theme-sidebar-item-active-bg)'
-                                : 'transparent';
-                            }}
-                          >
-                            {child.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
                   {isOpen && item.children && (
-                    <div
-                      className={`ml-4 mt-1 space-y-1 pl-3 ${sidebarCollapsed ? 'lg:hidden' : ''}`}
+                    <div 
+                      className="ml-4 mt-1 space-y-1 pl-3"
                       style={{ borderLeft: '1px solid var(--theme-sidebar-border)' }}
                     >
                       {item.children.map((child) => (
@@ -561,11 +378,11 @@ function Layout() {
                           onClick={() => setSidebarOpen(false)}
                           className="block px-3 py-2 text-sm rounded-lg transition-colors"
                           style={{
-                            color: isActive(child.href)
-                              ? 'var(--theme-sidebar-text-active)'
+                            color: isActive(child.href) 
+                              ? 'var(--theme-sidebar-text-active)' 
                               : 'var(--theme-sidebar-text)',
-                            backgroundColor: isActive(child.href)
-                              ? 'var(--theme-sidebar-item-active-bg)'
+                            backgroundColor: isActive(child.href) 
+                              ? 'var(--theme-sidebar-item-active-bg)' 
                               : 'transparent',
                             borderLeft: isActive(child.href) ? '2px solid var(--theme-primary-color)' : undefined,
                           }}
@@ -579,25 +396,41 @@ function Layout() {
               );
             })}
           </nav>
-            <a
-              href="https://myshm.ru"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-2 py-2"
-              style={{
-                color: 'var(--theme-primary-color)'
-              }}
-              title="Telegram"
+
+          {}
+          <div className="p-4" style={{ borderTop: '1px solid var(--theme-sidebar-border)' }}>
+            <div className="flex items-center gap-3 mb-3">
+              <div 
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                style={{ background: `linear-gradient(135deg, ${colors.primaryColor}, ${colors.primaryColorHover})` }}
+              >
+                {user?.login?.charAt(0).toUpperCase() || 'A'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate" style={{ color: 'var(--theme-header-text)' }}>
+                  {user?.login || '-'}
+                </p>
+                <p className="text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
+                  ID: {user?.user_id || '-'}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors"
+              style={{ color: 'var(--theme-sidebar-text)' }}
             >
-              MySHM.ru
-            </a>
+              <LogOut className="w-4 h-4" />
+              Выйти
+            </button>
+          </div>
         </div>
       </aside>
 
       {}
       <div className="flex-1 flex flex-col overflow-hidden">
         {}
-        <header
+        <header 
           className="h-16 flex items-center justify-between px-4"
           style={{
             backgroundColor: 'var(--theme-header-bg)',
@@ -615,57 +448,7 @@ function Layout() {
             <SelectedUserDropdown />
           </div>
           <div className="flex items-center gap-2">
-            <a
-              href="https://t.me/shm_billing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm transition-all"
-              style={{
-                color: 'var(--theme-content-text-muted)'
-              }}
-              title="Telegram"
-            >
-              <Send className="w-5 h-5" />
-            </a>
-            {version !== null && (
-              <a
-                href="https://github.com/danuk/shm"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm transition-all"
-                style={{
-                  color: 'var(--theme-content-text-muted)'
-                }}
-              >
-                <span>{version}</span>
-              </a>
-            )}
-            {stars !== null && (
-              <a
-                href="https://github.com/danuk/shm"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm transition-all"
-                style={{
-                  color: 'var(--theme-content-text-muted)'
-                }}
-              >
-                <Github className="w-5 h-5" />
-                <span>{stars}</span>
-                <Star className="w-5 h-5" />
-              </a>
-            )}
             <ThemeToggle />
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm transition-all"
-              style={{
-                color: 'var(--theme-content-text-muted)'
-              }}
-              title="Выйти"
-            >
-              <LogOut className="w-5 h-5" />
-            </button>
           </div>
         </header>
 
