@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Editor from '@monaco-editor/react';
+import { addClipboardActions } from '../lib/monacoClipboard';
 
 interface MonacoEditorModalProps {
   value: string;
@@ -27,6 +28,9 @@ function MonacoEditorModal({ value, language = 'json', onSave, onClose }: Monaco
           value={code}
           onChange={v => setCode(v || '')}
           theme="vs-dark"
+          onMount={(editor, monaco) => {
+            addClipboardActions(editor, monaco);
+          }}
         />
       </div>
     </div>

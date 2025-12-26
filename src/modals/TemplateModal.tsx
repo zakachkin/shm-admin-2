@@ -10,6 +10,7 @@ import { shm_request } from '../lib/shm_request';
 import { useThemeStore } from '../store/themeStore';
 import TemplateSidebar from '../components/TemplateEditor/TemplateSidebar';
 import { registerTTCompletion } from '../lib/ttMonaco';
+import { addClipboardActions } from '../lib/monacoClipboard';
 
 interface TemplateModalProps {
   open: boolean;
@@ -936,6 +937,7 @@ export default function TemplateModal({
                         onMount={(editor, monaco) => {
                           editorRef.current = editor;
                           registerTTCompletion(monaco);
+                          addClipboardActions(editor, monaco);
                         }}
                       />
                     </div>
@@ -1063,6 +1065,7 @@ export default function TemplateModal({
                 onMount={(editor, monaco) => {
                   editorRef.current = editor;
                   registerTTCompletion(monaco);
+                          addClipboardActions(editor, monaco);
                 }}
               />
             </div>

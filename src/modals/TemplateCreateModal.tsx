@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import Editor from '@monaco-editor/react';
 import JsonEditor from '../components/JsonEditor';
 import { registerTTCompletion } from '../lib/ttMonaco';
+import { addClipboardActions } from '../lib/monacoClipboard';
 
 interface TemplateCreateModalProps {
   open: boolean;
@@ -182,6 +183,7 @@ export default function TemplateCreateModal({
               onMount={(editor, monaco) => {
                 editorRef.current = editor;
                 registerTTCompletion(monaco);
+                addClipboardActions(editor, monaco);
               }}
             />
           </div>
