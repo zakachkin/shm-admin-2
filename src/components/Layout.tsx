@@ -247,7 +247,7 @@ function Layout() {
     try {
       const isNewTemplate = templateData?.is_add === 1 || templateData?.is_add === true;
       const data = await shm_request('/shm/v1/admin/template', {
-        method: isNewTemplate ? 'PUT' : 'POST',
+        method: isNewTemplate ? 'POST' : 'PUT',
         body: JSON.stringify(templateData)
       });
       toast.success(isNewTemplate ? 'Шаблон создан' : 'Шаблон обновлен');
