@@ -181,8 +181,9 @@ export default function TemplateModal({
     if (!activeTab) return;
 
     if (activeTab.id.startsWith('new-')) {
-      if (formData.is_add !== 1 || formData.id !== activeTab.template?.id || formData.data !== activeTab.template?.data) {
-        setFormData({ ...activeTab.template, is_add: 1 });
+      const tabIsAdd = activeTab.template?.is_add ?? 1;
+      if (formData.is_add !== tabIsAdd || formData.id !== activeTab.template?.id || formData.data !== activeTab.template?.data) {
+        setFormData({ ...activeTab.template, is_add: tabIsAdd });
         detectLanguage(activeTab.template?.data || '');
       }
       return;
@@ -365,13 +366,18 @@ export default function TemplateModal({
       window.dispatchEvent(new CustomEvent('templateSaved', { detail: { template: savedFormData } }));
       
       if (activeTabId) {
+        const targetTabId = activeTabId.startsWith('new-') ? savedFormData.id : activeTabId;
         setTabs(prev => prev.map(t => 
-          t.id === activeTabId ? { 
-            ...t, 
+          t.id === activeTabId ? {
+            ...t,
+            id: targetTabId,
             hasUnsavedChanges: false,
             template: savedFormData
           } : t
         ));
+        if (targetTabId !== activeTabId) {
+          setActiveTabId(targetTabId);
+        }
       }
     } catch (error) {
       toast.error('Ошибка сохранения');
@@ -396,13 +402,18 @@ export default function TemplateModal({
       }
       window.dispatchEvent(new CustomEvent('templateSaved', { detail: { template: savedFormData } }));
       if (activeTabId) {
-        setTabs(prev => prev.map(t =>
+        const targetTabId = activeTabId.startsWith('new-') ? savedFormData.id : activeTabId;
+        setTabs(prev => prev.map(t => 
           t.id === activeTabId ? {
             ...t,
+            id: targetTabId,
             hasUnsavedChanges: false,
             template: savedFormData
           } : t
         ));
+        if (targetTabId !== activeTabId) {
+          setActiveTabId(targetTabId);
+        }
       }
       setTestModalOpen(true);
     } catch (error) {
