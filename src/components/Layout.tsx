@@ -122,7 +122,6 @@ function ThemeToggle() {
     { value: 'dark', label: 'Тёмная', icon: Moon },
   ];
 
-  const currentTheme = themes.find(t => t.value === mode)!;
   const CurrentIcon = resolvedTheme === 'dark' ? Moon : Sun;
 
   return (
@@ -194,7 +193,7 @@ function Layout() {
 
   const showSwagger = import.meta.env.VITE_SHOW_SWAGGER === 'true';
   const menuItems = showSwagger
-    ? [...navigation, { name: 'API Swagger', href: '/swagger', icon: FileText }]
+    ? [...navigation, { name: 'Swagger', href: '/swagger', icon: FileText }]
     : navigation;
 
   useEffect(() => {
@@ -341,26 +340,12 @@ function Layout() {
               const isOpen = openMenus.includes(item.name);
 
               if (item.href && !item.children) {
-                // Swagger открываем в новой вкладке
-                if (item.name === 'API Swagger') {
-                  return (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="nav-item"
-                    >
-                      <Icon className="w-5 h-5" />
-                      <span className="flex-1">{item.name}</span>
-                    </a>
-                  );
-                }
-
                 return (
                   <Link
                     key={item.name}
                     to={item.href}
+                    target={item.href === '/swagger' ? '_blank' : undefined}
+                    rel={item.href === '/swagger' ? 'noopener noreferrer' : undefined}
                     onClick={() => setSidebarOpen(false)}
                     className={`nav-item ${active ? 'active' : ''}`}
                   >

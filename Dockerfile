@@ -19,10 +19,13 @@ EXPOSE 80
 
 COPY nginx.conf /etc/nginx/http.d/default.conf
 
+COPY swagger/index.html /swagger/index.html
+
 COPY entry.sh /entry.sh
 RUN chmod +x /entry.sh
 
 COPY --from=builder /app/dist /app
+COPY 404.html /app/404.html
 
 WORKDIR /app
 
