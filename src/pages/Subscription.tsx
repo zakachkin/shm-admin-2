@@ -52,22 +52,47 @@ function Subscription() {
 
   const loadSubscriptionInfo = async () => {
     setLoading(true);
-    setSubscriptionError('');
-    setShowSubscriptionForm(false);
 
     try {
       const response = await shm_request('shm/v1/admin/cloud/proxy/service/sub/get');
+      console.log('Subscription response:', response);
       
-      if (response.status === 200 || response) {
+      // Проверяем, есть ли ошибка в ответе
+      if (response.error) {
+        console.log('Response has error:', response.error, 'status:', response.status);
+        // Если ошибка с кодом 404 (подписка не найдена), показываем форму без ошибки
+        if (response.status === 404 || response.status === '404') {
+          setShowSubscriptionForm(true);
+          setSubscriptionInfo(null);
+          setSubscriptionError('');
+        } else {
+          // Для других ошибок показываем сообщение
+          setSubscriptionError(response.error);
+        }
+      } else {
+        // Успешный ответ
         const data = response.data || response;
         setSubscriptionInfo(data);
         setShowSubscriptionForm(false);
       }
     } catch (error: any) {
-      if (error.status === 404 || error.response?.status === 404) {
-        setShowSubscriptionForm(true);
-        setSubscriptionInfo(null);
-      } else {
+      console.error('Subscription loading exception:', error);
+      
+      // Парсим JSON из текста ошибки
+      try {
+        const errorText = error.message || String(error);
+        const errorData = JSON.parse(errorText);
+        
+        // Если это 404 (подписка не найдена), показываем форму без ошибки
+        if (errorData.status === 404 || errorData.status === '404') {
+          setShowSubscriptionForm(true);
+          setSubscriptionInfo(null);
+          setSubscriptionError('');
+        } else {
+          setSubscriptionError(errorData.error || 'Ошибка загрузки информации о подписке');
+        }
+      } catch {
+        // Если не удалось распарсить, показываем общую ошибку
         setSubscriptionError('Ошибка загрузки информации о подписке');
       }
     } finally {
@@ -99,11 +124,23 @@ function Subscription() {
       });
 
       if (response.status === 200 || response) {
-        toast.success('Подписка успешно оформлена');
-        await loadSubscriptionInfo();
+        if (response.error || response.data?.error) {
+          const errorMsg = response.error || response.data.error;
+          setSubscriptionError(errorMsg);
+          toast.error(errorMsg);
+        } else {
+          toast.success('Подписка успешно оформлена');
+          await loadSubscriptionInfo();
+        }
       }
     } catch (error: any) {
-      const errorMessage = error.data?.error || error.response?.data?.error || 'Ошибка оформления подписки';
+      const errorData = error.data || error.response?.data || {};
+      let errorMessage = errorData.error || 'Ошибка оформления подписки';
+      
+      if (errorData.error === 'insufficient money') {
+        errorMessage = 'Недостаточно средств на балансе для оформления подписки. Необходимо пополнить баланс, после чего повторить заказ услуги.';
+      }
+      
       setSubscriptionError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -288,43 +325,42 @@ function Subscription() {
             <label className="block text-sm font-medium mb-3" style={{ color: 'var(--theme-content-text)' }}>
               Выберите период:
             </label>
-            {subscriptionPlans.map((plan) => (
-              <div
-                key={plan.service_id}
-                className="p-4 rounded border cursor-pointer transition-all"
-                style={{
-                  ...cardStyles,
-                  borderColor: selectedPlan === plan.service_id ? 'var(--accent-primary)' : 'var(--theme-card-border)',
-                  backgroundColor: selectedPlan === plan.service_id ? 'rgba(59, 130, 246, 0.1)' : cardStyles.backgroundColor,
-                }}
-                onClick={() => setSelectedPlan(plan.service_id)}
-              >
-                <div className="flex items-center gap-3">
-                  <input
-                    type="radio"
-                    checked={selectedPlan === plan.service_id}
-                    onChange={() => setSelectedPlan(plan.service_id)}
-                    className="w-4 h-4"
-                    style={{ accentColor: 'var(--accent-primary)' }}
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold" style={{ color: 'var(--theme-content-text)' }}>
-                        {plan.name}
-                      </span>
-                      <span className="font-bold" style={{ color: 'var(--accent-primary)' }}>
-                        {plan.price} ₽
-                      </span>
+            <div className="grid gap-3">
+              {subscriptionPlans.map((plan) => (
+                <div
+                  key={plan.service_id}
+                  className="p-4 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md"
+                  style={{
+                    borderColor: selectedPlan === plan.service_id ? 'var(--accent-primary)' : 'var(--theme-card-border)',
+                    backgroundColor: selectedPlan === plan.service_id ? 'rgba(59, 130, 246, 0.1)' : cardStyles.backgroundColor,
+                  }}
+                  onClick={() => setSelectedPlan(plan.service_id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        {selectedPlan === plan.service_id && (
+                          <CheckCircle className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
+                        )}
+                        <span className="font-semibold text-lg" style={{ color: 'var(--theme-content-text)' }}>
+                          {plan.name}
+                        </span>
+                      </div>
+                      {plan.price_next && (
+                        <p className="text-sm" style={{ color: 'var(--theme-content-text-muted)' }}>
+                          Далее {plan.price_next} ₽/мес
+                        </p>
+                      )}
                     </div>
-                    {plan.price_next && (
-                      <p className="text-sm mt-1" style={{ color: 'var(--theme-content-text-muted)' }}>
-                        (далее {plan.price_next} руб. в месяц при заблаговременной оплате)
-                      </p>
-                    )}
+                    <div className="text-right ml-4">
+                      <div className="font-bold text-2xl" style={{ color: 'var(--accent-primary)' }}>
+                        {plan.price} ₽
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           <div className="flex justify-center">
