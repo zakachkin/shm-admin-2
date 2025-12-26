@@ -134,7 +134,7 @@ function Templates() {
         onClose={() => setCreateModalOpen(false)}
         onSave={async (data) => {
           await shm_request(`/shm/v1/admin/template`, {
-            method: 'POST',
+            method: 'PUT',
             body: JSON.stringify(data),
           });
           fetchData(limit, offset, filters, sortField, sortDirection);
@@ -145,7 +145,7 @@ function Templates() {
         onClose={() => setUploadModalOpen(false)}
         onSave={async (data) => {
           await shm_request(`/shm/v1/admin/template`, {
-            method: 'POST',
+            method: 'PUT',
             body: JSON.stringify(data),
           });
           fetchData(limit, offset, filters, sortField, sortDirection);
