@@ -42,12 +42,18 @@
         { url: '/shm/v1/swagger.json', name: 'Client API' },
         { url: '/shm/v1/swagger_admin.json', name: 'Admin API' },
       ],
-          'urls.primaryName': 'Client API',
-          dom_id: '#swagger-ui',
-          presets: [
-            SwaggerUIBundle.presets.apis,
-            SwaggerUIStandalonePreset,
-          ],
+      'urls.primaryName': 'Client API',
+      dom_id: '#swagger-ui',
+      requestInterceptor: (req) => {
+        if (sessionId) {
+          req.headers['session-id'] = sessionId;
+        }
+        return req;
+      },
+      presets: [
+        SwaggerUIBundle.presets.apis,
+        SwaggerUIStandalonePreset,
+      ],
           layout: 'StandaloneLayout',
         });
       };
