@@ -33,8 +33,8 @@ export function AreaLineChart({
   valueFormatter = (v) => v.toLocaleString(),
   averageLine = false,
 }: AreaLineChartProps) {
-  const average = data.length > 0 
-    ? data.reduce((sum, d) => sum + d.value, 0) / data.length 
+  const average = data.length > 0
+    ? data.reduce((sum, d) => sum + d.value, 0) / data.length
     : 0;
 
   if (!data || data.length === 0) {
@@ -58,9 +58,9 @@ export function AreaLineChart({
           margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
         >
           {showGrid && (
-            <CartesianGrid 
-              strokeDasharray="3 3" 
-              stroke="var(--theme-table-border)" 
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="var(--theme-table-border)"
               strokeOpacity={0.5}
             />
           )}
@@ -91,12 +91,12 @@ export function AreaLineChart({
           />
           {showLegend && <Legend />}
           {averageLine && average > 0 && (
-            <ReferenceLine 
-              y={average} 
-              stroke="#f59e0b" 
+            <ReferenceLine
+              y={average}
+              stroke="#f59e0b"
               strokeDasharray="3 3"
-              label={{ 
-                value: `Среднее: ${valueFormatter(average)}`, 
+              label={{
+                value: `Среднее: ${valueFormatter(average)}`,
                 fill: '#f59e0b',
                 fontSize: 11,
               }}

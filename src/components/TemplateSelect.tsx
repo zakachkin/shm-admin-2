@@ -39,7 +39,7 @@ export default function TemplateSelect({
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'search' | 'list'>('list');
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null);
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -59,7 +59,7 @@ export default function TemplateSelect({
       lastLoadedTemplateIdRef.current = value;
       abortControllerRef.current = new AbortController();
       setLoadingTemplate(true);
-      
+
       shm_request(`/shm/v1/admin/template?id=${value}`)
         .then(res => {
           const data = res.data || res;
@@ -249,7 +249,7 @@ export default function TemplateSelect({
         method,
         body: JSON.stringify(templateData),
       });
-      
+
       if (templateData.id === selectedTemplate?.id && selectedTemplate) {
         setSelectedTemplate({
           ...selectedTemplate,
@@ -257,7 +257,7 @@ export default function TemplateSelect({
           id: templateData.id || selectedTemplate.id,
         });
       }
-      
+
       onTemplateUpdated?.();
     } catch (error) {
       throw error;
@@ -295,7 +295,7 @@ export default function TemplateSelect({
         >
           <Edit className="w-4 h-4" />
         </button>
-        
+
         <TemplateModal
           open={templateModalOpen}
           onClose={() => setTemplateModalOpen(false)}
@@ -353,19 +353,19 @@ export default function TemplateSelect({
           <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
             <FileText className="w-4 h-4" style={{ color: 'var(--theme-content-text-muted)' }} />
           </div>
-          
+
           {loadingTemplate ? (
-            <div 
+            <div
               className="w-full pl-10 pr-3 py-2 text-sm rounded border"
               style={inputStyles}
             >
               <div className="flex items-center gap-2">
-                <div 
-                  className="h-4 rounded animate-pulse flex-1" 
-                  style={{ 
+                <div
+                  className="h-4 rounded animate-pulse flex-1"
+                  style={{
                     maxWidth: '100px',
                     backgroundColor: 'var(--theme-input-border)',
-                  }} 
+                  }}
                 />
               </div>
             </div>
@@ -382,7 +382,7 @@ export default function TemplateSelect({
               style={inputStyles}
             />
           )}
-          
+
           {loading && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>

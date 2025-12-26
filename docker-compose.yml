@@ -1,21 +1,10 @@
 services:
   admin-2:
     build: .
-    image: "zakachkin/shm-admin-2:dev"
+    image: "bkeenke/shm-admin-2:latest"
     pull_policy: always
     restart: always
-    environment:
-      SHM_HOST: http://api
-      MYSQL_HOST: mysql
-      MYSQL_PORT: 3306
-      MYSQL_USER: ${MYSQL_USER:-shm}
-      MYSQL_PASS: ${MYSQL_PASS}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-shm}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
     depends_on:
       - api
-      - mysql
-      - redis
     ports:
       - "8080:80"

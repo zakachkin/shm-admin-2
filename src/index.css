@@ -6,7 +6,7 @@
   /* Default to dark theme values */
   --theme-primary-color: #22d3ee;
   --theme-primary-color-hover: #06b6d4;
-  
+
   --theme-sidebar-bg: #1e293b;
   --theme-sidebar-border: #334155;
   --theme-sidebar-text: #94a3b8;
@@ -14,25 +14,25 @@
   --theme-sidebar-text-active: #22d3ee;
   --theme-sidebar-item-hover-bg: rgba(51, 65, 85, 0.5);
   --theme-sidebar-item-active-bg: rgba(34, 211, 238, 0.1);
-  
+
   --theme-header-bg: #1e293b;
   --theme-header-border: #334155;
   --theme-header-text: #ffffff;
-  
+
   --theme-content-bg: #0f172a;
   --theme-content-text: #f1f5f9;
   --theme-content-text-muted: #94a3b8;
-  
+
   --theme-card-bg: #1e293b;
   --theme-card-border: #334155;
   --theme-card-header-bg: #1e293b;
-  
+
   --theme-input-bg: #1e293b;
   --theme-input-border: #475569;
   --theme-input-text: #ffffff;
   --theme-input-placeholder: #94a3b8;
   --theme-input-focus-border: #22d3ee;
-  
+
   --theme-table-bg: #1e293b;
   --theme-table-header-bg: rgba(30, 41, 59, 0.8);
   --theme-table-header-text: #94a3b8;
@@ -40,7 +40,7 @@
   --theme-table-row-hover-bg: rgba(51, 65, 85, 0.3);
   --theme-table-row-alt-bg: rgba(51, 65, 85, 0.15);
   --theme-table-text: #cbd5e1;
-  
+
   --theme-button-secondary-bg: #334155;
   --theme-button-secondary-text: #e2e8f0;
   --theme-button-secondary-border: #475569;

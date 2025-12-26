@@ -10,7 +10,7 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       showHelp: false,
-      
+
       setShowHelp: (show) => {
         set({ showHelp: show });
       },

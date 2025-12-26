@@ -10,17 +10,17 @@ const spoolColumns = [
   { key: 'created', label: 'Создано', visible: true, sortable: true },
   { key: 'user_id', label: 'Пользователь', visible: true, sortable: true },
   { key: 'event', label: 'event', visible: true, sortable: true },
-  { 
-    key: 'event', 
-    label: 'title', 
-    visible: true, 
+  {
+    key: 'event',
+    label: 'title',
+    visible: true,
     sortable: false,
     render: (value: any) => value?.title || '-'
   },
-  { 
-    key: 'status', 
-    label: 'Статус', 
-    visible: true, 
+  {
+    key: 'status',
+    label: 'Статус',
+    visible: true,
     sortable: true,
     filterType: 'select' as const,
     filterOptions: [
@@ -53,9 +53,9 @@ function Spool() {
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-    
+
   const { selectedUser } = useSelectedUserStore();
-    
+
   const externalFilters = useMemo(() => {
     if (selectedUser?.user_id) {
       return { user_id: String(selectedUser.user_id) };
@@ -66,12 +66,12 @@ function Spool() {
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
     let url = `/shm/v1/admin/spool?limit=${l}&offset=${o}`;
-    
+
     const combinedFilters = { ...f, ...externalFilters };
     if (Object.keys(combinedFilters).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(combinedFilters))}`;
     }
-    
+
     if (sf && sd) {
       url += `&sort_field=${sf}&sort_direction=${sd}`;
     }
@@ -136,9 +136,9 @@ function Spool() {
         <button
           onClick={handleCreate}
           className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
-          style={{ 
-            backgroundColor: 'var(--accent-primary)', 
-            color: 'var(--accent-text)' 
+          style={{
+            backgroundColor: 'var(--accent-primary)',
+            color: 'var(--accent-text)'
           }}
         >
           <Plus className="w-4 h-4" />
@@ -164,7 +164,7 @@ function Spool() {
         externalFilters={externalFilters}
       />
       </div>
-      
+
       {}
       <SpoolModal
         open={viewModalOpen}

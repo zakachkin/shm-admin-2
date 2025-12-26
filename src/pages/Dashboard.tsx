@@ -41,10 +41,10 @@ function Dashboard() {
 
   const fetchDashboardData = async () => {
     setLoading(true);
-    
+
     try {
       const data = await fetchDashboardAnalytics(7);
-      
+
       // Добавляем метки дат и цвета для графиков
       const enrichedData: DashboardAnalytics = {
         ...data,
@@ -63,7 +63,7 @@ function Dashboard() {
       };
 
       setAnalytics(enrichedData);
-      
+
     } catch (error) {
       console.error('Dashboard fetch error:', error);
     } finally {
@@ -195,8 +195,8 @@ function Dashboard() {
           iconColor="text-violet-400"
           loading={loading}
           actions={
-            <Link 
-              to="/user-services" 
+            <Link
+              to="/user-services"
               className="text-xs flex items-center gap-1 hover:opacity-80 transition-opacity"
               style={{ color: 'var(--theme-primary-color)' }}
             >

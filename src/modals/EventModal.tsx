@@ -32,7 +32,7 @@ export default function EventModal({
   useEffect(() => {
     if (open && data) {
       setFormData(data);
-      
+
       if (data.settings?.template_id) {
         setMode('template');
       } else if (data.settings?.cmd) {
@@ -40,7 +40,7 @@ export default function EventModal({
       } else {
         setMode('default');
       }
-      
+
       setServerTransport(data.server?.transport || '');
     } else if (open && !data) {
       setFormData({
@@ -72,17 +72,17 @@ export default function EventModal({
       toast.error('Введите название');
       return;
     }
-    
+
     if (!formData.name) {
       toast.error('Выберите событие');
       return;
     }
-    
+
     if (formData.server_gid === undefined || formData.server_gid === null) {
       toast.error('Выберите группу серверов');
       return;
     }
-    
+
     if (
       formData.server_gid === 0 &&
       (formData.name === 'create' || formData.name === 'not_enough_money')
@@ -92,12 +92,12 @@ export default function EventModal({
       );
       return;
     }
-    
+
     if (mode === 'template' && !formData.settings?.template_id) {
       toast.error('Выберите шаблон');
       return;
     }
-    
+
     if (mode === 'cmd' && !formData.settings?.cmd?.trim()) {
       toast.error('Введите команду');
       return;
@@ -106,14 +106,14 @@ export default function EventModal({
     setSaving(true);
     try {
       const dataToSave = { ...formData };
-      
+
       if (mode !== 'cmd') {
         delete dataToSave.settings?.cmd;
       }
       if (mode !== 'template') {
         delete dataToSave.settings?.template_id;
       }
-      
+
       await onSave(dataToSave);
       onClose();
       toast.success(data ? 'Событие обновлено' : 'Событие создано');
@@ -341,7 +341,7 @@ export default function EventModal({
           </div>
         </div>
       </div>
-      
+
       {}
       <ConfirmModal
         open={confirmDeleteOpen}

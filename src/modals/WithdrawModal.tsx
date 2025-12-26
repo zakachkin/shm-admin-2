@@ -115,7 +115,7 @@ export default function WithdrawModal({
           </label>
           <div className="flex-1">
             <ServiceSelect
-              value={formData.service_id} 
+              value={formData.service_id}
               readonly
             />
           </div>
@@ -189,7 +189,7 @@ export default function WithdrawModal({
         {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
-            Период (мес.) 
+            Период (мес.)
           </label>
           <input
             type="number"

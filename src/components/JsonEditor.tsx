@@ -15,11 +15,11 @@ interface JsonEditorProps {
   inline?: boolean;
 }
 
-export default function JsonEditor({ 
-  data, 
-  onChange, 
-  readonly = false, 
-  label, 
+export default function JsonEditor({
+  data,
+  onChange,
+  readonly = false,
+  label,
   className = '',
   showInput = true,
   inline = false,
@@ -36,7 +36,7 @@ export default function JsonEditor({
 
   useEffect(() => {
     const shouldInitialize = inline || modalOpen;
-    
+
     if (shouldInitialize && containerRef.current && !editorRef.current) {
       try {
         const options: any = {
@@ -60,7 +60,7 @@ export default function JsonEditor({
 
         editorRef.current = new JSONEditor(containerRef.current, options);
         editorRef.current.set(dataRef.current || {});
-        
+
         if (containerRef.current) {
           containerRef.current.classList.add('jsoneditor-hide-sort-transform');
         }
@@ -119,8 +119,8 @@ export default function JsonEditor({
   if (inline) {
     return (
       <div className={className} style={{ width: '100%' }}>
-        <div 
-          ref={containerRef} 
+        <div
+          ref={containerRef}
           className="jsoneditor-react-container"
           style={{ minHeight: '150px', width: '100%' }}
         />
@@ -212,19 +212,19 @@ export default function JsonEditor({
         }
       >
         {readonly && (
-          <div 
+          <div
             className="mb-3 px-3 py-1.5 text-xs rounded inline-block"
-            style={{ 
-              backgroundColor: 'var(--warning-bg, #fef3c7)', 
-              color: 'var(--warning-text, #92400e)' 
+            style={{
+              backgroundColor: 'var(--warning-bg, #fef3c7)',
+              color: 'var(--warning-text, #92400e)'
             }}
           >
             Только чтение
           </div>
         )}
-        
-        <div 
-          ref={containerRef} 
+
+        <div
+          ref={containerRef}
           className="jsoneditor-react-container"
           style={{ height: '500px', width: '100%' }}
         />

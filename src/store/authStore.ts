@@ -5,7 +5,7 @@ export interface User {
   user_id: number;
   login: string;
   full_name?: string;
-  gid: number; 
+  gid: number;
 }
 
 interface AuthState {

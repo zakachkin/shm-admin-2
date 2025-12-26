@@ -25,9 +25,9 @@ function Profiles() {
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  
+
     const { selectedUser } = useSelectedUserStore();
-  
+
     const externalFilters = useMemo(() => {
       if (selectedUser?.user_id) {
         return { user_id: String(selectedUser.user_id) };
@@ -38,12 +38,12 @@ function Profiles() {
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
     let url = `/shm/v1/admin/user/profile?limit=${l}&offset=${o}`;
-    
+
     const combinedFilters = { ...f, ...externalFilters };
     if (Object.keys(combinedFilters).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(combinedFilters))}`;
     }
-    
+
     if (sf && sd) {
       url += `&sort_field=${sf}&sort_direction=${sd}`;
     }
@@ -100,7 +100,7 @@ function Profiles() {
 
   const handleDelete = async () => {
     if (!selectedRow?.id) return;
-    
+
     await shm_request(`/shm/v1/admin/user/profile?id=${selectedRow.id}`, {
       method: 'DELETE',
     });
@@ -117,9 +117,9 @@ function Profiles() {
         <button
           onClick={() => setCreateModalOpen(true)}
           className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
-          style={{ 
-            backgroundColor: 'var(--accent-primary)', 
-            color: 'var(--accent-text)' 
+          style={{
+            backgroundColor: 'var(--accent-primary)',
+            color: 'var(--accent-text)'
           }}
         >
           <Plus className="w-4 h-4" />
@@ -145,7 +145,7 @@ function Profiles() {
         externalFilters={externalFilters}
       />
       </div>
-      
+
       <ProfileModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

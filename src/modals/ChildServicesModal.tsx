@@ -179,7 +179,7 @@ export const ChildServicesModal: React.FC<ChildServicesModalProps> = ({
             >
               <option value="">Выберите услугу...</option>
               {availableServices
-                .filter(s => s.service_id !== serviceId) 
+                .filter(s => s.service_id !== serviceId)
                 .map(service => (
                   <option key={service.service_id} value={service.service_id}>
                     {service.service_id} - {service.name}
@@ -205,9 +205,9 @@ export const ChildServicesModal: React.FC<ChildServicesModalProps> = ({
           <label className="block text-sm font-medium mb-2" style={labelStyles}>
             Дочерние услуги
           </label>
-          <div 
+          <div
             className="border rounded-lg overflow-hidden"
-            style={{ 
+            style={{
               backgroundColor: 'var(--theme-card-bg)',
               borderColor: 'var(--theme-card-border)',
             }}
@@ -220,25 +220,25 @@ export const ChildServicesModal: React.FC<ChildServicesModalProps> = ({
               <table className="w-full">
                 <thead style={{ backgroundColor: 'var(--theme-table-header-bg)' }}>
                   <tr>
-                    <th 
+                    <th
                       className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider"
                       style={{ color: 'var(--theme-content-text-muted)' }}
                     >
                       ID
                     </th>
-                    <th 
+                    <th
                       className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider"
                       style={{ color: 'var(--theme-content-text-muted)' }}
                     >
                       Название
                     </th>
-                    <th 
+                    <th
                       className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider w-32"
                       style={{ color: 'var(--theme-content-text-muted)' }}
                     >
                       Кол-во
                     </th>
-                    <th 
+                    <th
                       className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider w-20"
                       style={{ color: 'var(--theme-content-text-muted)' }}
                     >
@@ -248,7 +248,7 @@ export const ChildServicesModal: React.FC<ChildServicesModalProps> = ({
                 </thead>
                 <tbody>
                   {childServices.map((child, index) => (
-                    <tr 
+                    <tr
                       key={child.service_id}
                       style={{
                         borderTopWidth: index > 0 ? '1px' : '0',

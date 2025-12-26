@@ -45,7 +45,7 @@ export default function UserServiceCreateModal({
   const handleServiceChange = (serviceId: number | null, service: any) => {
     setSelectedService(service);
     handleChange('service_id', serviceId);
-    
+
     if (service) {
       setFormData(prev => ({
         ...prev,

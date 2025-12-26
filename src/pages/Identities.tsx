@@ -27,11 +27,11 @@ function Identities() {
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
     let url = `/shm/v1/admin/server/identity?limit=${l}&offset=${o}`;
-    
+
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
     }
-    
+
     if (sf && sd) {
       url += `&sort_field=${sf}&sort_direction=${sd}`;
     }
@@ -87,7 +87,7 @@ function Identities() {
       ...identityData,
       fingerprint: identityData.fingerprint || '',
     };
-    
+
     await shm_request('/shm/v1/admin/server/identity', {
       method: 'PUT',
       body: JSON.stringify(dataToSend),
@@ -97,7 +97,7 @@ function Identities() {
 
   const handleDelete = async () => {
     if (!selectedRow?.id) return;
-    
+
     await shm_request(`/shm/v1/admin/server/identity?id=${selectedRow.id}`, {
       method: 'DELETE',
     });
@@ -118,9 +118,9 @@ function Identities() {
         <button
           onClick={handleCreate}
           className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
-          style={{ 
-            backgroundColor: 'var(--accent-primary)', 
-            color: 'var(--accent-text)' 
+          style={{
+            backgroundColor: 'var(--accent-primary)',
+            color: 'var(--accent-text)'
           }}
         >
           <Plus className="w-4 h-4" />
@@ -143,7 +143,7 @@ function Identities() {
         onRefresh={handleRefresh}
         storageKey="identities"
       />
-      
+
       {}
       <IdentityModal
         open={editModalOpen}

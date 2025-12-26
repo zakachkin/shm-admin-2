@@ -22,7 +22,7 @@ export default function SpoolCreateModal({
   defaultUserId,
 }: SpoolCreateModalProps) {
   const { selectedUser } = useSelectedUserStore();
-  
+
   const [formData, setFormData] = useState<Record<string, any>>({
     title: 'Пользовательская задача',
     mode: 'selected_user',
@@ -72,13 +72,13 @@ export default function SpoolCreateModal({
   const handleChange = (field: string, value: any) => {
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
-      
+
       if (field === 'mode' && value !== 'selected_user') {
         const newSettings = { ...newData.settings };
         delete newSettings.user_id;
         newData.settings = newSettings;
       }
-      
+
       return newData;
     });
   };
@@ -126,7 +126,7 @@ export default function SpoolCreateModal({
 
       await onSave(args);
       onClose();
-      
+
       setFormData({
         title: 'Пользовательская задача',
         mode: 'selected_user',
@@ -138,7 +138,7 @@ export default function SpoolCreateModal({
           template_id: '',
         },
       });
-      
+
       toast.success('Задача создана');
     } catch (error) {
       toast.error('Ошибка создания');

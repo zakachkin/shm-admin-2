@@ -52,12 +52,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
     setLoading(true);
     try {
       const res = await shm_request('/shm/v1/admin/cloud/paysystems');
-      const systems = Array.isArray(res.data) && Array.isArray(res.data[0]) 
-        ? res.data[0] 
+      const systems = Array.isArray(res.data) && Array.isArray(res.data[0])
+        ? res.data[0]
         : (res.data || []);
-      
+
       const sortedSystems = systems.sort((a: PaySystem, b: PaySystem) => b.weight - a.weight);
-      
+
       setPaySystems(sortedSystems);
     } catch (error) {
       toast.error('Не удалось загрузить платежные системы');
@@ -74,14 +74,14 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
       await shm_request(`/shm/v1/admin/cloud/autopayment?pay_system=${paysystem}`, {
         method: 'DELETE',
       });
-      
+
       setPaySystems(prev => prev.filter((_, i) => i !== index));
-      
+
       const uniqueKey = `${paysystem}-${index}`;
       if (selectedSystem === uniqueKey) {
         setSelectedSystem('');
       }
-      
+
       toast.success('Способ оплаты отвязан');
     } catch (error) {
       toast.error('Не удалось отвязать способ оплаты');
@@ -93,7 +93,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
       toast.error('Введите корректную сумму');
       return;
     }
-    
+
     if (!selectedSystem) {
       toast.error('Выберите платежную систему');
       return;
@@ -102,7 +102,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
     try {
       const index = parseInt(selectedSystem.split('-').pop() || '0');
       const selectedPaySystem = paySystems[index];
-      
+
       if (selectedPaySystem) {
         const paymentUrl = `${selectedPaySystem.shm_url}${amount}`;
         window.open(paymentUrl, '_blank');
@@ -129,12 +129,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       onClick={onClose}
     >
-      <div 
-        className="rounded-lg shadow-xl max-w-md w-full mx-4" 
+      <div
+        className="rounded-lg shadow-xl max-w-md w-full mx-4"
         style={cardStyles}
         onClick={(e) => e.stopPropagation()}
       >
@@ -158,7 +158,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
               Сумма пополнения (₽)
             </label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" 
+              <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4"
                           style={{ color: 'var(--theme-content-text-muted)' }} />
               <input
                 type="number"
@@ -180,7 +180,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
             {loading ? (
               <div className="space-y-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-12 rounded animate-pulse" 
+                  <div key={i} className="h-12 rounded animate-pulse"
                        style={{ backgroundColor: 'var(--theme-input-border)' }} />
                 ))}
               </div>
@@ -193,7 +193,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
                 {paySystems.map((ps, index) => {
                   const uniqueKey = `${ps.paysystem}-${index}`;
                   const isSelected = selectedSystem === uniqueKey;
-                  
+
                   return (
                     <div key={uniqueKey} className="relative">
                       <button
@@ -201,8 +201,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
                         className="w-full p-3 rounded border text-left transition-colors"
                         style={{
                           ...inputStyles,
-                          borderColor: isSelected 
-                            ? 'var(--theme-primary-color)' 
+                          borderColor: isSelected
+                            ? 'var(--theme-primary-color)'
                             : 'var(--theme-input-border)',
                           backgroundColor: isSelected
                             ? 'var(--accent-primary-transparent)'

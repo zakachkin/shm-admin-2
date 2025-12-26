@@ -42,9 +42,9 @@ function Users() {
   const [sortField, setSortField] = useState<string | undefined>();
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [filters, setFilters] = useState<Record<string, string>>({});
-  
+
   const { setSelectedUser } = useSelectedUserStore();
-  
+
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -53,11 +53,11 @@ function Users() {
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
     let url = `/shm/v1/admin/user?limit=${l}&offset=${o}`;
-    
+
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
     }
-    
+
     if (sf && sd) {
       url += `&sort_field=${sf}&sort_direction=${sd}`;
     }
@@ -100,26 +100,26 @@ function Users() {
   const handleCreate = () => {
     setCreateModalOpen(true);
   };
-  
+
   const handleChangePasswordOpen = () => {
     setChangePasswordModalOpen(true);
   };
-  
+
   const handleCliLogin = async () => {
     if (!selectedRow?.user_id) {
       toast.error('Не удалось получить user_id');
       return;
     }
-    
+
     try {
       const configRes = await shm_request('/shm/v1/admin/config/cli');
       const { data: configItems } = normalizeListResponse(configRes);
-      
+
       if (!configItems || configItems.length === 0) {
         toast.error('Не удалось получить URL');
         return;
       }
-      
+
       const cliUrl = configItems[0].url;
       const sessionRes = await shm_request('/shm/v1/admin/user/session', {
         method: 'PUT',
@@ -174,9 +174,9 @@ function Users() {
         <button
           onClick={handleCreate}
           className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
-          style={{ 
-            backgroundColor: 'var(--accent-primary)', 
-            color: 'var(--accent-text)' 
+          style={{
+            backgroundColor: 'var(--accent-primary)',
+            color: 'var(--accent-text)'
           }}
         >
           <Plus className="w-4 h-4" />
@@ -199,7 +199,7 @@ function Users() {
         onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
         storageKey="users"
       />
-      
+
       {}
       <UserModal
         open={editModalOpen}

@@ -41,13 +41,13 @@ export default function ServerGroupSelect({
       .then((res) => {
         const data = res.data || res;
         const serverGroups = Array.isArray(data) ? data : [];
-        
+
         const autoGroup: ServerGroup = {
           group_id: 0,
           name: '<AUTO> - на том же сервере, на котором услуга была создана',
           server_gid: 0,
         };
-        
+
         setGroups([autoGroup, ...serverGroups]);
       })
       .catch((err) => {
@@ -106,17 +106,17 @@ export default function ServerGroupSelect({
     return (
       <div className="flex gap-2 w-full">
         {loadingGroup ? (
-          <div 
+          <div
             className="flex-1 px-3 py-2 text-sm rounded border"
             style={inputStyles}
           >
             <div className="flex items-center gap-2">
-              <div 
-                className="h-4 rounded animate-pulse" 
-                style={{ 
+              <div
+                className="h-4 rounded animate-pulse"
+                style={{
                   width: '100px',
                   backgroundColor: 'var(--theme-input-border)',
-                }} 
+                }}
               />
             </div>
           </div>
@@ -154,24 +154,24 @@ export default function ServerGroupSelect({
 
   if (loadingGroup) {
     return (
-      <div 
+      <div
         className={`px-3 py-2 text-sm rounded border ${className}`}
         style={inputStyles}
       >
         <div className="flex items-center gap-2">
-          <div 
-            className="h-4 rounded animate-pulse" 
-            style={{ 
+          <div
+            className="h-4 rounded animate-pulse"
+            style={{
               width: '60px',
               backgroundColor: 'var(--theme-input-border)',
-            }} 
+            }}
           />
-          <div 
-            className="h-4 rounded animate-pulse flex-1" 
-            style={{ 
+          <div
+            className="h-4 rounded animate-pulse flex-1"
+            style={{
               maxWidth: '150px',
               backgroundColor: 'var(--theme-input-border)',
-            }} 
+            }}
           />
         </div>
       </div>

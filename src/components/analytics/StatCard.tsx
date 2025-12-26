@@ -39,13 +39,13 @@ export function StatCard({
   const colors = colorClasses[color] || colorClasses.cyan;
 
   return (
-    <div 
+    <div
       className={`card p-5 transition-all duration-200 ${onClick ? 'cursor-pointer hover:scale-[1.02]' : ''}`}
       onClick={onClick}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
-          <p 
+          <p
             className="text-sm font-medium truncate"
             style={{ color: 'var(--theme-content-text-muted)' }}
           >
@@ -59,7 +59,7 @@ export function StatCard({
             )}
           </p>
           {subtitle && (
-            <p 
+            <p
               className="text-xs mt-1 truncate"
               style={{ color: 'var(--theme-content-text-muted)' }}
             >
@@ -68,13 +68,13 @@ export function StatCard({
           )}
           {trend && !loading && (
             <div className="flex items-center gap-1 mt-2">
-              <span 
+              <span
                 className={`text-xs font-medium ${trend.isPositive ? 'text-emerald-400' : 'text-rose-400'}`}
               >
                 {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
               </span>
               {trend.label && (
-                <span 
+                <span
                   className="text-xs"
                   style={{ color: 'var(--theme-content-text-muted)' }}
                 >

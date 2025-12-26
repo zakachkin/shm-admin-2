@@ -1,16 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  User, 
-  ChevronDown, 
-  UserCircle, 
-  Package, 
-  CreditCard, 
-  Gift, 
+import {
+  User,
+  ChevronDown,
+  UserCircle,
+  Package,
+  CreditCard,
+  Gift,
   TrendingDown,
   FileText,
   Database,
-  X 
+  X
 } from 'lucide-react';
 import { useSelectedUserStore } from '../store/selectedUserStore';
 import { shm_request } from '../lib/shm_request';
@@ -122,9 +122,9 @@ export default function SelectedUserDropdown() {
 
         {isOpen && (
           <>
-            <div 
-              className="fixed inset-0 z-40" 
-              onClick={() => setIsOpen(false)} 
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setIsOpen(false)}
             />
             <div
               className="absolute left-0 top-full mt-1 w-56 rounded shadow-lg z-50 py-1"
@@ -134,7 +134,7 @@ export default function SelectedUserDropdown() {
               }}
             >
               {}
-              <div 
+              <div
                 className="px-4 py-2 border-b"
                 style={{
                   borderColor: 'var(--theme-border)',
@@ -174,7 +174,7 @@ export default function SelectedUserDropdown() {
               })}
 
               {}
-              <div 
+              <div
                 className="border-t mt-1 pt-1"
                 style={{
                   borderColor: 'var(--theme-border)',

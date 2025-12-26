@@ -38,13 +38,13 @@ export default function ServerModal({
   useEffect(() => {
     if (open && data) {
       setFormData(data);
-      
+
       if (data.settings?.cmd) {
         setMode('cmd');
       } else {
         setMode('template');
       }
-      
+
       setTransport(data.transport || data.server?.transport || '');
     }
   }, [open, data]);
@@ -65,22 +65,22 @@ export default function ServerModal({
       toast.error('Введите имя сервера');
       return;
     }
-    
+
     if (formData.server_gid === undefined || formData.server_gid === null) {
       toast.error('Выберите группу серверов');
       return;
     }
-    
+
     if (transport !== 'local' && !formData.host?.trim()) {
       toast.error('Введите хост');
       return;
     }
-    
+
     if (mode === 'template' && !formData.settings?.template_id) {
       toast.error('Выберите шаблон');
       return;
     }
-    
+
     if (mode === 'cmd' && !formData.settings?.cmd?.trim()) {
       toast.error('Введите команду');
       return;
@@ -89,14 +89,14 @@ export default function ServerModal({
     setSaving(true);
     try {
       const dataToSave = { ...formData };
-      
+
       if (mode !== 'cmd') {
         delete dataToSave.settings?.cmd;
       }
       if (mode !== 'template') {
         delete dataToSave.settings?.template_id;
       }
-      
+
       await onSave(dataToSave);
       onClose();
       toast.success(data ? 'Сервер обновлён' : 'Сервер создан');
@@ -127,12 +127,12 @@ export default function ServerModal({
         ...formData.settings,
         host: formData.host,
       };
-      
+
       const res = await shm_request('/shm/v1/admin/transport/ssh/test', {
         method: 'PUT',
         body: JSON.stringify(args),
       });
-      
+
       const pipelineId = Array.isArray(res.data) ? res.data[0]?.pipeline_id : res.data?.pipeline_id;
       if (pipelineId) {
         setConsolePipelineId(pipelineId);
@@ -158,12 +158,12 @@ export default function ServerModal({
         server_id: formData.server_id,
         host: formData.host,
       };
-      
+
       const res = await shm_request('/shm/v1/admin/transport/ssh/init', {
         method: 'PUT',
         body: JSON.stringify(args),
       });
-      
+
       const pipelineId = Array.isArray(res.data) ? res.data[0]?.pipeline_id : res.data?.pipeline_id;
       if (pipelineId) {
         setConsolePipelineId(pipelineId);
@@ -235,7 +235,7 @@ export default function ServerModal({
             {testing ? 'Тестирование...' : 'TEST SSH'}
           </button>
         )}
-        
+
         {}
         {transport === 'ssh' && mode === 'template' && data?.server_id && (
           <button
@@ -251,7 +251,7 @@ export default function ServerModal({
             {testing ? 'Выполнение...' : 'INIT'}
           </button>
         )}
-        
+
         {}
         {transport === 'mail' && (
           <button
@@ -267,7 +267,7 @@ export default function ServerModal({
             {testing ? 'Отправка...' : 'TEST MAIL'}
           </button>
         )}
-        
+
         <button
           onClick={onClose}
           className="px-4 py-2 rounded flex items-center gap-2"
@@ -607,7 +607,7 @@ export default function ServerModal({
           </div>
         </div>
       </div>
-      
+
       {}
       <ConfirmModal
         open={confirmDeleteOpen}

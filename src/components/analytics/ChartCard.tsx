@@ -65,8 +65,8 @@ export function MetricRow({ label, value, color, percentage }: MetricRowProps) {
     <div className="flex items-center justify-between py-2 border-b last:border-b-0" style={{ borderColor: 'var(--theme-card-border)' }}>
       <div className="flex items-center gap-2">
         {color && (
-          <div 
-            className="w-3 h-3 rounded-full" 
+          <div
+            className="w-3 h-3 rounded-full"
             style={{ backgroundColor: color }}
           />
         )}
@@ -74,9 +74,9 @@ export function MetricRow({ label, value, color, percentage }: MetricRowProps) {
       </div>
       <div className="flex items-center gap-3">
         {percentage !== undefined && (
-          <span 
+          <span
             className="text-xs px-2 py-0.5 rounded-full"
-            style={{ 
+            style={{
               backgroundColor: 'var(--theme-sidebar-item-active-bg)',
               color: 'var(--theme-primary-color)',
             }}
@@ -98,17 +98,17 @@ interface EmptyStateProps {
   icon?: LucideIcon;
 }
 
-export function EmptyState({ 
-  title = 'Нет данных', 
+export function EmptyState({
+  title = 'Нет данных',
   description = 'Данные для отображения отсутствуют',
   icon: Icon,
 }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
       {Icon && (
-        <Icon 
-          className="w-12 h-12 mb-4" 
-          style={{ color: 'var(--theme-content-text-muted)' }} 
+        <Icon
+          className="w-12 h-12 mb-4"
+          style={{ color: 'var(--theme-content-text-muted)' }}
         />
       )}
       <h4 className="font-medium mb-1" style={{ color: 'var(--theme-content-text)' }}>

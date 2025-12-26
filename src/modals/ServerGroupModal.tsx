@@ -87,7 +87,7 @@ export default function ServerGroupModal({
 
   const handleConfirmDelete = async () => {
     if (!onDelete) return;
-    
+
     setDeleting(true);
     setConfirmDelete(false);
     try {

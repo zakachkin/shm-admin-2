@@ -39,12 +39,12 @@ function Bonuses() {
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
     let url = `/shm/v1/admin/user/bonus?limit=${l}&offset=${o}`;
-    
+
     const combinedFilters = { ...f, ...externalFilters };
     if (Object.keys(combinedFilters).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(combinedFilters))}`;
     }
-    
+
     if (sf && sd) {
       url += `&sort_field=${sf}&sort_direction=${sd}`;
     }
@@ -122,7 +122,7 @@ function Bonuses() {
         externalFilters={externalFilters}
       />
       </div>
-      
+
       <BonusModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

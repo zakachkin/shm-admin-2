@@ -30,7 +30,7 @@ export function registerTTCompletion(monaco: any, enableForAllLanguages: boolean
     ],
     colors: {}
   });
-  
+
   monaco.editor.defineTheme('tt-light', {
     base: 'vs',
     inherit: true,
@@ -51,8 +51,8 @@ export function registerTTCompletion(monaco: any, enableForAllLanguages: boolean
   // Проверяем, инициализирована ли уже система TT (только один раз для языка tt и UI)
   if (!(monaco as any).__ttLanguageRegistered) {
     (monaco as any).__ttLanguageRegistered = true;
-    
-    monaco.languages.register({ 
+
+    monaco.languages.register({
       id: 'tt',
       extensions: ['.tt', '.tt2'],
       aliases: ['Template Toolkit', 'tt'],
@@ -66,56 +66,56 @@ export function registerTTCompletion(monaco: any, enableForAllLanguages: boolean
           // Template Toolkit директивы - более точные паттерны
           [/\{\{\s*(BLOCK|END|FOR|FOREACH|WHILE|IF|ELSIF|ELSE|UNLESS|SWITCH|CASE|DEFAULT|INCLUDE|PROCESS|INSERT|WRAPPER|FILTER|MACRO|CALL|SET|GET|TRY|CATCH|THROW|LAST|NEXT|STOP|RETURN|CLEAR|META|TAGS|PERL|RAWPERL)\b/, 'keyword'],
           [/\[%\s*(BLOCK|END|FOR|FOREACH|WHILE|IF|ELSIF|ELSE|UNLESS|SWITCH|CASE|DEFAULT|INCLUDE|PROCESS|INSERT|WRAPPER|FILTER|MACRO|CALL|SET|GET|TRY|CATCH|THROW|LAST|NEXT|STOP|RETURN|CLEAR|META|TAGS|PERL|RAWPERL)\b/, 'keyword'],
-          
+
           // Template Toolkit переменные и выражения
           [/\{\{[^}]*\}\}/, 'string'],
           [/\[%[^%]*%\]/, 'string'],
-          
+
           // Комментарии Template Toolkit
           [/\{\{#[^}]*#\}\}/, 'comment'],
           [/\[%#[^%]*#%\]/, 'comment'],
-          
-          // Переменные и операторы внутри TT блоков  
+
+          // Переменные и операторы внутри TT блоков
           [/\{\{/, { token: 'delimiter', bracket: '@open', next: '@ttBlock' }],
           [/\[%/, { token: 'delimiter', bracket: '@open', next: '@ttBlock' }],
-          
+
           // HTML теги
           [/<\/?[a-zA-Z][\w:.-]*\/?>/, 'tag'],
-          
+
           // Строки
           [/"([^"\\]|\\.)*"/, 'string'],
           [/'([^'\\]|\\.)*'/, 'string'],
-          
+
           // Числа
           [/\b\d+(\.\d+)?\b/, 'number'],
-          
+
           // Обычный текст
           [/[^{<\["']+/, 'text']
         ],
-        
+
         ttBlock: [
           // Закрывающие теги
           [/\}\}/, { token: 'delimiter', bracket: '@close', next: '@pop' }],
           [/%\]/, { token: 'delimiter', bracket: '@close', next: '@pop' }],
-          
+
           // Ключевые слова внутри блоков
           [/(BLOCK|END|FOR|FOREACH|WHILE|IF|ELSIF|ELSE|UNLESS|SWITCH|CASE|DEFAULT|INCLUDE|PROCESS|INSERT|WRAPPER|FILTER|MACRO|CALL|SET|GET|TRY|CATCH|THROW|LAST|NEXT|STOP|RETURN|CLEAR|META|TAGS|PERL|RAWPERL)\b/, 'keyword'],
-          
+
           // Операторы и пунктуация
           [/[=!<>]=?/, 'operator'],
           [/[+\-*\/]/, 'operator'],
           [/[()[\]{}|]/, 'delimiter'],
-          
+
           // Переменные (начинающиеся с букв)
           [/[a-zA-Z_]\w*/, 'variable'],
-          
+
           // Строки внутри блоков
           [/"([^"\\]|\\.)*"/, 'string'],
           [/'([^'\\]|\\.)*'/, 'string'],
-          
+
           // Числа
           [/\b\d+(\.\d+)?\b/, 'number'],
-          
+
           // Пробелы
           [/\s+/, 'white']
         ]
@@ -170,10 +170,10 @@ export function registerTTCompletion(monaco: any, enableForAllLanguages: boolean
   };
 
   // Определяем языки для регистрации провайдеров автодополнения
-  const languagesToRegister = enableForAllLanguages 
+  const languagesToRegister = enableForAllLanguages
     ? ['tt', 'plaintext', 'html', 'json', 'javascript', 'shell', 'perl']
     : ['tt']; // Только для 'tt' если не включен флаг для всех языков
-    
+
   languagesToRegister.forEach((language) => {
     const disposable = monaco.languages.registerCompletionItemProvider(language, {
       triggerCharacters: ['{', '.'],

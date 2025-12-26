@@ -58,7 +58,7 @@ export default function ProfileModal({
 
   const handleConfirmDelete = async () => {
     if (!onDelete) return;
-    
+
     setDeleting(true);
     setConfirmDelete(false);
     try {

@@ -125,12 +125,12 @@ export default function IdentitiesSelect({
         >
           {loadingIdentity ? (
             <div className="flex items-center gap-2 flex-1">
-              <div 
-                className="h-4 rounded animate-pulse" 
-                style={{ 
+              <div
+                className="h-4 rounded animate-pulse"
+                style={{
                   width: '100px',
                   backgroundColor: 'var(--theme-input-border)',
-                }} 
+                }}
               />
             </div>
           ) : (

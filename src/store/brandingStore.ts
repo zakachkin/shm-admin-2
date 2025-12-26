@@ -35,7 +35,7 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
 
   fetchBranding: async () => {
     if (get().loaded) return;
-    
+
     set({ loading: true });
     try {
       // Получаем настройки компании из SHM API
@@ -63,13 +63,13 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
     set({ loading: true });
     try {
       const newBranding = { ...get().branding, ...settings };
-      
+
       // Сохраняем в SHM API через admin/config
       const configData = {
         name: newBranding.appName,
         title: newBranding.appTitle || newBranding.appName,
       };
-      
+
       const result = await shm_request('/shm/v1/admin/config', {
         method: 'POST',
         body: JSON.stringify({
@@ -77,7 +77,7 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
           value: configData
         }),
       });
-      
+
       // Проверяем статус ответа
       if (result.status === 200) {
         set({ branding: newBranding });
@@ -99,7 +99,7 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
         name: DEFAULT_BRANDING.appName,
         title: DEFAULT_BRANDING.appTitle,
       };
-      
+
       const result = await shm_request('/shm/v1/admin/config', {
         method: 'POST',
         body: JSON.stringify({
@@ -107,7 +107,7 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
           value: defaultConfig
         }),
       });
-      
+
       // Проверяем статус ответа
       if (result.status === 200) {
         set({ branding: DEFAULT_BRANDING });

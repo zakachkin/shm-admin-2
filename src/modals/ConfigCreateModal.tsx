@@ -31,7 +31,7 @@ export default function ConfigCreateModal({ open, onClose, onSave }: ConfigCreat
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.key || !formData.key.trim()) {
       toast.error('Ключ обязателен');
       return;

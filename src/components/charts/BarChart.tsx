@@ -62,15 +62,15 @@ export function BarChart({
           margin={{ top: 5, right: 20, left: isVertical ? 80 : 10, bottom: 5 }}
         >
           {showGrid && (
-            <CartesianGrid 
-              strokeDasharray="3 3" 
-              stroke="var(--theme-table-border)" 
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="var(--theme-table-border)"
               strokeOpacity={0.5}
             />
           )}
           {isVertical ? (
             <>
-              <XAxis 
+              <XAxis
                 type="number"
                 axisLine={false}
                 tickLine={false}
@@ -122,9 +122,9 @@ export function BarChart({
             radius={[4, 4, 0, 0]}
           >
             {!color && data.map((entry, index) => (
-              <Cell 
-                key={`cell-${index}`} 
-                fill={entry.color || COLORS[index % COLORS.length]} 
+              <Cell
+                key={`cell-${index}`}
+                fill={entry.color || COLORS[index % COLORS.length]}
               />
             ))}
           </Bar>

@@ -63,7 +63,7 @@ export default function PayCreateModal({
       if (!formData.comment?.text?.trim()) {
         delete payload.comment;
       }
-      
+
       await onSave(payload);
       onClose();
       toast.success('Платёж создан');

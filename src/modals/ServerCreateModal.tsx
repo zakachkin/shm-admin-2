@@ -47,22 +47,22 @@ export default function ServerCreateModal({
       toast.error('Введите имя сервера');
       return;
     }
-    
+
     if (formData.server_gid === undefined || formData.server_gid === null) {
       toast.error('Выберите группу серверов');
       return;
     }
-    
+
     if (transport !== 'local' && !formData.host?.trim()) {
       toast.error('Введите хост');
       return;
     }
-    
+
     if (mode === 'template' && !formData.settings?.template_id) {
       toast.error('Выберите шаблон');
       return;
     }
-    
+
     if (mode === 'cmd' && !formData.settings?.cmd?.trim()) {
       toast.error('Введите команду');
       return;
@@ -71,16 +71,16 @@ export default function ServerCreateModal({
     setSaving(true);
     try {
       const dataToSave = { ...formData };
-      
+
       if (mode !== 'cmd') {
         delete dataToSave.settings?.cmd;
       }
       if (mode !== 'template') {
         delete dataToSave.settings?.template_id;
       }
-      
+
       await onSave(dataToSave);
-      
+
       setFormData({
         name: '',
         enabled: 1,
@@ -92,7 +92,7 @@ export default function ServerCreateModal({
       });
       setMode('template');
       setTransport('');
-      
+
       onClose();
       toast.success('Сервер создан');
     } catch (error) {

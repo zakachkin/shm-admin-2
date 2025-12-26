@@ -12,10 +12,10 @@ const serverColumns = [
   { key: 'name', label: 'Имя', visible: true, sortable: true },
   { key: 'host', label: 'Хост', visible: true, sortable: true },
   { key: 'ip', label: 'IP', visible: false, sortable: true },
-  { 
-    key: 'transport', 
-    label: 'Транспорт', 
-    visible: true, 
+  {
+    key: 'transport',
+    label: 'Транспорт',
+    visible: true,
     sortable: true,
     filterType: 'select' as const,
     filterOptions: [
@@ -48,11 +48,11 @@ function Servers() {
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
     let url = `/shm/v1/admin/server?limit=${l}&offset=${o}`;
-    
+
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
     }
-    
+
     if (sf && sd) {
       url += `&sort_field=${sf}&sort_direction=${sd}`;
     }

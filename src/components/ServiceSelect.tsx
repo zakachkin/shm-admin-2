@@ -39,7 +39,7 @@ export default function ServiceSelect({
     if (readonly && value && !selectedService) {
       setLoadingService(true);
       onLoadingChange?.(true);
-      
+
       shm_request(`/shm/v1/admin/service?service_id=${value}&limit=1`)
         .then(res => {
           const data = res.data || res;
@@ -60,13 +60,13 @@ export default function ServiceSelect({
     if (!readonly) {
       setLoading(true);
       onLoadingChange?.(true);
-      
+
       shm_request('/shm/v1/admin/service?limit=0')
         .then(res => {
           const data = res.data || res;
           const services = Array.isArray(data) ? data : [];
           setItems(services);
-          
+
           if ((value === null || value === undefined) && services.length > 0) {
             onChange?.(services[0].service_id, services[0]);
           }
@@ -100,7 +100,7 @@ export default function ServiceSelect({
       method: 'POST',
       body: JSON.stringify(serviceData),
     });
-    
+
     if (value) {
       const res = await shm_request(`/shm/v1/admin/service?service_id=${value}&limit=1`);
       const data = res.data || res;
@@ -109,7 +109,7 @@ export default function ServiceSelect({
         setSelectedService(services[0]);
       }
     }
-    
+
     onServiceUpdated?.();
   };
 
@@ -128,16 +128,16 @@ export default function ServiceSelect({
 
   if (loadingService) {
     return (
-      <div 
+      <div
         className={`w-full px-3 py-2 text-sm rounded border ${className}`}
         style={inputStyles}
       >
         <div className="flex items-center gap-2">
-          <div 
-            className="h-4 rounded animate-pulse flex-1" 
-            style={{ 
+          <div
+            className="h-4 rounded animate-pulse flex-1"
+            style={{
               backgroundColor: 'var(--theme-input-border)',
-            }} 
+            }}
           />
         </div>
       </div>
@@ -188,16 +188,16 @@ export default function ServiceSelect({
 
   if (loading) {
     return (
-      <div 
+      <div
         className={`w-full px-3 py-2 text-sm rounded border ${className}`}
         style={inputStyles}
       >
         <div className="flex items-center gap-2">
-          <div 
-            className="h-4 rounded animate-pulse flex-1" 
-            style={{ 
+          <div
+            className="h-4 rounded animate-pulse flex-1"
+            style={{
               backgroundColor: 'var(--theme-input-border)',
-            }} 
+            }}
           />
         </div>
       </div>

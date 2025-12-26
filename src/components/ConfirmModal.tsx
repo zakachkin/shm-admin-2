@@ -56,7 +56,7 @@ export default function ConfirmModal({
 }: ConfirmModalProps) {
   const config = variantConfig[variant];
   const [inputValue, setInputValue] = useState('');
-  
+
   useEffect(() => {
     if (!open) {
       setInputValue('');
@@ -144,8 +144,8 @@ export default function ConfirmModal({
             style={{
               backgroundColor: 'var(--theme-input-bg)',
               color: 'var(--theme-input-text)',
-              borderColor: inputValue && inputValue.toLowerCase() === confirmWord.toLowerCase() 
-                ? '#22c55e' 
+              borderColor: inputValue && inputValue.toLowerCase() === confirmWord.toLowerCase()
+                ? '#22c55e'
                 : 'var(--theme-input-border)',
             }}
           />
@@ -198,7 +198,7 @@ export function useConfirm() {
 
   const ConfirmDialog = React.useCallback(() => {
     if (!state.options) return null;
-    
+
     return (
       <ConfirmModal
         open={state.isOpen}

@@ -1,16 +1,16 @@
 import React, { ReactNode } from 'react';
 import JsonEditor from './JsonEditor';
 
-export type FieldType = 
-  | 'text' 
-  | 'number' 
-  | 'email' 
+export type FieldType =
+  | 'text'
+  | 'number'
+  | 'email'
   | 'password'
-  | 'textarea' 
-  | 'select' 
-  | 'checkbox' 
-  | 'date' 
-  | 'datetime' 
+  | 'textarea'
+  | 'select'
+  | 'checkbox'
+  | 'date'
+  | 'datetime'
   | 'json'
   | 'readonly'
   | 'custom';
@@ -29,14 +29,14 @@ export interface FormFieldProps {
   readonly?: boolean;
   required?: boolean;
   placeholder?: string;
-  options?: SelectOption[]; 
+  options?: SelectOption[];
   min?: number;
   max?: number;
   step?: number;
-  rows?: number; 
+  rows?: number;
   className?: string;
-  labelWidth?: string; 
-  render?: (value: any, onChange: (value: any) => void) => ReactNode; 
+  labelWidth?: string;
+  render?: (value: any, onChange: (value: any) => void) => ReactNode;
   helpText?: string;
   error?: string;
 }
@@ -184,7 +184,7 @@ export default function FormField({
         }
         return null;
 
-      default: 
+      default:
         return (
           <input
             type={type}

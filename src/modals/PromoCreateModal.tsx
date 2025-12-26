@@ -66,7 +66,7 @@ export default function PromoCreateModal({
       toast.error('Выберите шаблон');
       return;
     }
-    
+
     if (formData.settings.reusable === 1) {
       if (!formData.code) {
         toast.error('Введите код промокода');
@@ -93,7 +93,7 @@ export default function PromoCreateModal({
       if (!dataToSave.expire) {
         delete dataToSave.expire;
       }
-      
+
       await onSave(dataToSave);
       onClose();
       toast.success('Промокод создан');

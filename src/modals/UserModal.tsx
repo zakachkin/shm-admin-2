@@ -72,7 +72,7 @@ export default function UserModal({
 
   const handleConfirmDelete = async () => {
     if (!onDelete) return;
-    
+
     setDeleting(true);
     setConfirmDelete(false);
     try {
@@ -242,7 +242,7 @@ export default function UserModal({
             />
           </div>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-6">
           <div className="flex items-center gap-3">
             <label className="w-28 text-sm font-medium shrink-0" style={labelStyles}>
@@ -415,7 +415,7 @@ export default function UserModal({
             method: 'PUT',
             body: JSON.stringify(dataWithUser),
           });
-          
+
           setPayModalOpen(false);
           if (onRefresh) {
             await onRefresh();
@@ -432,7 +432,7 @@ export default function UserModal({
             method: 'PUT',
             body: JSON.stringify(dataWithUser),
           });
-          
+
           setBonusModalOpen(false);
           if (onRefresh) {
             await onRefresh();

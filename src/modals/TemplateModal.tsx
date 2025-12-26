@@ -75,13 +75,13 @@ export default function TemplateModal({
         // Удаляем вкладку с удаленным шаблоном
         setTabs(prev => {
           const newTabs = prev.filter(t => t.template.id !== deletedId);
-          
+
           // Если удаленный шаблон был активным, переключаемся на другую вкладку
           if (activeTabId === deletedId) {
             if (newTabs.length > 0) {
               const newActiveTab = newTabs[newTabs.length - 1];
               setActiveTabId(newActiveTab.id);
-              
+
               if (newActiveTab.id.startsWith('new-')) {
                 setFormData({ ...newActiveTab.template, is_add: 1 });
                 detectLanguage(newActiveTab.template.data || '');
@@ -104,7 +104,7 @@ export default function TemplateModal({
               setIsFullscreen(false);
             }
           }
-          
+
           return newTabs;
         });
       }
@@ -120,7 +120,7 @@ export default function TemplateModal({
         setIsMinimized(false);
         setIsFullscreen(true);
       }
-      
+
       const existingTab = tabs.find(t => t.template.id === data.id);
       if (existingTab) {
         setIsFullscreen(true);
@@ -129,20 +129,20 @@ export default function TemplateModal({
         detectLanguage(existingTab.template.data || '');
         return;
       }
-      
+
       if (tabs.length > 0) {
         setIsFullscreen(true);
       } else {
-        setIsFullscreen(false); 
+        setIsFullscreen(false);
       }
-      
+
       setLoading(true);
       shm_request(`/shm/v1/admin/template?id=${data.id}`)
         .then(res => {
           const templateData = res.data?.[0] || res.data;
           setFormData({ ...templateData, is_add: 0 });
           detectLanguage(templateData.data || '');
-          
+
           const newTab = {
             id: templateData.id,
             template: templateData,
@@ -163,9 +163,9 @@ export default function TemplateModal({
       } else if (tabs.length > 0) {
         setIsFullscreen(true);
       } else {
-        setIsFullscreen(false); 
+        setIsFullscreen(false);
       }
-      
+
       setFormData({ is_add: 1, data: '', settings: {} });
       setEditorLanguage('plaintext');
       const newTab = {
@@ -184,7 +184,7 @@ export default function TemplateModal({
       registerTTCompletion(monacoRef.current, enableTTSnippetsInOtherLanguages);
     }
   }, [enableTTSnippetsInOtherLanguages]);
-  
+
   useEffect(() => {
     if (!activeTabId) return;
     const activeTab = tabs.find(t => t.id === activeTabId);
@@ -232,7 +232,7 @@ export default function TemplateModal({
     }
 
     const trimmed = content.trim();
-    
+
     if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
       setEditorLanguage('json');
     } else if (
@@ -254,7 +254,7 @@ export default function TemplateModal({
       content.includes('<%') || content.includes('%>') ||
       content.includes('{{') || content.includes('}}')
     ) {
-      setEditorLanguage('tt'); 
+      setEditorLanguage('tt');
     } else if (
       content.includes('<html') || content.includes('<!DOCTYPE') ||
       content.includes('<head>') || content.includes('<body>')
@@ -268,12 +268,12 @@ export default function TemplateModal({
   const handleChange = (field: string, value: any) => {
     const newFormData = { ...formData, [field]: value };
     setFormData(newFormData);
-    
+
     // Обновляем данные в текущей вкладке
     if (activeTabId) {
-      setTabs(prev => prev.map(t => 
-        t.id === activeTabId ? { 
-          ...t, 
+      setTabs(prev => prev.map(t =>
+        t.id === activeTabId ? {
+          ...t,
           hasUnsavedChanges: true,
           template: { ...t.template, [field]: value }
         } : t
@@ -284,7 +284,7 @@ export default function TemplateModal({
   const handleEditorChange = (value: string | undefined) => {
     handleChange('data', value || '');
   };
-  
+
   const handleTemplateSelect = (template: any) => {
     const existingTab = tabs.find(t => t.template.id === template.id);
     if (existingTab) {
@@ -294,7 +294,7 @@ export default function TemplateModal({
       detectLanguage(existingTab.template.data || '');
       return;
     }
-    
+
     setLoading(true);
     shm_request(`/shm/v1/admin/template?id=${template.id}`)
       .then(res => {
@@ -314,7 +314,7 @@ export default function TemplateModal({
       })
       .finally(() => setLoading(false));
   };
-  
+
   const handleTabClose = (tabId: string) => {
     const tab = tabs.find(t => t.id === tabId);
     if (tab?.hasUnsavedChanges) {
@@ -322,19 +322,19 @@ export default function TemplateModal({
       setConfirmCloseTabOpen(true);
       return;
     }
-    
+
     closeTabById(tabId);
   };
-  
+
   const closeTabById = (tabId: string) => {
     const newTabs = tabs.filter(t => t.id !== tabId);
     setTabs(newTabs);
-    
+
     if (activeTabId === tabId) {
       if (newTabs.length > 0) {
         const newActiveTab = newTabs[newTabs.length - 1];
         setActiveTabId(newActiveTab.id);
-        
+
         if (newActiveTab.id.startsWith('new-')) {
           setFormData({ ...newActiveTab.template, is_add: 1 });
           detectLanguage(newActiveTab.template.data || '');
@@ -373,11 +373,11 @@ export default function TemplateModal({
         setFormData(savedFormData);
       }
       window.dispatchEvent(new CustomEvent('templateSaved', { detail: { template: savedFormData } }));
-      
+
       if (activeTabId) {
-        setTabs(prev => prev.map(t => 
-          t.id === activeTabId ? { 
-            ...t, 
+        setTabs(prev => prev.map(t =>
+          t.id === activeTabId ? {
+            ...t,
             hasUnsavedChanges: false,
             template: savedFormData
           } : t
@@ -483,17 +483,17 @@ export default function TemplateModal({
       setConfirmCloseAllOpen(true);
       return;
     }
-    
+
     closeAllTabs();
   };
-  
+
   const closeAllTabs = () => {
     setTabs([]);
     setActiveTabId(null);
     localStorage.removeItem('templateEditorTabs');
     onClose();
   };
-  
+
   const handleModalClose = () => {
     if (tabs.length === 1 && !isFullscreen) {
       const hasUnsaved = tabs.some(t => t.hasUnsavedChanges);
@@ -502,7 +502,7 @@ export default function TemplateModal({
         return;
       }
       closeAllTabs();
-    } 
+    }
     else if (tabs.length > 1 && !isFullscreen) {
       const activeTab = tabs.find(t => t.id === activeTabId);
       if (activeTab?.hasUnsavedChanges) {
@@ -530,12 +530,12 @@ export default function TemplateModal({
       setTabs([]);
       setActiveTabId(null);
       localStorage.removeItem('templateEditorTabs');
-      setIsMinimized(false); 
+      setIsMinimized(false);
       setIsFullscreen(false);
-      onClose(); 
+      onClose();
       return;
     }
-    
+
     if (activeTabId) {
       handleTabClose(activeTabId);
     }
@@ -668,27 +668,27 @@ export default function TemplateModal({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.key === 's') {
         event.preventDefault();
-        
+
         // Проверяем, есть ли активная вкладка
         if (!activeTabId) {
           toast.error('Выберите шаблон для сохранения');
           return;
         }
-        
+
         // Получаем данные текущей активной вкладки
         const activeTab = tabs.find(t => t.id === activeTabId);
         if (!activeTab) {
           toast.error('Шаблон не найден');
           return;
         }
-        
+
         // Для существующих шаблонов проверяем наличие ID
         const currentTemplate = activeTab.template;
         if (currentTemplate.is_add !== 1 && !currentTemplate.id && !formData.id) {
           toast.error('Введите ID шаблона');
           return;
         }
-        
+
         handleSave();
       }
     };
@@ -724,7 +724,7 @@ export default function TemplateModal({
       </button>
     );
   }
-  
+
   if (isMinimized && tabs.length === 0) {
     return null;
   }
@@ -765,7 +765,7 @@ export default function TemplateModal({
                   onClick={() => {
                     if (activeTabId !== tab.id) {
                       setActiveTabId(tab.id);
-                      
+
                       if (tab.id.startsWith('new-')) {
                         setFormData({ ...tab.template, is_add: 1 });
                         detectLanguage(tab.template.data || '');
@@ -850,7 +850,7 @@ export default function TemplateModal({
                 }}
               />
             </div>
-            
+
             {}
             <div className="flex-1 flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--theme-content-bg)' }}>
               {loading ? (
@@ -878,7 +878,7 @@ export default function TemplateModal({
                         color: 'var(--theme-input-text)',
                       }}
                     />
-                    
+
                     <label className="text-sm font-medium shrink-0 ml-4" style={{ color: 'var(--theme-content-text-muted)' }}>
                       Язык
                     </label>
@@ -910,7 +910,7 @@ export default function TemplateModal({
                         AUTO
                       </button>
                     </div>
-                    
+
                     {/* Переключатель сниппетов Template Toolkit для полноэкранного режима */}
                     {editorLanguage !== 'tt' && (
                       <label className="flex items-center gap-2 cursor-pointer ml-4">
@@ -974,7 +974,7 @@ export default function TemplateModal({
                   </div>
                 </div>
               )}
-              
+
               {}
               <div
                 className="border-t p-4"

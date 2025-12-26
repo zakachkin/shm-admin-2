@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { 
-  Settings, 
-  Palette, 
-  Save, 
-  RotateCcw, 
-  Sun, 
-  Moon, 
-  Monitor, 
-  Eye, 
-  EyeOff, 
+import {
+  Settings,
+  Palette,
+  Save,
+  RotateCcw,
+  Sun,
+  Moon,
+  Monitor,
+  Eye,
+  EyeOff,
   HelpCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -113,14 +113,14 @@ const colorGroups: ColorGroup[] = [
   },
 ];
 
-function ColorPicker({ 
-  colorKey, 
-  label, 
+function ColorPicker({
+  colorKey,
+  label,
   description,
-  value, 
+  value,
   onChange,
   defaultValue,
-}: { 
+}: {
   colorKey: keyof ThemeColors;
   label: string;
   description?: string;
@@ -129,7 +129,7 @@ function ColorPicker({
   defaultValue: string;
 }) {
   const isModified = value !== defaultValue;
-  
+
   return (
     <div className="flex items-center gap-3 py-2">
       <div className="flex items-center gap-2">
@@ -138,7 +138,7 @@ function ColorPicker({
           value={value.startsWith('rgba') ? '#888888' : value}
           onChange={(e) => onChange(colorKey, e.target.value)}
           className="w-8 h-8 rounded cursor-pointer bg-transparent border-0"
-          style={{ 
+          style={{
             borderColor: 'var(--theme-input-border)',
           }}
         />
@@ -149,8 +149,8 @@ function ColorPicker({
             {label}
           </span>
           {isModified && (
-            <span className="text-xs px-1.5 py-0.5 rounded" style={{ 
-              backgroundColor: 'var(--theme-primary-color)', 
+            <span className="text-xs px-1.5 py-0.5 rounded" style={{
+              backgroundColor: 'var(--theme-primary-color)',
               color: 'white',
               opacity: 0.8,
             }}>
@@ -176,18 +176,18 @@ function ColorPicker({
 
 function UnifiedSettings() {
   const [activeTab, setActiveTab] = useState<TabType>('branding');
-  
+
   // Branding state
   const { branding, loading: brandingLoading, updateBranding, resetBranding } = useBrandingStore();
   const [formData, setFormData] = useState(branding);
   const [confirmResetBranding, setConfirmResetBranding] = useState(false);
-  
+
   // Appearance state
   const { mode, setMode, colors, customColors, setCustomColor, resetCustomColors, resolvedTheme } = useThemeStore();
   const { showHelp, setShowHelp } = useSettingsStore();
   const [expandedGroups, setExpandedGroups] = useState<string[]>(['Основные цвета']);
   const [confirmResetColors, setConfirmResetColors] = useState(false);
-  
+
   const tabs = [
     { id: 'branding' as TabType, label: 'Брендинг', icon: Palette },
     { id: 'appearance' as TabType, label: 'Внешний вид', icon: Sun },
@@ -229,7 +229,7 @@ function UnifiedSettings() {
 
   // Appearance handlers
   const baseColors = resolvedTheme === 'dark' ? darkTheme : lightTheme;
-  
+
   const themes: { value: ThemeMode; label: string; icon: any; description: string }[] = [
     { value: 'system', label: 'Системная', icon: Monitor, description: 'Использовать настройки системы' },
     { value: 'light', label: 'Светлая', icon: Sun, description: 'Яркая тема для дневного использования' },
@@ -237,8 +237,8 @@ function UnifiedSettings() {
   ];
 
   const toggleGroup = (title: string) => {
-    setExpandedGroups(prev => 
-      prev.includes(title) 
+    setExpandedGroups(prev =>
+      prev.includes(title)
         ? prev.filter(t => t !== title)
         : [...prev, title]
     );
@@ -263,7 +263,7 @@ function UnifiedSettings() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 
+          <h1
             className="text-2xl font-bold flex items-center gap-3"
             style={{ color: 'var(--theme-content-text)' }}
           >
@@ -274,7 +274,7 @@ function UnifiedSettings() {
             Брендинг и внешний вид
           </p>
         </div>
-        
+
         {/* Action buttons based on active tab */}
         <div className="flex gap-3">
           {activeTab === 'branding' && (
@@ -305,7 +305,7 @@ function UnifiedSettings() {
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
-            
+
             return (
               <button
                 key={tab.id}
@@ -337,7 +337,7 @@ function UnifiedSettings() {
                 </div>
                 <div className="card-body space-y-4">
                   <div>
-                    <label 
+                    <label
                       className="block text-sm font-medium mb-1"
                       style={{ color: 'var(--theme-content-text)' }}
                     >
@@ -357,7 +357,7 @@ function UnifiedSettings() {
                   </div>
 
                   <div>
-                    <label 
+                    <label
                       className="block text-sm font-medium mb-1"
                       style={{ color: 'var(--theme-content-text)' }}
                     >
@@ -377,7 +377,7 @@ function UnifiedSettings() {
                   </div>
 
                   <div>
-                    <label 
+                    <label
                       className="block text-sm font-medium mb-1"
                       style={{ color: 'var(--theme-content-text)' }}
                     >
@@ -394,7 +394,7 @@ function UnifiedSettings() {
                   </div>
 
                   <div>
-                    <label 
+                    <label
                       className="block text-sm font-medium mb-1"
                       style={{ color: 'var(--theme-content-text)' }}
                     >
@@ -411,7 +411,7 @@ function UnifiedSettings() {
                   </div>
 
                   <div>
-                    <label 
+                    <label
                       className="block text-sm font-medium mb-1"
                       style={{ color: 'var(--theme-content-text)' }}
                     >
@@ -431,7 +431,7 @@ function UnifiedSettings() {
                   </div>
 
                   <div>
-                    <label 
+                    <label
                       className="block text-sm font-medium mb-1"
                       style={{ color: 'var(--theme-content-text)' }}
                     >
@@ -468,31 +468,31 @@ function UnifiedSettings() {
                 </div>
                 <div className="card-body">
                   {/* Login preview */}
-                  <div 
+                  <div
                     className="rounded-lg p-6 mb-4"
                     style={{ backgroundColor: 'var(--theme-content-bg)' }}
                   >
                     <div className="text-center">
-                      <div 
+                      <div
                         className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center"
                         style={{ backgroundColor: formData.primaryColor + '30' }}
                       >
                         {formData.logoUrl ? (
                           <img src={formData.logoUrl} alt="Logo" className="w-8 h-8 object-contain" />
                         ) : (
-                          <div 
-                            className="w-8 h-8 rounded-lg" 
+                          <div
+                            className="w-8 h-8 rounded-lg"
                             style={{ background: `linear-gradient(135deg, ${formData.primaryColor}, ${formData.primaryColor}dd)` }}
                           />
                         )}
                       </div>
-                      <h3 
+                      <h3
                         className="text-lg font-bold"
                         style={{ color: 'var(--theme-content-text)' }}
                       >
                         {formData.loginTitle}
                       </h3>
-                      <p 
+                      <p
                         className="text-sm"
                         style={{ color: 'var(--theme-content-text-muted)' }}
                       >
@@ -502,32 +502,32 @@ function UnifiedSettings() {
                   </div>
 
                   {/* Sidebar preview */}
-                  <div 
+                  <div
                     className="rounded-lg p-4"
                     style={{ backgroundColor: 'var(--theme-sidebar-bg)' }}
                   >
-                    <div 
+                    <div
                       className="flex items-center gap-3 mb-4 pb-4"
                       style={{ borderBottom: '1px solid var(--theme-sidebar-border)' }}
                     >
                       {formData.logoUrl ? (
                         <img src={formData.logoUrl} alt="Logo" className="w-8 h-8 object-contain" />
                       ) : (
-                        <div 
-                          className="w-8 h-8 rounded-lg" 
+                        <div
+                          className="w-8 h-8 rounded-lg"
                           style={{ background: `linear-gradient(135deg, ${formData.primaryColor}, ${formData.primaryColor}dd)` }}
                         />
                       )}
-                      <span 
+                      <span
                         className="font-bold"
                         style={{ color: 'var(--theme-header-text)' }}
                       >
                         {formData.appName}
                       </span>
                     </div>
-                    <div 
+                    <div
                       className="text-sm py-2 px-3 rounded-lg"
-                      style={{ 
+                      style={{
                         backgroundColor: formData.primaryColor + '20',
                         color: formData.primaryColor,
                         borderLeft: `2px solid ${formData.primaryColor}`
@@ -556,7 +556,7 @@ function UnifiedSettings() {
                     {themes.map((theme) => {
                       const Icon = theme.icon;
                       const isActive = mode === theme.value;
-                      
+
                       return (
                         <button
                           key={theme.value}
@@ -568,11 +568,11 @@ function UnifiedSettings() {
                           }}
                         >
                           <div className="flex items-center gap-3 mb-2">
-                            <Icon 
-                              className="w-5 h-5" 
+                            <Icon
+                              className="w-5 h-5"
                               style={{ color: isActive ? 'var(--theme-primary-color)' : 'var(--theme-content-text-muted)' }}
                             />
-                            <span 
+                            <span
                               className="font-medium"
                               style={{ color: isActive ? 'var(--theme-primary-color)' : 'var(--theme-content-text)' }}
                             >
@@ -586,7 +586,7 @@ function UnifiedSettings() {
                       );
                     })}
                   </div>
-                  
+
                   {mode === 'system' && (
                     <p className="mt-4 text-sm" style={{ color: 'var(--theme-content-text-muted)' }}>
                       Текущая системная тема: <strong>{resolvedTheme === 'dark' ? 'Тёмная' : 'Светлая'}</strong>
@@ -605,12 +605,12 @@ function UnifiedSettings() {
                 <div className="card-body">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <HelpCircle 
-                        className="w-5 h-5" 
+                      <HelpCircle
+                        className="w-5 h-5"
                         style={{ color: 'var(--theme-primary-color)' }}
                       />
                       <div>
-                        <span 
+                        <span
                           className="font-medium"
                           style={{ color: 'var(--theme-content-text)' }}
                         >
@@ -653,7 +653,7 @@ function UnifiedSettings() {
                   {colorGroups.map((group) => {
                     const isExpanded = expandedGroups.includes(group.title);
                     const modifiedCount = group.colors.filter(c => customColors[c.key]).length;
-                    
+
                     return (
                       <div key={group.title} style={{ borderBottom: '1px solid var(--theme-card-border)' }}>
                         <button
@@ -666,7 +666,7 @@ function UnifiedSettings() {
                                 <div
                                   key={c.key}
                                   className="w-5 h-5 rounded-full border-2"
-                                  style={{ 
+                                  style={{
                                     backgroundColor: colors[c.key],
                                     borderColor: 'var(--theme-card-bg)',
                                     zIndex: 4 - i,
@@ -680,9 +680,9 @@ function UnifiedSettings() {
                                   {group.title}
                                 </span>
                                 {modifiedCount > 0 && (
-                                  <span 
+                                  <span
                                     className="text-xs px-1.5 py-0.5 rounded"
-                                    style={{ 
+                                    style={{
                                       backgroundColor: 'var(--theme-primary-color)',
                                       color: 'white',
                                     }}
@@ -702,7 +702,7 @@ function UnifiedSettings() {
                             <Eye className="w-5 h-5" style={{ color: 'var(--theme-content-text-muted)' }} />
                           )}
                         </button>
-                        
+
                         {isExpanded && (
                           <div className="px-6 pb-4 space-y-1">
                             {group.colors.map((color) => (

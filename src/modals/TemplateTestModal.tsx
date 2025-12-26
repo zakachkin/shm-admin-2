@@ -35,7 +35,7 @@ export default function TemplateTestModal({
         dry_run: dryRun ? '1' : '0',
         format: 'default',
       });
-      
+
       if (usi) {
         params.append('usi', usi);
       }

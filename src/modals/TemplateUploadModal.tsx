@@ -56,7 +56,7 @@ export function TemplateUploadModal({ open, onClose, onSave }: TemplateUploadMod
         data: fileContent,
         settings: settings,
       });
-      
+
       toast.success('Шаблон загружен');
       handleClose();
     } catch (error: any) {
@@ -173,9 +173,9 @@ export function TemplateUploadModal({ open, onClose, onSave }: TemplateUploadMod
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
               Информация о файле
             </label>
-            <div 
+            <div
               className="flex-1 p-3 rounded"
-              style={{ 
+              style={{
                 backgroundColor: 'var(--theme-card-header-bg)',
                 border: '1px solid var(--theme-card-border)'
               }}

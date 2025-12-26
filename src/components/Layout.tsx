@@ -48,13 +48,13 @@ interface MenuItem {
 }
 
 const navigation: MenuItem[] = [
-  { 
-    name: 'Главная', 
-    href: '/', 
-    icon: Home 
+  {
+    name: 'Главная',
+    href: '/',
+    icon: Home
   },
-  { 
-    name: 'Пользователи', 
+  {
+    name: 'Пользователи',
     icon: Users,
     children: [
       { name: 'Список', href: '/users' },
@@ -67,16 +67,16 @@ const navigation: MenuItem[] = [
       { name: 'Промокоды', href: '/promo' },
     ]
   },
-  { 
-    name: 'Услуги', 
+  {
+    name: 'Услуги',
     icon: Package,
     children: [
       { name: 'Каталог', href: '/services' },
       { name: 'События', href: '/events' },
     ]
   },
-  { 
-    name: 'Сервера', 
+  {
+    name: 'Сервера',
     icon: Server,
     children: [
       { name: 'Список', href: '/servers' },
@@ -84,24 +84,24 @@ const navigation: MenuItem[] = [
       { name: 'Ключи', href: '/identities' },
     ]
   },
-  { 
-    name: 'Задачи', 
+  {
+    name: 'Задачи',
     icon: Activity,
     children: [
       { name: 'Текущие задачи', href: '/spool' },
       { name: 'Архив', href: '/spool-history' },
     ]
   },
-  { 
-    name: 'Настройки', 
+  {
+    name: 'Настройки',
     icon: Settings,
     children: [
       { name: 'Шаблоны', href: '/templates' },
       { name: 'Конфигурация', href: '/config' },
     ]
   },
-  { 
-    name: 'Настройки системы', 
+  {
+    name: 'Настройки системы',
     href: '/settings',
     icon: Wrench
   },
@@ -110,16 +110,16 @@ const navigation: MenuItem[] = [
 function ThemeToggle() {
   const { mode, setMode, resolvedTheme } = useThemeStore();
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const themes: { value: ThemeMode; label: string; icon: any }[] = [
     { value: 'system', label: 'Системная', icon: Monitor },
     { value: 'light', label: 'Светлая', icon: Sun },
     { value: 'dark', label: 'Тёмная', icon: Moon },
   ];
-  
+
   const currentTheme = themes.find(t => t.value === mode)!;
   const CurrentIcon = resolvedTheme === 'dark' ? Moon : Sun;
-  
+
   return (
     <div className="relative">
       <button
@@ -129,14 +129,14 @@ function ThemeToggle() {
       >
         <CurrentIcon className="w-5 h-5" />
       </button>
-      
+
       {isOpen && (
         <>
-          <div 
-            className="fixed inset-0 z-40" 
-            onClick={() => setIsOpen(false)} 
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
           />
-          <div 
+          <div
             className="absolute right-0 top-full mt-2 z-50 w-40 rounded-lg shadow-lg border"
             style={{
               backgroundColor: 'var(--theme-card-bg)',
@@ -154,11 +154,11 @@ function ThemeToggle() {
                   }}
                   className="w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors first:rounded-t-lg last:rounded-b-lg"
                   style={{
-                    color: mode === theme.value 
-                      ? 'var(--theme-primary-color)' 
+                    color: mode === theme.value
+                      ? 'var(--theme-primary-color)'
                       : 'var(--theme-content-text-muted)',
-                    backgroundColor: mode === theme.value 
-                      ? 'var(--theme-sidebar-item-active-bg)' 
+                    backgroundColor: mode === theme.value
+                      ? 'var(--theme-sidebar-item-active-bg)'
                       : 'transparent',
                   }}
                 >
@@ -210,7 +210,7 @@ function Layout() {
   };
 
   const isActive = (path: string) => location.pathname === path;
-  
+
   const isMenuActive = (item: MenuItem) => {
     if (item.href) return isActive(item.href);
     return item.children?.some(child => isActive(child.href));
@@ -219,20 +219,20 @@ function Layout() {
   const toggleMenu = (name: string) => {
     setOpenMenus(prev => {
       const isCurrentlyOpen = prev.includes(name);
-      
+
       if (isCurrentlyOpen) {
         setManuallyClosed(closed => [...closed, name]);
         return prev.filter(n => n !== name);
       } else {
         setManuallyClosed(closed => closed.filter(n => n !== name));
-        
+
         const activeMenus = navigation
-          .filter(item => 
-            item.children?.some(child => isActive(child.href)) && 
+          .filter(item =>
+            item.children?.some(child => isActive(child.href)) &&
             !manuallyClosed.includes(item.name)
           )
           .map(item => item.name);
-        
+
         return [name, ...activeMenus.filter(m => m !== name)];
       }
     });
@@ -259,11 +259,11 @@ function Layout() {
         method: 'DELETE'
       });
       toast.success('Шаблон удален');
-      
+
       // Закрываем модал и сбрасываем выбранные данные
       setTemplateModalOpen(false);
       setSelectedData(null);
-      
+
       // Отправляем событие для обновления списка шаблонов
       window.dispatchEvent(new CustomEvent('templateDeleted', { detail: { id } }));
     } catch (error: any) {
@@ -294,7 +294,7 @@ function Layout() {
       >
         <div className="flex flex-col h-full">
           {}
-          <div 
+          <div
             className="flex items-center justify-between h-16 px-4"
             style={{ borderBottom: '1px solid var(--theme-sidebar-border)' }}
           >
@@ -302,7 +302,7 @@ function Layout() {
               {branding.logoUrl ? (
                 <img src={branding.logoUrl} alt="Logo" className="w-8 h-8 object-contain" />
               ) : (
-                <div 
+                <div
                   className="w-8 h-8 rounded-lg flex items-center justify-center"
                   style={{ background: `linear-gradient(135deg, ${colors.primaryColor}, ${colors.primaryColorHover})` }}
                 >
@@ -328,7 +328,7 @@ function Layout() {
               const Icon = item.icon;
               const active = isMenuActive(item);
               const isOpen = openMenus.includes(item.name);
-              
+
               if (item.href && !item.children) {
                 return (
                   <Link
@@ -342,13 +342,13 @@ function Layout() {
                   </Link>
                 );
               }
-              
+
               return (
                 <div key={item.name} className="mb-1">
                   <button
                     onClick={() => toggleMenu(item.name)}
                     className={`nav-item w-full`}
-                    style={{ 
+                    style={{
                       color: active ? 'var(--theme-sidebar-text-active)' : undefined,
                       borderLeft: active ? '2px solid var(--theme-primary-color)' : undefined,
                     }}
@@ -362,7 +362,7 @@ function Layout() {
                     )}
                   </button>
                   {isOpen && item.children && (
-                    <div 
+                    <div
                       className="ml-4 mt-1 space-y-1 pl-3"
                       style={{ borderLeft: '1px solid var(--theme-sidebar-border)' }}
                     >
@@ -373,11 +373,11 @@ function Layout() {
                           onClick={() => setSidebarOpen(false)}
                           className="block px-3 py-2 text-sm rounded-lg transition-colors"
                           style={{
-                            color: isActive(child.href) 
-                              ? 'var(--theme-sidebar-text-active)' 
+                            color: isActive(child.href)
+                              ? 'var(--theme-sidebar-text-active)'
                               : 'var(--theme-sidebar-text)',
-                            backgroundColor: isActive(child.href) 
-                              ? 'var(--theme-sidebar-item-active-bg)' 
+                            backgroundColor: isActive(child.href)
+                              ? 'var(--theme-sidebar-item-active-bg)'
                               : 'transparent',
                             borderLeft: isActive(child.href) ? '2px solid var(--theme-primary-color)' : undefined,
                           }}
@@ -395,7 +395,7 @@ function Layout() {
           {}
           <div className="p-4" style={{ borderTop: '1px solid var(--theme-sidebar-border)' }}>
             <div className="flex items-center gap-3 mb-3">
-              <div 
+              <div
                 className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
                 style={{ background: `linear-gradient(135deg, ${colors.primaryColor}, ${colors.primaryColorHover})` }}
               >
@@ -425,7 +425,7 @@ function Layout() {
       {}
       <div className="flex-1 flex flex-col overflow-hidden">
         {}
-        <header 
+        <header
           className="h-16 flex items-center justify-between px-4"
           style={{
             backgroundColor: 'var(--theme-header-bg)',

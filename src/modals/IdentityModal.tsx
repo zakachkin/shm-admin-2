@@ -64,7 +64,7 @@ export default function IdentityModal({
 
   const handleConfirmDelete = async () => {
     if (!onDelete) return;
-    
+
     setDeleting(true);
     setConfirmDelete(false);
     try {

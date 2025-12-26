@@ -35,7 +35,7 @@ export default function ServiceModal({
     if (open && data) {
       const onceService = data.period === 0 && data.next === -1;
       setFormData({ ...data, once_service: onceService });
-      
+
       shm_request('/shm/v1/admin/service?limit=0')
         .then(res => {
           const { data: items } = normalizeListResponse(res);
@@ -300,7 +300,7 @@ export default function ServiceModal({
 
         <div className="col-span-2 border-t pt-4 mt-2" style={{ borderColor: 'var(--theme-card-border)' }}>
           <label className="block text-sm font-medium mb-3" style={labelStyles}>Биллинг</label>
-          
+
           <div className="grid grid-cols-2 gap-x-6 gap-y-2 ml-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input

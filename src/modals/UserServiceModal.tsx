@@ -46,7 +46,7 @@ export default function UserServiceModal({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const [withdrawData, setWithdrawData] = useState<Record<string, any> | null>(null);
-  
+
   const statusMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export default function UserServiceModal({
         setStatusMenuOpen(false);
       }
     };
-    
+
     if (statusMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -112,7 +112,7 @@ export default function UserServiceModal({
 
   const handleDelete = async () => {
     if (!onDelete) return;
-    
+
     const canDelete = formData.status === 'BLOCK' || formData.status === 'NOT PAID';
     if (!canDelete) {
       toast.error('Можно удалить только заблокированные или неоплаченные услуги');
@@ -124,7 +124,7 @@ export default function UserServiceModal({
 
   const handleConfirmDelete = async () => {
     if (!onDelete) return;
-    
+
     setDeleting(true);
     setConfirmDelete(false);
     try {
@@ -142,7 +142,7 @@ export default function UserServiceModal({
     try {
       await shm_request('/shm/v1/admin/user/service/stop', {
         method: 'POST',
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           user_id: formData.user_id,
           user_service_id: formData.user_service_id,
           auto_bill: 0,
@@ -160,7 +160,7 @@ export default function UserServiceModal({
     try {
       await shm_request('/shm/v1/admin/user/service/activate', {
         method: 'POST',
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           user_id: formData.user_id,
           user_service_id: formData.user_service_id,
           auto_bill: 1,
@@ -178,9 +178,9 @@ export default function UserServiceModal({
     try {
       await shm_request('/shm/v1/admin/user/service/status', {
         method: 'POST',
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           user_id: formData.user_id,
-          user_service_id: formData.user_service_id, 
+          user_service_id: formData.user_service_id,
           status,
         }),
       });
@@ -194,14 +194,14 @@ export default function UserServiceModal({
 
   const handleOpenWithdrawModal = async () => {
     if (!formData.user_service_id) return;
-    
+
     try {
       const res = await shm_request(
         `/shm/v1/admin/user/service/withdraw?user_service_id=${formData.user_service_id}&limit=1&sort_field=withdraw_date&sort_direction=desc`
       );
       const data = res.data || res;
       const withdraws = Array.isArray(data) ? data : [];
-      
+
       if (withdraws.length > 0) {
         setWithdrawData(withdraws[0]);
         setWithdrawModalOpen(true);
@@ -301,9 +301,9 @@ export default function UserServiceModal({
             Пользователь
           </label>
           <div className="flex-1">
-            <UserSelect 
-              value={formData.user_id} 
-              readonly 
+            <UserSelect
+              value={formData.user_id}
+              readonly
               onLoadingChange={setLoadingUser}
             />
           </div>
@@ -315,9 +315,9 @@ export default function UserServiceModal({
             Услуга
           </label>
           <div className="flex-1">
-            <ServiceSelect 
-              value={formData.service_id} 
-              readonly 
+            <ServiceSelect
+              value={formData.service_id}
+              readonly
               onServiceUpdated={onRefresh}
             />
           </div>
@@ -339,12 +339,12 @@ export default function UserServiceModal({
                 {statusConfig.label}
                 <ChevronDown className={`w-4 h-4 transition-transform ${statusMenuOpen ? 'rotate-180' : ''}`} />
               </button>
-              
+
               {}
               {statusMenuOpen && (
-                <div 
+                <div
                   className="absolute top-full left-0 mt-1 py-1 rounded shadow-lg border z-50 min-w-[140px]"
-                  style={{ 
+                  style={{
                     backgroundColor: 'var(--theme-content-bg)',
                     borderColor: 'var(--theme-input-border)',
                   }}

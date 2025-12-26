@@ -37,7 +37,7 @@ export default function UserSelect({
   const [loading, setLoading] = useState(false);
   const [loadingUser, setLoadingUser] = useState(false);
   const [userModalOpen, setUserModalOpen] = useState(false);
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -57,7 +57,7 @@ export default function UserSelect({
       lastLoadedUserIdRef.current = value;
       abortControllerRef.current = new AbortController();
       setLoadingUser(true);
-      
+
       shm_request(`/shm/v1/admin/user?user_id=${value}&limit=1`)
         .then(res => {
           const data = res.data || res;
@@ -101,7 +101,7 @@ export default function UserSelect({
       body: JSON.stringify(userData),
     });
     if (value) {
-      lastLoadedUserIdRef.current = null; 
+      lastLoadedUserIdRef.current = null;
       const res = await shm_request(`/shm/v1/admin/user?user_id=${value}&limit=1`);
       const data = res.data || res;
       const users = Array.isArray(data) ? data : [];
@@ -112,7 +112,7 @@ export default function UserSelect({
     }
     onUserUpdated?.();
   };
-  
+
   const searchUsers = useCallback((query: string) => {
     if (!query || query.length < 1) {
       setItems([]);
@@ -121,7 +121,7 @@ export default function UserSelect({
     }
 
     setLoading(true);
-    
+
     const filter = {
       block: 0,
       '-or': [
@@ -221,31 +221,31 @@ export default function UserSelect({
   if (readonly) {
     if (loadingUser) {
       return (
-        <div 
+        <div
           className={`w-full px-3 py-2 text-sm rounded border ${className}`}
           style={inputStyles}
         >
           <div className="flex items-center gap-2">
-            <div 
-              className="h-4 rounded animate-pulse" 
-              style={{ 
+            <div
+              className="h-4 rounded animate-pulse"
+              style={{
                 width: '40px',
                 backgroundColor: 'var(--theme-input-border)',
-              }} 
+              }}
             />
-            <div 
-              className="h-4 rounded animate-pulse" 
-              style={{ 
+            <div
+              className="h-4 rounded animate-pulse"
+              style={{
                 width: '80px',
                 backgroundColor: 'var(--theme-input-border)',
-              }} 
+              }}
             />
-            <div 
-              className="h-4 rounded animate-pulse flex-1" 
-              style={{ 
+            <div
+              className="h-4 rounded animate-pulse flex-1"
+              style={{
                 maxWidth: '120px',
                 backgroundColor: 'var(--theme-input-border)',
-              }} 
+              }}
             />
           </div>
         </div>
@@ -287,7 +287,7 @@ export default function UserSelect({
             onSave={handleSaveUser}
             onRefresh={async () => {
               if (value) {
-                lastLoadedUserIdRef.current = null; 
+                lastLoadedUserIdRef.current = null;
                 const res = await shm_request(`/shm/v1/admin/user?user_id=${value}&limit=1`);
                 const data = res.data || res;
                 const users = Array.isArray(data) ? data : [];
@@ -318,7 +318,7 @@ export default function UserSelect({
         className="w-full px-3 py-2 text-sm rounded border"
         style={inputStyles}
       />
-      
+
       {loading && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
           <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin"

@@ -25,10 +25,10 @@ const userServiceColumns = [
   { key: 'user_service_id', label: 'ID', visible: true, sortable: true },
   { key: 'user_id', label: 'Пользователь', visible: true, sortable: true },
   { key: 'name', label: 'Услуга', visible: true, sortable: true },
-  { 
-    key: 'status', 
-    label: 'Статус', 
-    visible: true, 
+  {
+    key: 'status',
+    label: 'Статус',
+    visible: true,
     sortable: true,
     filterType: 'select' as const,
     filterOptions: [
@@ -76,12 +76,12 @@ function UserServices() {
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
     let url = `/shm/v1/admin/user/service?limit=${l}&offset=${o}`;
-    
+
     const combinedFilters = { ...f, ...externalFilters };
     if (Object.keys(combinedFilters).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(combinedFilters))}`;
     }
-    
+
     if (sf && sd) {
       url += `&sort_field=${sf}&sort_direction=${sd}`;
     }
@@ -181,9 +181,9 @@ function UserServices() {
         <button
           onClick={handleCreate}
           className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
-          style={{ 
-            backgroundColor: 'var(--accent-primary)', 
-            color: 'var(--accent-text)' 
+          style={{
+            backgroundColor: 'var(--accent-primary)',
+            color: 'var(--accent-text)'
           }}
         >
           <Plus className="w-4 h-4" />
@@ -209,7 +209,7 @@ function UserServices() {
         externalFilters={externalFilters}
       />
       </div>
-      
+
       {}
       <UserServiceModal
         open={editModalOpen}

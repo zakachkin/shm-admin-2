@@ -9,18 +9,18 @@ const spoolHistoryColumns = [
   { key: 'executed', label: 'Выполнено', visible: true, sortable: true },
   { key: 'user_id', label: 'USER ID', visible: true, sortable: true },
   { key: 'event', label: 'Событие', visible: true, sortable: true },
-  { 
-    key: 'title', 
-    label: 'Название', 
-    visible: true, 
+  {
+    key: 'title',
+    label: 'Название',
+    visible: true,
     sortable: false,
     filter: false,
     render: (value: any, row: any) => row?.event?.title || '-'
   },
-  { 
-    key: 'status', 
-    label: 'Статус', 
-    visible: true, 
+  {
+    key: 'status',
+    label: 'Статус',
+    visible: true,
     sortable: false,
     filterType: 'select' as const,
     filterOptions: [
@@ -53,9 +53,9 @@ function SpoolHistory() {
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [filters, setFilters] = useState<Record<string, string>>({});
-      
+
     const { selectedUser } = useSelectedUserStore();
-      
+
     const externalFilters = useMemo(() => {
       if (selectedUser?.user_id) {
         return { user_id: String(selectedUser.user_id) };
@@ -66,12 +66,12 @@ function SpoolHistory() {
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
     let url = `/shm/v1/admin/spool/history?limit=${l}&offset=${o}`;
-    
+
     const combinedFilters = { ...f, ...externalFilters };
     if (Object.keys(combinedFilters).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(combinedFilters))}`;
     }
-    
+
     if (sf && sd) {
       url += `&sort_field=${sf}&sort_direction=${sd}`;
     }
@@ -102,7 +102,7 @@ function SpoolHistory() {
 
   const handleFilterChange = useCallback((newFilters: Record<string, string>) => {
     setFilters(newFilters);
-    setOffset(0); 
+    setOffset(0);
   }, []);
 
   const handleRowClick = (row: any) => {
@@ -137,7 +137,7 @@ function SpoolHistory() {
         storageKey="spool-history"
         externalFilters={externalFilters}
       />
-      
+
       <SpoolHistoryModal
         open={modalOpen}
         onClose={() => {

@@ -9,10 +9,10 @@ const serverGroupColumns = [
   { key: 'group_id', label: 'ID', visible: true, sortable: true },
   { key: 'name', label: 'Название', visible: true, sortable: true },
   { key: 'type', label: 'Тип', visible: true, sortable: true },
-  { 
-    key: 'transport', 
-    label: 'Транспорт', 
-    visible: true, 
+  {
+    key: 'transport',
+    label: 'Транспорт',
+    visible: true,
     sortable: true,
     filterType: 'select' as const,
     filterOptions: [
@@ -41,11 +41,11 @@ function ServerGroups() {
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
     let url = `/shm/v1/admin/server/group?limit=${l}&offset=${o}`;
-    
+
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
     }
-    
+
     if (sf && sd) {
       url += `&sort_field=${sf}&sort_direction=${sd}`;
     }
@@ -106,7 +106,7 @@ function ServerGroups() {
 
   const handleDelete = async () => {
     if (!selectedRow?.group_id) return;
-    
+
     await shm_request(`/shm/v1/admin/server/group?group_id=${selectedRow.group_id}`, {
       method: 'DELETE',
     });
@@ -127,9 +127,9 @@ function ServerGroups() {
         <button
           onClick={handleCreate}
           className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
-          style={{ 
-            backgroundColor: 'var(--accent-primary)', 
-            color: 'var(--accent-text)' 
+          style={{
+            backgroundColor: 'var(--accent-primary)',
+            color: 'var(--accent-text)'
           }}
         >
           <Plus className="w-4 h-4" />
@@ -152,7 +152,7 @@ function ServerGroups() {
         onRefresh={handleRefresh}
         storageKey="server-groups"
       />
-      
+
       {}
       <ServerGroupModal
         open={editModalOpen}
