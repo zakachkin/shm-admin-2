@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { shm_request, normalizeListResponse } from '../lib/shm_request';
 
 export interface BrandingSettings {
   appName: string;
@@ -37,12 +38,22 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
     
     set({ loading: true });
     try {
-      const response = await fetch('/api/branding');
-      if (response.ok) {
-        const data = await response.json();
-        set({ branding: { ...DEFAULT_BRANDING, ...data }, loaded: true });
+      // Получаем настройки компании из SHM API
+      const result = await shm_request('/shm/v1/company');
+      if (result.status === 200 && result.data?.[0]) {
+        const company = result.data[0];
+        const branding = {
+          ...DEFAULT_BRANDING,
+          appName: company.title || company.name || DEFAULT_BRANDING.appName,
+          appTitle: company.title || company.name || DEFAULT_BRANDING.appTitle,
+          loginTitle: company.title || company.name || DEFAULT_BRANDING.loginTitle,
+        };
+        set({ branding, loaded: true });
+      } else {
+        set({ branding: DEFAULT_BRANDING, loaded: true });
       }
     } catch (error) {
+      set({ branding: DEFAULT_BRANDING, loaded: true });
     } finally {
       set({ loading: false });
     }
@@ -52,16 +63,27 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
     set({ loading: true });
     try {
       const newBranding = { ...get().branding, ...settings };
-      const response = await fetch('/api/branding', {
+      
+      // Сохраняем в SHM API через admin/config
+      const configData = {
+        name: newBranding.appName,
+        title: newBranding.appTitle || newBranding.appName,
+      };
+      
+      const result = await shm_request('/shm/v1/admin/config', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newBranding),
+        body: JSON.stringify({
+          key: 'company',
+          value: configData
+        }),
       });
       
-      if (response.ok) {
-        const { data } = await response.json();
-        set({ branding: data });
-        document.title = data.appTitle || data.appName;
+      // Проверяем статус ответа
+      if (result.status === 200) {
+        set({ branding: newBranding });
+        document.title = newBranding.appTitle || newBranding.appName;
+      } else {
+        throw new Error(`API returned status ${result.status}`);
       }
     } catch (error) {
       throw error;
@@ -73,10 +95,25 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
   resetBranding: async () => {
     set({ loading: true });
     try {
-      const response = await fetch('/api/branding', { method: 'DELETE' });
-      if (response.ok) {
+      const defaultConfig = {
+        name: DEFAULT_BRANDING.appName,
+        title: DEFAULT_BRANDING.appTitle,
+      };
+      
+      const result = await shm_request('/shm/v1/admin/config', {
+        method: 'POST',
+        body: JSON.stringify({
+          key: 'company',
+          value: defaultConfig
+        }),
+      });
+      
+      // Проверяем статус ответа
+      if (result.status === 200) {
         set({ branding: DEFAULT_BRANDING });
         document.title = DEFAULT_BRANDING.appTitle;
+      } else {
+        throw new Error(`API returned status ${result.status}`);
       }
     } catch (error) {
       throw error;

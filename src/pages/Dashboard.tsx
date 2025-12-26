@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { StatCard, StatCardGrid, ChartCard } from '../components/analytics';
 import { AreaLineChart, BarChart } from '../components/charts';
-import { useCacheStore } from '../store/cacheStore';
 import {
   fetchDashboardAnalytics,
   DashboardAnalytics,
@@ -37,33 +36,11 @@ function getStatusColor(status: string): string {
 }
 
 function Dashboard() {
-  const { settings, get: getCached, set: setCache, needsBackgroundRefresh } = useCacheStore();
   const [loading, setLoading] = useState(true);
-  const [isBackgroundRefresh, setIsBackgroundRefresh] = useState(false);
-  const backgroundRefreshRef = useRef(false);
   const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
 
-  const cacheKey = 'dashboard_main';
-
-  const fetchDashboardData = async (forceRefresh = false) => {
-    if (!forceRefresh && settings.enabled) {
-      const cached = getCached(cacheKey);
-      if (cached) {
-        setAnalytics(cached);
-        setLoading(false);
-
-        if (needsBackgroundRefresh(cacheKey) && !backgroundRefreshRef.current) {
-          backgroundRefreshRef.current = true;
-          setIsBackgroundRefresh(true);
-          fetchDashboardData(true);
-        }
-        return;
-      }
-    }
-
-    if (!isBackgroundRefresh) {
-      setLoading(true);
-    }
+  const fetchDashboardData = async () => {
+    setLoading(true);
     
     try {
       const data = await fetchDashboardAnalytics(7);
@@ -86,15 +63,6 @@ function Dashboard() {
       };
 
       setAnalytics(enrichedData);
-
-      if (settings.enabled) {
-        setCache(cacheKey, enrichedData);
-      }
-
-      if (isBackgroundRefresh) {
-        setIsBackgroundRefresh(false);
-        backgroundRefreshRef.current = false;
-      }
       
     } catch (error) {
       console.error('Dashboard fetch error:', error);
@@ -133,23 +101,9 @@ function Dashboard() {
               Обзор системы SHM
             </p>
           </div>
-          {settings.enabled && !loading && !isBackgroundRefresh && getCached(cacheKey) && (
-            <span 
-              className="text-xs px-2 py-1 rounded-full flex items-center gap-1"
-              style={{ 
-                backgroundColor: 'rgba(34, 211, 238, 0.1)',
-                color: 'var(--theme-primary-color)',
-                border: '1px solid rgba(34, 211, 238, 0.3)',
-              }}
-              title="Данные загружены из кеша"
-            >
-              <Activity className="w-3 h-3" />
-              Кеш
-            </span>
-          )}
-        </div>
+          </div>
         <button
-          onClick={() => fetchDashboardData(true)}
+          onClick={() => fetchDashboardData()}
           disabled={loading}
           className="btn-secondary flex items-center gap-2"
         >

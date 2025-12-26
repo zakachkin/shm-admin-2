@@ -17,7 +17,6 @@ import {
   ChevronDown,
   Timer
 } from 'lucide-react';
-import { useCacheStore } from '../store/cacheStore';
 
 interface Column {
   key: string;
@@ -116,52 +115,8 @@ function DataTable({
   storageKey,
   externalFilters
 }: DataTableProps) {
-  const { settings, get: getCached, set: setCache, needsBackgroundRefresh } = useCacheStore();
-  const [cachedData, setCachedData] = useState<any[] | null>(null);
-  const [isBackgroundRefresh, setIsBackgroundRefresh] = useState(false);
-  const backgroundRefreshRef = useRef(false);
-  
-  const cacheKey = storageKey 
-    ? `table_${storageKey}_${limit}_${offset}_${sortField}_${sortDirection}_${JSON.stringify(externalFilters)}`
-    : null;
-  
-  useEffect(() => {
-    if (!cacheKey || !settings.enabled) {
-      setCachedData(null);
-      return;
-    }
-    
-    const cached = getCached(cacheKey);
-    if (cached) {
-      setCachedData(cached);
-      
-      if (needsBackgroundRefresh(cacheKey) && !backgroundRefreshRef.current) {
-        backgroundRefreshRef.current = true;
-        setIsBackgroundRefresh(true);
-        onRefresh?.();
-      }
-    } else {
-      setCachedData(null);
-    }
-  }, [cacheKey, settings.enabled, getCached, needsBackgroundRefresh, onRefresh]);
-  
-  useEffect(() => {
-    if (!loading && data !== undefined && cacheKey && settings.enabled) {
-      setCache(cacheKey, data);
-      setCachedData(data);
-      
-      if (isBackgroundRefresh) {
-        setIsBackgroundRefresh(false);
-        backgroundRefreshRef.current = false;
-      }
-    } else if (!loading && data !== undefined) {
-      // Если кеширование выключено, очищаем cachedData
-      setCachedData(null);
-    }
-  }, [data, loading, cacheKey, setCache, isBackgroundRefresh, settings.enabled]);
-  
-  const displayData = cachedData !== null && !loading ? cachedData : data;
-  const isShowingCached = cachedData !== null && !loading && !isBackgroundRefresh;
+  const displayData = data;
+  const [filters, setFilters] = useState<Record<string, string>>({});
   
   const [columns, setColumns] = useState<Column[]>(() => {
     const defaultColumns = initialColumns.map(col => ({ 
@@ -466,20 +421,6 @@ function DataTable({
               }}
             >
               Фильтры активны
-            </span>
-          )}
-          {isShowingCached && settings.enabled && (
-            <span 
-              className="text-xs px-2 py-1 rounded-full flex items-center gap-1"
-              style={{ 
-                backgroundColor: 'rgba(34, 211, 238, 0.1)',
-                color: 'var(--theme-primary-color)',
-                border: '1px solid rgba(34, 211, 238, 0.3)',
-              }}
-              title="Данные загружены из кеша"
-            >
-              <Timer className="w-3 h-3" />
-              Кеш
             </span>
           )}
         </div>

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { 
   Settings, 
   Palette, 
-  Database,
   Save, 
   RotateCcw, 
   Sun, 
@@ -10,21 +9,15 @@ import {
   Monitor, 
   Eye, 
   EyeOff, 
-  HelpCircle,
-  Timer,
-  Trash2,
-  ToggleLeft,
-  ToggleRight,
-  RefreshCw
+  HelpCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../components/ConfirmModal';
 import { useBrandingStore } from '../store/brandingStore';
 import { useThemeStore, ThemeMode, ThemeColors, darkTheme, lightTheme } from '../store/themeStore';
 import { useSettingsStore } from '../store/settingsStore';
-import { useCacheStore } from '../store/cacheStore';
 
-type TabType = 'branding' | 'appearance' | 'cache';
+type TabType = 'branding' | 'appearance';
 
 interface ColorGroup {
   title: string;
@@ -181,12 +174,6 @@ function ColorPicker({
   );
 }
 
-function formatTTL(seconds: number): string {
-  if (seconds < 60) return `${seconds}с`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}м`;
-  return `${Math.floor(seconds / 3600)}ч ${Math.floor((seconds % 3600) / 60)}м`;
-}
-
 function UnifiedSettings() {
   const [activeTab, setActiveTab] = useState<TabType>('branding');
   
@@ -201,28 +188,16 @@ function UnifiedSettings() {
   const [expandedGroups, setExpandedGroups] = useState<string[]>(['Основные цвета']);
   const [confirmResetColors, setConfirmResetColors] = useState(false);
   
-  // Cache state
-  const { settings: cacheSettings, setSettings: setCacheSettings, clear: clearCache, getStats } = useCacheStore();
-  const [stats, setStats] = useState(getStats());
-
   const tabs = [
     { id: 'branding' as TabType, label: 'Брендинг', icon: Palette },
     { id: 'appearance' as TabType, label: 'Внешний вид', icon: Sun },
-    { id: 'cache' as TabType, label: 'Кеширование', icon: Database },
   ];
 
   useEffect(() => {
     setFormData(branding);
   }, [branding]);
 
-  useEffect(() => {
-    if (activeTab === 'cache') {
-      const interval = setInterval(() => {
-        setStats(getStats());
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [activeTab, getStats]);
+
 
   // Branding handlers
   const handleBrandingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -279,13 +254,7 @@ function UnifiedSettings() {
     toast.success('Цвета сброшены');
   };
 
-  // Cache handlers
-  const handleClearCache = () => {
-    if (confirm('Очистить весь кеш?')) {
-      clearCache();
-      setStats(getStats());
-    }
-  };
+
 
   const hasCustomColors = Object.keys(customColors).length > 0;
 
@@ -302,7 +271,7 @@ function UnifiedSettings() {
             Настройки системы
           </h1>
           <p style={{ color: 'var(--theme-content-text-muted)' }} className="mt-1">
-            Брендинг, внешний вид и кеширование
+            Брендинг и внешний вид
           </p>
         </div>
         
@@ -326,12 +295,7 @@ function UnifiedSettings() {
               Сбросить цвета
             </button>
           )}
-          {activeTab === 'cache' && (
-            <button onClick={handleClearCache} className="btn-secondary">
-              <Trash2 className="w-4 h-4" />
-              Очистить кеш
-            </button>
-          )}
+
         </div>
       </div>
 
@@ -762,196 +726,8 @@ function UnifiedSettings() {
             </div>
           )}
 
-          {/* Cache Tab */}
-          {activeTab === 'cache' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Settings */}
-              <div className="card">
-                <div className="card-header">
-                  <h2 className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--theme-content-text)' }}>
-                    <Timer className="w-5 h-5" />
-                    Основные настройки
-                  </h2>
-                </div>
-                <div className="card-body space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <label className="font-medium" style={{ color: 'var(--theme-content-text)' }}>
-                        Кеширование
-                      </label>
-                      <p className="text-sm mt-1" style={{ color: 'var(--theme-content-text-muted)' }}>
-                        Включить кеширование данных таблиц
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setCacheSettings({ enabled: !cacheSettings.enabled })}
-                      className="flex items-center gap-2"
-                      style={{ color: cacheSettings.enabled ? 'var(--theme-primary-color)' : 'var(--theme-content-text-muted)' }}
-                    >
-                      {cacheSettings.enabled ? <ToggleRight size={32} /> : <ToggleLeft size={32} />}
-                    </button>
-                  </div>
-
-                  <div>
-                    <label className="block font-medium mb-2" style={{ color: 'var(--theme-content-text)' }}>
-                      Время жизни кеша (TTL)
-                    </label>
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="range"
-                        min="30"
-                        max="3600"
-                        step="30"
-                        value={cacheSettings.ttl}
-                        onChange={(e) => setCacheSettings({ ttl: parseInt(e.target.value) })}
-                        className="flex-1"
-                        style={{ accentColor: 'var(--theme-primary-color)' }}
-                      />
-                      <span className="font-mono text-sm w-24" style={{ color: 'var(--theme-content-text)' }}>
-                        {formatTTL(cacheSettings.ttl)}
-                      </span>
-                    </div>
-                    <p className="text-xs mt-1" style={{ color: 'var(--theme-content-text-muted)' }}>
-                      Время хранения данных в кеше
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <label className="font-medium" style={{ color: 'var(--theme-content-text)' }}>
-                        Фоновое обновление
-                      </label>
-                      <p className="text-sm mt-1" style={{ color: 'var(--theme-content-text-muted)' }}>
-                        Обновлять данные в фоне до истечения кеша
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setCacheSettings({ backgroundRefresh: !cacheSettings.backgroundRefresh })}
-                      className="flex items-center gap-2"
-                      style={{ color: cacheSettings.backgroundRefresh ? 'var(--theme-primary-color)' : 'var(--theme-content-text-muted)' }}
-                    >
-                      {cacheSettings.backgroundRefresh ? <ToggleRight size={32} /> : <ToggleLeft size={32} />}
-                    </button>
-                  </div>
-
-                  {cacheSettings.backgroundRefresh && (
-                    <div>
-                      <label className="block font-medium mb-2" style={{ color: 'var(--theme-content-text)' }}>
-                        Порог обновления
-                      </label>
-                      <div className="flex items-center gap-4">
-                        <input
-                          type="range"
-                          min="0.5"
-                          max="0.95"
-                          step="0.05"
-                          value={cacheSettings.backgroundRefreshThreshold}
-                          onChange={(e) => setCacheSettings({ backgroundRefreshThreshold: parseFloat(e.target.value) })}
-                          className="flex-1"
-                          style={{ accentColor: 'var(--theme-primary-color)' }}
-                        />
-                        <span className="font-mono text-sm w-24" style={{ color: 'var(--theme-content-text)' }}>
-                          {Math.round(cacheSettings.backgroundRefreshThreshold * 100)}%
-                        </span>
-                      </div>
-                      <p className="text-xs mt-1" style={{ color: 'var(--theme-content-text-muted)' }}>
-                        При достижении {Math.round(cacheSettings.backgroundRefreshThreshold * 100)}% времени жизни начнется фоновое обновление
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Statistics */}
-              <div className="card">
-                <div className="card-header">
-                  <h2 className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--theme-content-text)' }}>
-                    <Database className="w-5 h-5" />
-                    Статистика кеша
-                  </h2>
-                </div>
-                <div className="card-body space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--theme-content-bg)' }}>
-                      <div className="text-2xl font-bold" style={{ color: 'var(--theme-primary-color)' }}>
-                        {stats.totalKeys}
-                      </div>
-                      <div className="text-sm" style={{ color: 'var(--theme-content-text-muted)' }}>
-                        Записей в кеше
-                      </div>
-                    </div>
-                    <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--theme-content-bg)' }}>
-                      <div className="text-2xl font-bold" style={{ color: 'var(--theme-primary-color)' }}>
-                        {stats.totalSize}
-                      </div>
-                      <div className="text-sm" style={{ color: 'var(--theme-content-text-muted)' }}>
-                        Размер кеша
-                      </div>
-                    </div>
-                  </div>
-
-                  {stats.entries.length > 0 && (
-                    <div className="space-y-2 max-h-96 overflow-y-auto">
-                      {stats.entries.map((entry) => (
-                        <div
-                          key={entry.key}
-                          className="p-3 rounded-lg"
-                          style={{
-                            backgroundColor: 'var(--theme-content-bg)',
-                            border: `1px solid var(--theme-card-border)`,
-                          }}
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-mono truncate" style={{ color: 'var(--theme-content-text)' }}>
-                                {entry.key}
-                              </div>
-                              <div className="flex items-center gap-3 mt-1 text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
-                                <span>Размер: {entry.size}</span>
-                                <span>Возраст: {entry.age}</span>
-                                <span>Истекает: {entry.expiresIn}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {stats.entries.length === 0 && (
-                    <div className="text-center py-8" style={{ color: 'var(--theme-content-text-muted)' }}>
-                      Кеш пуст
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
-
-      {/* Help Section for Cache */}
-      {activeTab === 'cache' && (
-        <div className="card">
-          <div className="card-body">
-            <div className="flex items-start gap-3">
-              <RefreshCw className="w-5 h-5 mt-1" style={{ color: 'var(--theme-primary-color)', flexShrink: 0 }} />
-              <div>
-                <h3 className="font-medium mb-1" style={{ color: 'var(--theme-content-text)' }}>
-                  Как работает кеширование?
-                </h3>
-                <ul className="text-sm space-y-1" style={{ color: 'var(--theme-content-text-muted)' }}>
-                  <li>• Данные таблиц сохраняются в локальном кеше браузера</li>
-                  <li>• При повторном открытии таблицы данные загружаются из кеша мгновенно</li>
-                  <li>• Фоновое обновление обновляет данные незаметно для пользователя</li>
-                  <li>• Кеш автоматически очищается при выходе или истечении TTL</li>
-                  <li>• Принудительное обновление (F5 или кнопка обновить) игнорирует кеш</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Confirmation Modals */}
       <ConfirmModal
