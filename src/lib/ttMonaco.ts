@@ -117,9 +117,23 @@ export function registerTTCompletion(monaco: any) {
   languages.forEach((language) => {
     monaco.languages.registerCompletionItemProvider(language, {
       triggerCharacters: ['{', '[', '.', ' ', 'I'],
-      provideCompletionItems: (model: any, position: any) => ({
-        suggestions: getSuggestions(model, position),
-      }),
+      provideCompletionItems: (model: any, position: any) => {
+        const word = model.getWordUntilPosition(position);
+        const range = {
+          startLineNumber: position.lineNumber,
+          startColumn: word.startColumn,
+          endLineNumber: position.lineNumber,
+          endColumn: word.endColumn,
+        };
+
+        const suggestions = getSuggestions(model, position).map((item: any) => ({
+          ...item,
+          range,
+        }));
+
+        return { suggestions };
+      },
     });
   });
 }
+
