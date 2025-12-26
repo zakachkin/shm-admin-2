@@ -25,6 +25,7 @@ COPY entry.sh /entry.sh
 RUN chmod +x /entry.sh
 
 COPY --from=builder /app/dist /app
+COPY --from=builder /app/swagger /app/swagger
 
 COPY --from=builder /app/server /app/server
 COPY --from=builder /app/node_modules /app/node_modules
