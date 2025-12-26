@@ -28,8 +28,7 @@ export default defineConfig({
   // server: {
   //   proxy: {
   //     '/shm': {
-  //     //  target: 'http://localhost:8081',
-  //       target: 'https://shm-api.bkcloud.ru',
+  //       target: 'http://localhost:8081',
   //       changeOrigin: true,
   //       secure: false,
   //     },
