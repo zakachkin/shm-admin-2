@@ -17,74 +17,103 @@ const canEdit = (editor: MonacoEditor, monacoInstance: MonacoInstance) => {
 };
 
 export const addClipboardActions = (editor: MonacoEditor, monacoInstance: MonacoInstance) => {
-  const wrapAction = (id: string, fallback: () => Promise<void>) => {
+  const wrapAction = (
+    id: string,
+    fallback: () => Promise<boolean>,
+    fallbackFirst = false,
+  ) => {
     const action = editor.getAction(id);
     if (!action) {
       return;
     }
 
     const originalRun = action.run?.bind(action);
+    const runOriginal = async () => {
+      if (!originalRun) {
+        return false;
+      }
+      try {
+        await originalRun();
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
     action.run = async () => {
-      if (originalRun) {
-        try {
-          await originalRun();
-          return;
-        } catch {
-          // Fall back to clipboard API.
+      if (fallbackFirst) {
+        const ok = await fallback();
+        if (!ok) {
+          await runOriginal();
         }
+        return;
       }
 
-      await fallback();
+      const ok = await runOriginal();
+      if (!ok) {
+        await fallback();
+      }
     };
   };
 
   wrapAction('editor.action.clipboardCopyAction', async () => {
     const text = getSelectionText(editor);
     if (!text || !navigator.clipboard?.writeText) {
-      return;
+      return false;
     }
 
     await navigator.clipboard.writeText(text);
+    return true;
   });
 
-  wrapAction('editor.action.clipboardCutAction', async () => {
-    if (!canEdit(editor, monacoInstance)) {
-      return;
-    }
+  wrapAction(
+    'editor.action.clipboardCutAction',
+    async () => {
+      if (!canEdit(editor, monacoInstance)) {
+        return false;
+      }
 
-    const selection = editor.getSelection();
-    const text = getSelectionText(editor);
-    if (!selection || !text || !navigator.clipboard?.writeText) {
-      return;
-    }
+      const selection = editor.getSelection();
+      const text = getSelectionText(editor);
+      if (!selection || !text || !navigator.clipboard?.writeText) {
+        return false;
+      }
 
-    await navigator.clipboard.writeText(text);
-    editor.executeEdits('clipboard.cut', [
-      { range: selection, text: '', forceMoveMarkers: true },
-    ]);
-  });
+      await navigator.clipboard.writeText(text);
+      editor.executeEdits('clipboard.cut', [
+        { range: selection, text: '', forceMoveMarkers: true },
+      ]);
+      return true;
+    },
+    true,
+  );
 
-  wrapAction('editor.action.clipboardPasteAction', async () => {
-    if (!canEdit(editor, monacoInstance)) {
-      return;
-    }
+  wrapAction(
+    'editor.action.clipboardPasteAction',
+    async () => {
+      if (!canEdit(editor, monacoInstance)) {
+        return false;
+      }
 
-    if (!navigator.clipboard?.readText) {
-      return;
-    }
+      if (!navigator.clipboard?.readText) {
+        return false;
+      }
 
-    const selection = editor.getSelection();
-    if (!selection) {
-      return;
-    }
+      const selection = editor.getSelection();
+      if (!selection) {
+        return false;
+      }
 
-    const text = await navigator.clipboard.readText();
-    if (!text) {
-      return;
-    }
+      const text = await navigator.clipboard.readText();
+      if (!text) {
+        return false;
+      }
 
-    editor.executeEdits('clipboard.paste', [
-      { range: selection, text, forceMoveMarkers: true },
-    ]);
-  });
+      editor.executeEdits('clipboard.paste', [
+        { range: selection, text, forceMoveMarkers: true },
+      ]);
+      return true;
+    },
+    true,
+  );
 };
