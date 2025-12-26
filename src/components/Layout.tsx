@@ -98,6 +98,7 @@ const navigation: MenuItem[] = [
     children: [
       { name: 'Шаблоны', href: '/templates' },
       { name: 'Конфигурация', href: '/config' },
+      { name: 'Swagger', href: '/swagger' },
     ]
   },
   { 
