@@ -12,6 +12,7 @@ interface CacheSettings {
   ttl: number;
   backgroundRefresh: boolean;
   backgroundRefreshThreshold: number;
+  maxEntries: number;
 }
 
 interface CacheState {
@@ -45,6 +46,7 @@ const DEFAULT_SETTINGS: CacheSettings = {
   ttl: 300,
   backgroundRefresh: true,
   backgroundRefreshThreshold: 0.8,
+  maxEntries: 1000,
 };
 
 export const useCacheStore = create<CacheState>()(
@@ -91,6 +93,7 @@ export const useCacheStore = create<CacheState>()(
           return;
         }
         
+        const maxEntries = settings.maxEntries ?? DEFAULT_SETTINGS.maxEntries;
         const now = Date.now();
         const entry: CacheEntry = {
           data,
@@ -99,8 +102,19 @@ export const useCacheStore = create<CacheState>()(
         };
         
         set((state) => {
-          const newCache = { ...state.cache };
-          newCache[key] = entry;
+          const newCache: Record<string, CacheEntry> = { ...state.cache, [key]: entry };
+
+          if (maxEntries > 0) {
+            const keys = Object.keys(newCache);
+            if (keys.length > maxEntries) {
+              const sortedKeys = keys.sort((a, b) => newCache[a].timestamp - newCache[b].timestamp);
+              const toRemove = sortedKeys.slice(0, keys.length - maxEntries);
+              for (const removeKey of toRemove) {
+                delete newCache[removeKey];
+              }
+            }
+          }
+
           return { cache: newCache };
         });
       },
