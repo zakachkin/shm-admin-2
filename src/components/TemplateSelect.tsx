@@ -53,6 +53,12 @@ export default function TemplateSelect({
     return template.id;
   };
 
+  const sortTemplates = (templates: Template[]) => {
+    return [...templates].sort((a, b) =>
+      String(a.id).localeCompare(String(b.id), undefined, { sensitivity: 'variant' })
+    );
+  };
+
   useEffect(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -97,8 +103,9 @@ export default function TemplateSelect({
         .then(res => {
           const data = res.data || res;
           const templates = Array.isArray(data) ? data : [];
-          setAllTemplates(templates);
-          setItems(templates);
+          const sortedTemplates = sortTemplates(templates);
+          setAllTemplates(sortedTemplates);
+          setItems(sortedTemplates);
         })
         .catch(() => {})
         .finally(() => setLoading(false));
@@ -119,7 +126,7 @@ export default function TemplateSelect({
       .then(res => {
         const data = res.data || res;
         const templates = Array.isArray(data) ? data : [];
-        setItems(templates);
+        setItems(sortTemplates(templates));
       })
       .catch(() => {})
       .finally(() => {
@@ -364,7 +371,7 @@ export default function TemplateSelect({
             const newMode = viewMode === 'search' ? 'list' : 'search';
             setViewMode(newMode);
             if (newMode === 'list') {
-              setItems(allTemplates);
+              setItems(sortTemplates(allTemplates));
               setDropdownVisible(true);
             } else {
               setDropdownVisible(false);
