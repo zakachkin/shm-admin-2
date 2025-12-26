@@ -22,16 +22,93 @@ export default function TemplateTestModal({
   const [rendering, setRendering] = useState(false);
   const [renderResult, setRenderResult] = useState('');
 
+  const formatDumperPretty = (input: string) => {
+    let out = '';
+    let indent = 0;
+    let inString = false;
+    let quote = '';
+    const indentStep = 2;
+    const pushIndent = () => {
+      out += `\n${' '.repeat(indent)}`;
+    };
+
+    for (let i = 0; i < input.length; i += 1) {
+      const ch = input[i];
+      const next = input[i + 1];
+
+      if (inString) {
+        out += ch;
+        if (ch === '\\') {
+          if (next) {
+            out += next;
+            i += 1;
+          }
+          continue;
+        }
+        if (ch === quote) {
+          inString = false;
+          quote = '';
+        }
+        continue;
+      }
+
+      if (ch === '"' || ch === "'") {
+        inString = true;
+        quote = ch;
+        out += ch;
+        continue;
+      }
+
+      if (ch === '=' && next === '>') {
+        out += ' => ';
+        i += 1;
+        continue;
+      }
+
+      if (ch === '{' || ch === '[' || ch === '(') {
+        out += ch;
+        indent += indentStep;
+        pushIndent();
+        continue;
+      }
+
+      if (ch === '}' || ch === ']' || ch === ')') {
+        indent = Math.max(0, indent - indentStep);
+        pushIndent();
+        out += ch;
+        continue;
+      }
+
+      if (ch === ',') {
+        out += ch;
+        pushIndent();
+        continue;
+      }
+
+      if (/\s/.test(ch)) {
+        if (out.endsWith(' ')) {
+          continue;
+        }
+        out += ' ';
+        continue;
+      }
+
+      out += ch;
+    }
+
+    return out.trim();
+  };
+
   const formatRenderResult = (result: any) => {
     if (result == null) {
       return '';
     }
     if (typeof result !== 'string') {
-      return JSON.stringify(result, null, 0);
+      return JSON.stringify(result, null, 2);
     }
     const trimmed = result.trim();
     if (trimmed.startsWith('$VAR')) {
-      return trimmed.replace(/\s+/g, ' ');
+      return formatDumperPretty(trimmed);
     }
     return trimmed;
   };
