@@ -81,7 +81,9 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
         totalRevenue: totalRevenue,
       },
       payments: {
-        timeline: Object.entries(paymentsByDate).map(([date, value]) => ({ date, value })),
+        timeline: Object.entries(paymentsByDate)
+          .sort(([a], [b]) => String(a).localeCompare(String(b)))
+          .map(([date, value]) => ({ date, value })),
       },
       services: {
         byStatus: Object.entries(servicesByStatus).map(([name, value]) => ({ name, value })),
