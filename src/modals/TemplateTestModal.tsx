@@ -32,9 +32,11 @@ export default function TemplateTestModal({
       out += `\n${' '.repeat(indent)}`;
     };
 
-    for (let i = 0; i < input.length; i += 1) {
-      const ch = input[i];
-      const next = input[i + 1];
+    const normalized = input.replace(/^\$VAR\d+\s*=\s*/i, (match) => `${match.trim()}\n`);
+
+    for (let i = 0; i < normalized.length; i += 1) {
+      const ch = normalized[i];
+      const next = normalized[i + 1];
 
       if (inString) {
         out += ch;
@@ -256,7 +258,7 @@ export default function TemplateTestModal({
           <textarea
             value={renderResult}
             readOnly
-            className="flex-1 h-full px-2 py-1.5 text-xs rounded border font-mono leading-tight"
+            className="flex-1 h-full px-2 py-1.5 text-sm rounded border font-mono leading-snug"
             style={{ ...inputStyles, resize: 'none', minHeight: 280 }}
             placeholder="Результат рендера появится здесь..."
           />
