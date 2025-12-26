@@ -40,7 +40,7 @@ export default function TemplateTestModal({
         params.append('usi', usi);
       }
 
-      const response = await shm_request(`/shm/v1/template/${templateId}?${params.toString()}`);
+      const response = await shm_request(`shm/v1/template/${templateId}?${params.toString()}`);
       setRenderResult(response.data?.[0] || JSON.stringify(response.data, null, 2));
       toast.success('Успех');
     } catch (error) {

@@ -36,7 +36,7 @@ export default function ServiceModal({
       const onceService = data.period === 0 && data.next === -1;
       setFormData({ ...data, once_service: onceService });
 
-      shm_request('/shm/v1/admin/service?limit=0')
+      shm_request('shm/v1/admin/service?limit=0')
         .then(res => {
           const { data: items } = normalizeListResponse(res);
           setServices(items);

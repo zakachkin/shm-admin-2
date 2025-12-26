@@ -34,12 +34,12 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
 
     // Параллельные запросы к API - только данные за период
     const results = await Promise.allSettled([
-      shm_request('/shm/v1/admin/user?limit=1'),
-      shm_request(`/shm/v1/admin/user?start=${start}&stop=${stop}&field=created&limit=9999`),
-      shm_request(`/shm/v1/admin/user/service?start=${start}&stop=${stop}&field=created&limit=5000`),
-      shm_request('/shm/v1/admin/server?limit=1'),
-      shm_request(`/shm/v1/admin/user/pay?start=${start}&stop=${stop}&field=date&limit=9999`),
-      shm_request(`/shm/v1/admin/user/service/withdraw?start=${start}&stop=${stop}&field=create_date&limit=9999`),
+      shm_request('shm/v1/admin/user?limit=1'),
+      shm_request(`shm/v1/admin/user?start=${start}&stop=${stop}&field=created&limit=9999`),
+      shm_request(`shm/v1/admin/user/service?start=${start}&stop=${stop}&field=created&limit=5000`),
+      shm_request('shm/v1/admin/server?limit=1'),
+      shm_request(`shm/v1/admin/user/pay?start=${start}&stop=${stop}&field=date&limit=9999`),
+      shm_request(`shm/v1/admin/user/service/withdraw?start=${start}&stop=${stop}&field=create_date&limit=9999`),
     ]);
 
     const [

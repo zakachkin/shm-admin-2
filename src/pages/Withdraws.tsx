@@ -44,7 +44,7 @@ function Withdraws() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/user/service/withdraw?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/user/service/withdraw?limit=${l}&offset=${o}`;
 
     const combinedFilters = { ...f, ...externalFilters };
     if (Object.keys(combinedFilters).length > 0) {
@@ -122,7 +122,7 @@ function Withdraws() {
         onClose={() => setModalOpen(false)}
         data={selectedRow}
         onSave={async (data) => {
-          await shm_request(`/shm/v1/admin/user/service/withdraw`, {
+          await shm_request(`shm/v1/admin/user/service/withdraw`, {
             method: 'POST',
             body: JSON.stringify(data),
           });

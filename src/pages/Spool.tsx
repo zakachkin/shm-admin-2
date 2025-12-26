@@ -65,7 +65,7 @@ function Spool() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/spool?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/spool?limit=${l}&offset=${o}`;
 
     const combinedFilters = { ...f, ...externalFilters };
     if (Object.keys(combinedFilters).length > 0) {
@@ -115,7 +115,7 @@ function Spool() {
   };
 
   const handleSaveNew = async (spoolData: any) => {
-    await shm_request('/shm/v1/admin/spool', {
+    await shm_request('shm/v1/admin/spool', {
       method: 'PUT',
       body: JSON.stringify(spoolData),
     });

@@ -52,7 +52,7 @@ function Users() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/user?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/user?limit=${l}&offset=${o}`;
 
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
@@ -112,7 +112,7 @@ function Users() {
     }
 
     try {
-      const configRes = await shm_request('/shm/v1/admin/config/cli');
+      const configRes = await shm_request('shm/v1/admin/config/cli');
       const { data: configItems } = normalizeListResponse(configRes);
 
       if (!configItems || configItems.length === 0) {
@@ -121,7 +121,7 @@ function Users() {
       }
 
       const cliUrl = configItems[0].url;
-      const sessionRes = await shm_request('/shm/v1/admin/user/session', {
+      const sessionRes = await shm_request('shm/v1/admin/user/session', {
         method: 'PUT',
         body: JSON.stringify({ user_id: selectedRow.user_id }),
       });
@@ -133,7 +133,7 @@ function Users() {
   };
 
   const handleSaveNew = async (userData: any) => {
-    await shm_request('/shm/v1/admin/user', {
+    await shm_request('shm/v1/admin/user', {
       method: 'PUT',
       body: JSON.stringify(userData),
     });
@@ -141,7 +141,7 @@ function Users() {
   };
 
   const handleSaveEdit = async (userData: any) => {
-    await shm_request('/shm/v1/admin/user', {
+    await shm_request('shm/v1/admin/user', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
@@ -149,7 +149,7 @@ function Users() {
   };
 
   const handleChangePassword = async (userId: number, password: string) => {
-    await shm_request('/shm/v1/admin/user/passwd', {
+    await shm_request('shm/v1/admin/user/passwd', {
       method: 'POST',
       body: JSON.stringify({ user_id: userId, password }),
     });
@@ -158,7 +158,7 @@ function Users() {
   const handleDelete = async () => {
     if (!selectedRow?.user_id) return;
 
-    await shm_request(`/shm/v1/admin/user?user_id=${selectedRow.user_id}`, {
+    await shm_request(`shm/v1/admin/user?user_id=${selectedRow.user_id}`, {
       method: 'DELETE',
     });
     fetchData(limit, offset, filters, sortField, sortDirection);

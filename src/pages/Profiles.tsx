@@ -37,7 +37,7 @@ function Profiles() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/user/profile?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/user/profile?limit=${l}&offset=${o}`;
 
     const combinedFilters = { ...f, ...externalFilters };
     if (Object.keys(combinedFilters).length > 0) {
@@ -83,7 +83,7 @@ function Profiles() {
   };
 
   const handleSave = async (profileData: any) => {
-    await shm_request('/shm/v1/admin/user/profile', {
+    await shm_request('shm/v1/admin/user/profile', {
       method: 'POST',
       body: JSON.stringify(profileData),
     });
@@ -91,7 +91,7 @@ function Profiles() {
   };
 
   const handleCreate = async (profileData: any) => {
-    await shm_request('/shm/v1/admin/user/profile', {
+    await shm_request('shm/v1/admin/user/profile', {
       method: 'PUT',
       body: JSON.stringify(profileData),
     });
@@ -101,7 +101,7 @@ function Profiles() {
   const handleDelete = async () => {
     if (!selectedRow?.id) return;
 
-    await shm_request(`/shm/v1/admin/user/profile?id=${selectedRow.id}`, {
+    await shm_request(`shm/v1/admin/user/profile?id=${selectedRow.id}`, {
       method: 'DELETE',
     });
     fetchData(limit, offset, filters, sortField, sortDirection);

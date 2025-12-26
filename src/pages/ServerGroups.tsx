@@ -40,7 +40,7 @@ function ServerGroups() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/server/group?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/server/group?limit=${l}&offset=${o}`;
 
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
@@ -89,7 +89,7 @@ function ServerGroups() {
   };
 
   const handleSaveEdit = async (groupData: any) => {
-    await shm_request('/shm/v1/admin/server/group', {
+    await shm_request('shm/v1/admin/server/group', {
       method: 'POST',
       body: JSON.stringify(groupData),
     });
@@ -97,7 +97,7 @@ function ServerGroups() {
   };
 
   const handleSaveNew = async (groupData: any) => {
-    await shm_request('/shm/v1/admin/server/group', {
+    await shm_request('shm/v1/admin/server/group', {
       method: 'PUT',
       body: JSON.stringify(groupData),
     });
@@ -107,7 +107,7 @@ function ServerGroups() {
   const handleDelete = async () => {
     if (!selectedRow?.group_id) return;
 
-    await shm_request(`/shm/v1/admin/server/group?group_id=${selectedRow.group_id}`, {
+    await shm_request(`shm/v1/admin/server/group?group_id=${selectedRow.group_id}`, {
       method: 'DELETE',
     });
     fetchData(limit, offset, filters, sortField, sortDirection);

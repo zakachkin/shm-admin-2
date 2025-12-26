@@ -53,8 +53,10 @@ function App() {
     return () => document.removeEventListener('click', handleToastClick);
   }, []);
 
+  const basename = document.querySelector('base')?.getAttribute('href') || '/';
+
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <Toaster
         position="top-center"
         toastOptions={{
@@ -108,6 +110,7 @@ function App() {
           <Route path="templates" element={<Templates />} />
           <Route path="config" element={<Config />} />
           <Route path="settings" element={<UnifiedSettings />} />
+          <Route path="cloud" element={<SHMCloud />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -6,13 +6,12 @@
 
 if [ ! -z "$SHM_BASE_PATH" ] && [ "$SHM_BASE_PATH" != "/" ]; then
     sed -i "s|location / {|location $SHM_BASE_PATH {|" /etc/nginx/http.d/default.conf
-    sed -i "s|location /shm {|location $SHM_BASE_PATH/shm {|" /etc/nginx/http.d/default.conf
     sed -i "s|#proxy_cookie_path;|proxy_cookie_path / $SHM_BASE_PATH;|" /etc/nginx/http.d/default.conf
-    sed -i "s|<base href=\"/\"|<base href=\"$SHM_BASE_PATH/\"|" /app/index.html
+    sed -i "s|location /shm {|location $SHM_BASE_PATH/shm {|" /etc/nginx/http.d/default.conf
+    sed -i "s|<base href=\"/\" />|<base href=\"$SHM_BASE_PATH/\" />|" /app/index.html
 fi
 
 echo "Starting nginx with configuration:"
 echo "  SHM_HOST: ${SHM_HOST:-http://shm.local}"
-echo "  SHM_BASE_PATH: ${SHM_BASE_PATH:-/}"
 
 exec nginx -g 'daemon off;'

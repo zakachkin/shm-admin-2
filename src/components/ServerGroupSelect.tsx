@@ -37,7 +37,7 @@ export default function ServerGroupSelect({
     setLoading(true);
     onLoadingChange?.(true);
 
-    shm_request('/shm/v1/admin/server/group')
+    shm_request('shm/v1/admin/server/group')
       .then((res) => {
         const data = res.data || res;
         const serverGroups = Array.isArray(data) ? data : [];
@@ -65,7 +65,7 @@ export default function ServerGroupSelect({
       if (!found && groups.length > 0 && !loading && value !== 0) {
         lastLoadedIdRef.current = value;
         setLoadingGroup(true);
-        shm_request(`/shm/v1/admin/server/group?group_id=${value}&limit=1`)
+        shm_request(`shm/v1/admin/server/group?group_id=${value}&limit=1`)
           .then(res => {
             const data = res.data || res;
             const serverGroups = Array.isArray(data) ? data : [];

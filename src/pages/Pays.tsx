@@ -39,7 +39,7 @@ function Pays() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/user/pay?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/user/pay?limit=${l}&offset=${o}`;
 
     const combinedFilters = { ...f, ...externalFilters };
     if (Object.keys(combinedFilters).length > 0) {
@@ -133,7 +133,7 @@ function Pays() {
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onSave={async (data) => {
-          await shm_request(`/shm/v1/admin/user/payment`, {
+          await shm_request(`shm/v1/admin/user/payment`, {
             method: 'PUT',
             body: JSON.stringify(data),
           });

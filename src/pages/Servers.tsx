@@ -47,7 +47,7 @@ function Servers() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/server?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/server?limit=${l}&offset=${o}`;
 
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
@@ -93,7 +93,7 @@ function Servers() {
 
   const handleCreate = async (serverData: Record<string, any>) => {
     try {
-      await shm_request('/shm/v1/admin/server', {
+      await shm_request('shm/v1/admin/server', {
         method: 'PUT',
         body: JSON.stringify(serverData),
       });
@@ -105,7 +105,7 @@ function Servers() {
 
   const handleSave = async (serverData: Record<string, any>) => {
     try {
-      await shm_request('/shm/v1/admin/server', {
+      await shm_request('shm/v1/admin/server', {
         method: 'POST',
         body: JSON.stringify(serverData),
       });
@@ -117,7 +117,7 @@ function Servers() {
 
   const handleDelete = async (serverId: number) => {
     try {
-      await shm_request(`/shm/v1/admin/server?server_id=${serverId}`, {
+      await shm_request(`shm/v1/admin/server?server_id=${serverId}`, {
         method: 'DELETE',
       });
       fetchData(limit, offset, filters, sortField, sortDirection);

@@ -32,7 +32,7 @@ function Services() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/service?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/service?limit=${l}&offset=${o}`;
 
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
@@ -82,7 +82,7 @@ function Services() {
 
   const handleSaveView = async (updatedData: any) => {
     try {
-      await shm_request(`/shm/v1/admin/service`, {
+      await shm_request(`shm/v1/admin/service`, {
         method: 'POST',
         body: JSON.stringify(updatedData),
       });
@@ -95,7 +95,7 @@ function Services() {
 
   const handleCreateNew = async (newData: any) => {
     try {
-      await shm_request('/shm/v1/admin/service', {
+      await shm_request('shm/v1/admin/service', {
         method: 'PUT',
         body: JSON.stringify(newData),
       });
@@ -108,7 +108,7 @@ function Services() {
 
   const handleDeleteService = async (serviceId: number) => {
     try {
-      await shm_request(`/shm/v1/admin/service?service_id=${serviceId}`, {
+      await shm_request(`shm/v1/admin/service?service_id=${serviceId}`, {
         method: 'DELETE',
       });
       setViewModalOpen(false);

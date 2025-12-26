@@ -30,7 +30,7 @@ function Promo() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/promo?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/promo?limit=${l}&offset=${o}`;
 
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
@@ -115,14 +115,14 @@ function Promo() {
         onClose={() => setModalOpen(false)}
         data={selectedRow}
         onSave={async (data) => {
-          await shm_request(`/shm/v1/admin/promo`, {
+          await shm_request(`shm/v1/admin/promo`, {
             method: 'POST',
             body: JSON.stringify(data),
           });
           fetchData(limit, offset, filters, sortField, sortDirection);
         }}
         onDelete={async (id) => {
-          await shm_request(`/shm/v1/admin/promo/${id}`, {
+          await shm_request(`shm/v1/admin/promo/${id}`, {
             method: 'DELETE',
           });
           fetchData(limit, offset, filters, sortField, sortDirection);
@@ -132,7 +132,7 @@ function Promo() {
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onSave={async (data) => {
-          await shm_request(`/shm/v1/admin/promo`, {
+          await shm_request(`shm/v1/admin/promo`, {
             method: 'PUT',
             body: JSON.stringify(data),
           });

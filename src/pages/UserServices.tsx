@@ -75,7 +75,7 @@ function UserServices() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/user/service?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/user/service?limit=${l}&offset=${o}`;
 
     const combinedFilters = { ...f, ...externalFilters };
     if (Object.keys(combinedFilters).length > 0) {
@@ -143,7 +143,7 @@ function UserServices() {
   };
 
   const handleSaveEdit = async (serviceData: any) => {
-    await shm_request('/shm/v1/admin/user/service', {
+    await shm_request('shm/v1/admin/user/service', {
       method: 'POST',
       body: JSON.stringify(serviceData),
     });
@@ -151,7 +151,7 @@ function UserServices() {
   };
 
   const handleSaveNew = async (serviceData: any) => {
-    await shm_request('/shm/v1/admin/service/order', {
+    await shm_request('shm/v1/admin/service/order', {
       method: 'PUT',
       body: JSON.stringify(serviceData),
     });
@@ -161,7 +161,7 @@ function UserServices() {
   const handleDelete = async () => {
     if (!selectedRow?.user_service_id) return;
 
-    await shm_request(`/shm/v1/admin/user/service?user_id=${selectedRow.user_id}&user_service_id=${selectedRow.user_service_id}`, {
+    await shm_request(`shm/v1/admin/user/service?user_id=${selectedRow.user_id}&user_service_id=${selectedRow.user_service_id}`, {
       method: 'DELETE',
     });
     fetchData(limit, offset, filters, sortField, sortDirection);

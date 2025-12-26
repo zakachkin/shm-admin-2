@@ -128,7 +128,7 @@ export default function ServerModal({
         host: formData.host,
       };
 
-      const res = await shm_request('/shm/v1/admin/transport/ssh/test', {
+      const res = await shm_request('shm/v1/admin/transport/ssh/test', {
         method: 'PUT',
         body: JSON.stringify(args),
       });
@@ -159,7 +159,7 @@ export default function ServerModal({
         host: formData.host,
       };
 
-      const res = await shm_request('/shm/v1/admin/transport/ssh/init', {
+      const res = await shm_request('shm/v1/admin/transport/ssh/init', {
         method: 'PUT',
         body: JSON.stringify(args),
       });
