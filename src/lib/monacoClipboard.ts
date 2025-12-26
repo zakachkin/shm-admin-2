@@ -17,111 +17,116 @@ const canEdit = (editor: MonacoEditor, monacoInstance: MonacoInstance) => {
 };
 
 export const addClipboardActions = (editor: MonacoEditor, monacoInstance: MonacoInstance) => {
-  const wrapAction = (
-    id: string,
-    fallback: () => Promise<boolean>,
-    fallbackFirst = false,
-  ) => {
+  const builtinIds = [
+    'editor.action.clipboardCopyAction',
+    'editor.action.clipboardCutAction',
+    'editor.action.clipboardPasteAction',
+  ];
+
+  builtinIds.forEach((id) => {
     const action = editor.getAction(id);
-    if (!action) {
-      return;
+    if (action && typeof (action as { dispose?: () => void }).dispose === 'function') {
+      (action as { dispose: () => void }).dispose();
     }
+  });
 
-    const originalRun = action.run?.bind(action);
-    const runOriginal = async () => {
-      if (!originalRun) {
-        return false;
-      }
-      try {
-        await originalRun();
-        return true;
-      } catch {
-        return false;
-      }
-    };
-
-    action.run = async () => {
-      if (fallbackFirst) {
-        const ok = await fallback();
-        if (!ok) {
-          await runOriginal();
-        }
+  editor.addAction({
+    id: 'clipboard-copy',
+    label: 'Copy',
+    contextMenuGroupId: 'clipboard',
+    contextMenuOrder: 1,
+    run: async () => {
+      const text = getSelectionText(editor);
+      if (!text) {
         return;
       }
 
-      const ok = await runOriginal();
-      if (!ok) {
-        await fallback();
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+          return;
+        }
+      } catch {
       }
-    };
-  };
 
-  wrapAction('editor.action.clipboardCopyAction', async () => {
-    const text = getSelectionText(editor);
-    if (!text || !navigator.clipboard?.writeText) {
-      return false;
-    }
-
-    await navigator.clipboard.writeText(text);
-    return true;
+      window.prompt('Copy text:', text);
+    },
   });
 
-  wrapAction(
-    'editor.action.clipboardCutAction',
-    async () => {
-      try {
-        if (!canEdit(editor, monacoInstance)) {
-          return false;
-        }
-
-        const selection = editor.getSelection();
-        const text = getSelectionText(editor);
-        if (!selection || !text || !navigator.clipboard?.writeText) {
-          return false;
-        }
-
-        await navigator.clipboard.writeText(text);
-        editor.executeEdits('clipboard.cut', [
-          { range: selection, text: '', forceMoveMarkers: true },
-        ]);
-        return true;
-      } catch {
-        return false;
+  editor.addAction({
+    id: 'clipboard-cut',
+    label: 'Cut',
+    contextMenuGroupId: 'clipboard',
+    contextMenuOrder: 2,
+    run: async () => {
+      if (!canEdit(editor, monacoInstance)) {
+        return;
       }
-    },
-    true,
-  );
 
-  wrapAction(
-    'editor.action.clipboardPasteAction',
-    async () => {
-      try {
-        if (!canEdit(editor, monacoInstance)) {
-          return false;
-        }
-
-        if (!navigator.clipboard?.readText) {
-          return false;
-        }
-
-        const selection = editor.getSelection();
-        if (!selection) {
-          return false;
-        }
-
-        const text = await navigator.clipboard.readText();
-        if (!text) {
-          return false;
-        }
-
-        editor.executeEdits('clipboard.paste', [
-          { range: selection, text, forceMoveMarkers: true },
-        ]);
-        return true;
-      } catch {
-        return false;
+      const selection = editor.getSelection();
+      const text = getSelectionText(editor);
+      if (!selection || !text) {
+        return;
       }
+
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+          editor.executeEdits('clipboard.cut', [
+            { range: selection, text: '', forceMoveMarkers: true },
+          ]);
+          return;
+        }
+      } catch {
+      }
+
+      const manual = window.prompt('Copy text and click OK to cut:', text);
+      if (manual === null) {
+        return;
+      }
+
+      editor.executeEdits('clipboard.cut', [
+        { range: selection, text: '', forceMoveMarkers: true },
+      ]);
     },
-    true,
-  );
+  });
+
+  editor.addAction({
+    id: 'clipboard-paste',
+    label: 'Paste',
+    contextMenuGroupId: 'clipboard',
+    contextMenuOrder: 3,
+    run: async () => {
+      if (!canEdit(editor, monacoInstance)) {
+        return;
+      }
+
+      const selection = editor.getSelection();
+      if (!selection) {
+        return;
+      }
+
+      try {
+        if (navigator.clipboard?.readText) {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            editor.executeEdits('clipboard.paste', [
+              { range: selection, text, forceMoveMarkers: true },
+            ]);
+            return;
+          }
+        }
+      } catch {
+      }
+
+      const text = window.prompt('Paste text:', '');
+      if (!text) {
+        return;
+      }
+
+      editor.executeEdits('clipboard.paste', [
+        { range: selection, text, forceMoveMarkers: true },
+      ]);
+    },
+  });
 };
