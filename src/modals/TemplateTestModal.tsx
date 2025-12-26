@@ -22,6 +22,20 @@ export default function TemplateTestModal({
   const [rendering, setRendering] = useState(false);
   const [renderResult, setRenderResult] = useState('');
 
+  const formatRenderResult = (result: any) => {
+    if (result == null) {
+      return '';
+    }
+    if (typeof result !== 'string') {
+      return JSON.stringify(result, null, 0);
+    }
+    const trimmed = result.trim();
+    if (trimmed.startsWith('$VAR')) {
+      return trimmed.replace(/\s+/g, ' ');
+    }
+    return trimmed;
+  };
+
   const handleRender = async () => {
     if (!userId) {
       toast.error('Выберите пользователя');
@@ -41,7 +55,8 @@ export default function TemplateTestModal({
       }
 
       const response = await shm_request(`/shm/v1/template/${templateId}?${params.toString()}`);
-      setRenderResult(response.data?.[0] || JSON.stringify(response.data, null, 2));
+      const result = response.data?.[0] ?? response.data ?? response;
+      setRenderResult(formatRenderResult(result));
       toast.success('Успех');
     } catch (error) {
       toast.error('Ошибка');
@@ -173,6 +188,7 @@ export default function TemplateTestModal({
     </Modal>
   );
 }
+
 
 
 
