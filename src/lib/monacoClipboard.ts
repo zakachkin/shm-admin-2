@@ -12,6 +12,25 @@ const getSelectionText = (editor: MonacoEditor) => {
   return model.getValueInRange(selection);
 };
 
+const getInsertRange = (editor: MonacoEditor, monacoInstance: MonacoInstance) => {
+  const selection = editor.getSelection();
+  if (selection) {
+    return selection;
+  }
+
+  const position = editor.getPosition();
+  if (!position) {
+    return null;
+  }
+
+  return new monacoInstance.Range(
+    position.lineNumber,
+    position.column,
+    position.lineNumber,
+    position.column,
+  );
+};
+
 const canEdit = (editor: MonacoEditor, monacoInstance: MonacoInstance) => {
   return !editor.getOption(monacoInstance.editor.EditorOption.readOnly);
 };
@@ -80,7 +99,7 @@ export const addClipboardActions = (editor: MonacoEditor, monacoInstance: Monaco
       return;
     }
 
-    const selection = editor.getSelection();
+    const selection = getInsertRange(editor, monacoInstance);
     if (!selection) {
       return;
     }
