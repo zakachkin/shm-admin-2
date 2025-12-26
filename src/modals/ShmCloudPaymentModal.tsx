@@ -3,7 +3,7 @@ import { X, CreditCard, DollarSign } from 'lucide-react';
 import { shm_request } from '../lib/shm_request';
 import { toast } from 'react-hot-toast';
 
-interface PaySystem {
+interface ShmCloudPaySystem {
   allow_deletion: number;
   amount: string;
   forecast: number;
@@ -15,13 +15,13 @@ interface PaySystem {
   weight: number;
 }
 
-interface PaymentModalProps {
+interface ShmCloudPaymentModalProps {
   open: boolean;
   onClose: () => void;
 }
 
-export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => {
-  const [paySystems, setPaySystems] = useState<PaySystem[]>([]);
+export const ShmCloudPaymentModal: React.FC<ShmCloudPaymentModalProps> = ({ open, onClose }) => {
+  const [paySystems, setPaySystems] = useState<ShmCloudPaySystem[]>([]);
   const [loading, setLoading] = useState(true);
   const [amount, setAmount] = useState<string>('');
   const [selectedSystem, setSelectedSystem] = useState<string>('');
@@ -56,7 +56,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
         ? res.data[0]
         : (res.data || []);
 
-      const sortedSystems = systems.sort((a: PaySystem, b: PaySystem) => b.weight - a.weight);
+      const sortedSystems = systems.sort((a: ShmCloudPaySystem, b: ShmCloudPaySystem) => b.weight - a.weight);
 
       setPaySystems(sortedSystems);
     } catch (error) {

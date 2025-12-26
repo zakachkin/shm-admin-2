@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Cloud, LogIn, LogOut, UserPlus, Plus, DollarSign, Coins, Check, X, ShoppingCart, Zap, Gift, Rocket } from 'lucide-react';
 import { shm_request } from '../lib/shm_request';
 import toast from 'react-hot-toast';
-import { PaymentModal } from '../modals/PaymentModal';
+import { ShmCloudPaymentModal } from '../modals/ShmCloudPaymentModal';
 
 interface CloudUser {
   login?: string;
@@ -458,7 +458,7 @@ function SHMCloud() {
           );
         })}
       </div>
-      <PaymentModal
+      <ShmCloudPaymentModal
         open={paymentModalOpen}
         onClose={() => setPaymentModalOpen(false)}
       />
