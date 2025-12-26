@@ -17,114 +17,74 @@ const canEdit = (editor: MonacoEditor, monacoInstance: MonacoInstance) => {
 };
 
 export const addClipboardActions = (editor: MonacoEditor, monacoInstance: MonacoInstance) => {
-  const builtinIds = [
-    'editor.action.clipboardCopyAction',
-    'editor.action.clipboardCutAction',
-    'editor.action.clipboardPasteAction',
-  ];
-
-  builtinIds.forEach((id) => {
+  const wrapAction = (id: string, fallback: () => Promise<void>) => {
     const action = editor.getAction(id);
-    if (action && typeof (action as { dispose?: () => void }).dispose === 'function') {
-      (action as { dispose: () => void }).dispose();
+    if (!action) {
+      return;
     }
-  });
 
-  editor.addAction({
-    id: 'clipboard-copy',
-    label: 'Copy',
-    contextMenuGroupId: 'clipboard',
-    contextMenuOrder: 1,
-    run: async () => {
-      const action = editor.getAction('editor.action.clipboardCopyAction');
-      if (action) {
+    const originalRun = action.run?.bind(action);
+    action.run = async () => {
+      if (originalRun) {
         try {
-          await action.run();
+          await originalRun();
           return;
         } catch {
           // Fall back to clipboard API.
         }
       }
 
-      const text = getSelectionText(editor);
-      if (!text || !navigator.clipboard?.writeText) {
-        return;
-      }
+      await fallback();
+    };
+  };
 
-      await navigator.clipboard.writeText(text);
-    },
+  wrapAction('editor.action.clipboardCopyAction', async () => {
+    const text = getSelectionText(editor);
+    if (!text || !navigator.clipboard?.writeText) {
+      return;
+    }
+
+    await navigator.clipboard.writeText(text);
   });
 
-  editor.addAction({
-    id: 'clipboard-cut',
-    label: 'Cut',
-    contextMenuGroupId: 'clipboard',
-    contextMenuOrder: 2,
-    run: async () => {
-      const action = editor.getAction('editor.action.clipboardCutAction');
-      if (action) {
-        try {
-          await action.run();
-          return;
-        } catch {
-          // Fall back to clipboard API.
-        }
-      }
+  wrapAction('editor.action.clipboardCutAction', async () => {
+    if (!canEdit(editor, monacoInstance)) {
+      return;
+    }
 
-      if (!canEdit(editor, monacoInstance)) {
-        return;
-      }
+    const selection = editor.getSelection();
+    const text = getSelectionText(editor);
+    if (!selection || !text || !navigator.clipboard?.writeText) {
+      return;
+    }
 
-      const selection = editor.getSelection();
-      const text = getSelectionText(editor);
-      if (!selection || !text || !navigator.clipboard?.writeText) {
-        return;
-      }
-
-      await navigator.clipboard.writeText(text);
-      editor.executeEdits('clipboard.cut', [
-        { range: selection, text: '', forceMoveMarkers: true },
-      ]);
-    },
+    await navigator.clipboard.writeText(text);
+    editor.executeEdits('clipboard.cut', [
+      { range: selection, text: '', forceMoveMarkers: true },
+    ]);
   });
 
-  editor.addAction({
-    id: 'clipboard-paste',
-    label: 'Paste',
-    contextMenuGroupId: 'clipboard',
-    contextMenuOrder: 3,
-    run: async () => {
-      const action = editor.getAction('editor.action.clipboardPasteAction');
-      if (action) {
-        try {
-          await action.run();
-          return;
-        } catch {
-          // Fall back to clipboard API.
-        }
-      }
+  wrapAction('editor.action.clipboardPasteAction', async () => {
+    if (!canEdit(editor, monacoInstance)) {
+      return;
+    }
 
-      if (!canEdit(editor, monacoInstance)) {
-        return;
-      }
+    if (!navigator.clipboard?.readText) {
+      return;
+    }
 
-      if (!navigator.clipboard?.readText) {
-        return;
-      }
+    const selection = editor.getSelection();
+    if (!selection) {
+      return;
+    }
 
-      const selection = editor.getSelection();
-      if (!selection) {
-        return;
-      }
+    const text = await navigator.clipboard.readText();
+    if (!text) {
+      return;
+    }
 
-      const text = await navigator.clipboard.readText();
-      if (!text) {
-        return;
-      }
-
-      editor.executeEdits('clipboard.paste', [
-        { range: selection, text, forceMoveMarkers: true },
-      ]);
-    },
+    editor.executeEdits('clipboard.paste', [
+      { range: selection, text, forceMoveMarkers: true },
+    ]);
   });
 };
