@@ -251,7 +251,7 @@ export default function TemplateSelect({
 
   const handleSave = async (templateData: Record<string, any>) => {
     try {
-      const method = templateData.is_add ? 'PUT' : 'POST';
+      const method = templateData.is_add ? 'POST' : 'PUT';
       await shm_request('/shm/v1/admin/template', {
         method,
         body: JSON.stringify(templateData),
