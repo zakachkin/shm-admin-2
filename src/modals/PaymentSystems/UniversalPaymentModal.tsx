@@ -57,14 +57,8 @@ export const UniversalPaymentModal: React.FC<UniversalPaymentModalProps> = ({ op
     setLoading(true);
     try {
       // Загружаем форму через прокси на бэкенде, чтобы обойти CORS
+      const data = await shm_request(`shm/v1/admin/cloud/paysystems/form?name=${system.url_form}`);
       
-      const response = await shm_request(`shm/v1/admin/cloud/paysystems/form?name=${system.url_form}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to load form');
-      }
-      
-      const data = await response.json();
       // Бэкенд возвращает HTML в формате {data: [html_string]}
       const html = data.data && data.data[0] ? data.data[0] : '';
       setFormHtml(html);
