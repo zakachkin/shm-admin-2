@@ -44,7 +44,7 @@ interface MenuItem {
   name: string;
   href?: string;
   icon: any;
-  children?: { name: string; href: string }[];
+  children?: { name: string; href: string; reloadDocument?: boolean; target?: string }[];
 }
 
 const navigation: MenuItem[] = [
@@ -98,7 +98,7 @@ const navigation: MenuItem[] = [
     children: [
       { name: 'Шаблоны', href: '/templates' },
       { name: 'Конфигурация', href: '/config' },
-      { name: 'Swagger', href: '/swagger' },
+      { name: 'Swagger', href: '/swagger', reloadDocument: true },
     ]
   },
   { 
@@ -376,6 +376,8 @@ function Layout() {
                           key={child.href}
                           to={child.href}
                           onClick={() => setSidebarOpen(false)}
+                          reloadDocument={child.reloadDocument}
+                          target={child.target}
                           className="block px-3 py-2 text-sm rounded-lg transition-colors"
                           style={{
                             color: isActive(child.href) 
