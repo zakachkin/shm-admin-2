@@ -36,16 +36,9 @@ const canEdit = (editor: MonacoEditor, monacoInstance: MonacoInstance) => {
 };
 
 export const addClipboardActions = (editor: MonacoEditor, monacoInstance: MonacoInstance) => {
-  const replaceAction = (id: string, run: () => Promise<void>) => {
-    const action = editor.getAction(id);
-    if (!action) {
-      return;
-    }
+  editor.updateOptions({ contextmenu: false });
 
-    action.run = run;
-  };
-
-  replaceAction('editor.action.clipboardCopyAction', async () => {
+  const runCopy = async () => {
     const text = getSelectionText(editor);
     if (!text) {
       return;
@@ -60,9 +53,9 @@ export const addClipboardActions = (editor: MonacoEditor, monacoInstance: Monaco
     }
 
     window.prompt('Copy text:', text);
-  });
+  };
 
-  replaceAction('editor.action.clipboardCutAction', async () => {
+  const runCut = async () => {
     if (!canEdit(editor, monacoInstance)) {
       return;
     }
@@ -92,9 +85,9 @@ export const addClipboardActions = (editor: MonacoEditor, monacoInstance: Monaco
     editor.executeEdits('clipboard.cut', [
       { range: selection, text: '', forceMoveMarkers: true },
     ]);
-  });
+  };
 
-  replaceAction('editor.action.clipboardPasteAction', async () => {
+  const runPaste = async () => {
     if (!canEdit(editor, monacoInstance)) {
       return;
     }
@@ -125,5 +118,94 @@ export const addClipboardActions = (editor: MonacoEditor, monacoInstance: Monaco
     editor.executeEdits('clipboard.paste', [
       { range: selection, text, forceMoveMarkers: true },
     ]);
+  };
+
+  const domNode = editor.getDomNode();
+  if (!domNode) {
+    return;
+  }
+
+  const menu = document.createElement('div');
+  menu.style.position = 'fixed';
+  menu.style.zIndex = '100000';
+  menu.style.display = 'none';
+  menu.style.minWidth = '160px';
+  menu.style.background = 'var(--theme-content-bg, #1f2937)';
+  menu.style.border = '1px solid var(--theme-border, #374151)';
+  menu.style.borderRadius = '6px';
+  menu.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.35)';
+  menu.style.padding = '4px 0';
+  menu.style.color = 'var(--theme-content-text, #e5e7eb)';
+  menu.style.fontSize = '13px';
+  menu.style.fontFamily = 'inherit';
+
+  const buildItem = (label: string, onClick: () => void) => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.textContent = label;
+    item.style.display = 'block';
+    item.style.width = '100%';
+    item.style.padding = '6px 12px';
+    item.style.background = 'transparent';
+    item.style.border = '0';
+    item.style.textAlign = 'left';
+    item.style.cursor = 'pointer';
+    item.style.color = 'inherit';
+    item.onmouseenter = () => {
+      item.style.background = 'var(--theme-button-secondary-bg, #374151)';
+    };
+    item.onmouseleave = () => {
+      item.style.background = 'transparent';
+    };
+    item.onclick = () => {
+      hideMenu();
+      onClick();
+    };
+    return item;
+  };
+
+  const hideMenu = () => {
+    menu.style.display = 'none';
+  };
+
+  const showMenu = (x: number, y: number) => {
+    menu.style.left = `${x}px`;
+    menu.style.top = `${y}px`;
+    menu.style.display = 'block';
+  };
+
+  menu.appendChild(buildItem('Cut', () => void runCut()));
+  menu.appendChild(buildItem('Copy', () => void runCopy()));
+  menu.appendChild(buildItem('Paste', () => void runPaste()));
+
+  const handleContextMenu = (event: MouseEvent) => {
+    event.preventDefault();
+    showMenu(event.clientX, event.clientY);
+  };
+
+  const handleGlobalClick = (event: MouseEvent) => {
+    if (!menu.contains(event.target as Node)) {
+      hideMenu();
+    }
+  };
+
+  const handleEscape = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      hideMenu();
+    }
+  };
+
+  domNode.addEventListener('contextmenu', handleContextMenu);
+  document.addEventListener('click', handleGlobalClick);
+  document.addEventListener('keydown', handleEscape);
+  window.addEventListener('blur', hideMenu);
+  document.body.appendChild(menu);
+
+  editor.onDidDispose(() => {
+    domNode.removeEventListener('contextmenu', handleContextMenu);
+    document.removeEventListener('click', handleGlobalClick);
+    document.removeEventListener('keydown', handleEscape);
+    window.removeEventListener('blur', hideMenu);
+    menu.remove();
   });
 };
