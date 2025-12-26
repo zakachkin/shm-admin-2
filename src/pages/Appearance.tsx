@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Palette, Save, RotateCcw, Sun, Moon, Monitor, Eye, EyeOff, HelpCircle } from 'lucide-react';
+import { Palette, Save, RotateCcw, Sun, Moon, Monitor, Eye, EyeOff, HelpCircle, ExternalLink } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../components/ConfirmModal';
 import { useThemeStore, ThemeMode, ThemeColors, darkTheme, lightTheme } from '../store/themeStore';
@@ -306,6 +306,28 @@ function Appearance() {
               />
             </button>
           </div>
+        </div>
+      </div>
+
+      <div className="card mb-6">
+        <div className="card-header">
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--theme-content-text)' }}>
+            Swagger UI
+          </h2>
+          <p className="text-sm mt-1" style={{ color: 'var(--theme-content-text-muted)' }}>
+            API documentation and testing console.
+          </p>
+        </div>
+        <div className="card-body">
+          <a
+            href="/swagger"
+            target="_blank"
+            rel="noreferrer"
+            className="btn-secondary inline-flex items-center gap-2"
+          >
+            <ExternalLink className="w-4 h-4" />
+            Open Swagger
+          </a>
         </div>
       </div>
 
