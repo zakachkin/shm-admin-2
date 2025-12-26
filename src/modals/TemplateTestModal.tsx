@@ -164,7 +164,7 @@ export default function TemplateTestModal({
           <textarea
             value={renderResult}
             readOnly
-            className="flex-1 h-full px-2 py-1.5 text-xs rounded border font-mono leading-tight"
+            className="flex-1 h-full px-3 py-2 text-sm rounded border font-mono"
             style={{ ...inputStyles, resize: 'none', minHeight: 280 }}
             placeholder="Результат рендера появится здесь..."
           />
@@ -173,7 +173,6 @@ export default function TemplateTestModal({
     </Modal>
   );
 }
-
 
 
 
