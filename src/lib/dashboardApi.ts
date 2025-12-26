@@ -60,12 +60,6 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     const totalServersCount = serversCountRes?.items || serversCountRes?.total || 0;
     const payments = paymentsRes ? normalizeListResponse(paymentsRes).data : [];
     const withdraws = withdrawsRes ? normalizeListResponse(withdrawsRes).data : [];
-
-    const isCompletedWithdraw = (withdraw: any) => {
-      const status = String(withdraw?.status || '').toUpperCase();
-      return status === 'COMPLETED';
-    };
-    const completedWithdraws = withdraws.filter(isCompletedWithdraw);
     
     const getPaymentAmount = (payment: any) => {
       const amount = parseFloat(payment.money || 0);
@@ -81,8 +75,8 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
       const amount = getPaymentAmount(p);
       return sum + (amount < 0 ? Math.abs(amount) : 0);
     }, 0);
-    const totalWithdraws = completedWithdraws.reduce((sum: number, w: any) => sum + parseFloat(w.cost || 0), 0);
-    const totalBonusWithdraws = completedWithdraws.reduce((sum: number, w: any) => sum + parseFloat(w.bonus || 0), 0);
+    const totalWithdraws = withdraws.reduce((sum: number, w: any) => sum + parseFloat(w.cost || 0), 0);
+    const totalBonusWithdraws = withdraws.reduce((sum: number, w: any) => sum + parseFloat(w.bonus || 0), 0);
     const activeUserServices = userServicesNew.filter((us: any) => us.status === 'ACTIVE' || us.status === 'active').length;
     
     // Группировка платежей по датам
@@ -118,7 +112,7 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
         totalWithdraws,
         totalBonusWithdraws,
         totalRefunds,
-        netRevenue: totalWithdraws - totalRevenue - totalBonusWithdraws - totalRefunds,
+        netRevenue: totalRevenue - totalBonusWithdraws,
       },
       services: {
         byStatus: Object.entries(servicesByStatus).map(([name, value]) => ({ name, value })),

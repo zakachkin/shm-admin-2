@@ -219,7 +219,7 @@ function Dashboard() {
           loading={loading}
         />
         <StatCard
-          title="Операционная прибыль"
+          title="Чистая прибыль"
           value={analytics ? formatMoney(analytics.revenue.netRevenue) : '...'}
           icon={analytics && analytics.revenue.netRevenue >= 0 ? ArrowUpRight : ArrowDownRight}
           color={analytics && analytics.revenue.netRevenue >= 0 ? 'emerald' : 'rose'}
