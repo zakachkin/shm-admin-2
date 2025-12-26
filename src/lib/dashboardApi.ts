@@ -118,7 +118,7 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
         totalWithdraws,
         totalBonusWithdraws,
         totalRefunds,
-        netRevenue: totalWithdraws - totalBonusWithdraws - totalRefunds,
+        netRevenue: totalWithdraws - totalRevenue - totalBonusWithdraws - totalRefunds,
       },
       services: {
         byStatus: Object.entries(servicesByStatus).map(([name, value]) => ({ name, value })),
