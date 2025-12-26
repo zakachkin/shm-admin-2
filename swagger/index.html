@@ -20,13 +20,28 @@
       src="https://unpkg.com/swagger-ui-dist@5.24.1/swagger-ui-standalone-preset.js"
       crossorigin
     ></script>
-    <script>
-      window.onload = () => {
-        window.ui = SwaggerUIBundle({
-          urls: [
-            { url: '/shm/v1/swagger.json', name: 'Client API' },
-            { url: '/shm/v1/swagger_admin.json', name: 'Admin API' },
-          ],
+<script>
+  window.onload = () => {
+    let sessionId = null;
+    try {
+      const raw = localStorage.getItem('shm-auth-storage');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        sessionId = parsed?.state?.sessionId || null;
+      }
+    } catch (e) {
+    }
+
+    if (!sessionId) {
+      window.location.href = '/login';
+      return;
+    }
+
+    window.ui = SwaggerUIBundle({
+      urls: [
+        { url: '/shm/v1/swagger.json', name: 'Client API' },
+        { url: '/shm/v1/swagger_admin.json', name: 'Admin API' },
+      ],
           'urls.primaryName': 'Client API',
           dom_id: '#swagger-ui',
           presets: [
