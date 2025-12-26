@@ -58,7 +58,7 @@ export default function UserSelect({
       abortControllerRef.current = new AbortController();
       setLoadingUser(true);
 
-      shm_request(`/shm/v1/admin/user?user_id=${value}&limit=1`)
+      shm_request(`shm/v1/admin/user?user_id=${value}&limit=1`)
         .then(res => {
           const data = res.data || res;
           const users = Array.isArray(data) ? data : [];
@@ -96,13 +96,13 @@ export default function UserSelect({
   };
 
   const handleSaveUser = async (userData: Record<string, any>) => {
-    await shm_request('/shm/v1/admin/user', {
+    await shm_request('shm/v1/admin/user', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
     if (value) {
       lastLoadedUserIdRef.current = null;
-      const res = await shm_request(`/shm/v1/admin/user?user_id=${value}&limit=1`);
+      const res = await shm_request(`shm/v1/admin/user?user_id=${value}&limit=1`);
       const data = res.data || res;
       const users = Array.isArray(data) ? data : [];
       if (users.length > 0) {
@@ -131,7 +131,7 @@ export default function UserSelect({
       ],
     };
 
-    shm_request(`/shm/v1/admin/user?limit=20&filter=${encodeURIComponent(JSON.stringify(filter))}`)
+    shm_request(`shm/v1/admin/user?limit=20&filter=${encodeURIComponent(JSON.stringify(filter))}`)
       .then(res => {
         const data = res.data || res;
         const users = Array.isArray(data) ? data : [];
@@ -288,7 +288,7 @@ export default function UserSelect({
             onRefresh={async () => {
               if (value) {
                 lastLoadedUserIdRef.current = null;
-                const res = await shm_request(`/shm/v1/admin/user?user_id=${value}&limit=1`);
+                const res = await shm_request(`shm/v1/admin/user?user_id=${value}&limit=1`);
                 const data = res.data || res;
                 const users = Array.isArray(data) ? data : [];
                 if (users.length > 0) {

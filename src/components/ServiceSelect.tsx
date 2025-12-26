@@ -40,7 +40,7 @@ export default function ServiceSelect({
       setLoadingService(true);
       onLoadingChange?.(true);
 
-      shm_request(`/shm/v1/admin/service?service_id=${value}&limit=1`)
+      shm_request(`shm/v1/admin/service?service_id=${value}&limit=1`)
         .then(res => {
           const data = res.data || res;
           const services = Array.isArray(data) ? data : [];
@@ -61,7 +61,7 @@ export default function ServiceSelect({
       setLoading(true);
       onLoadingChange?.(true);
 
-      shm_request('/shm/v1/admin/service?limit=0')
+      shm_request('shm/v1/admin/service?limit=0')
         .then(res => {
           const data = res.data || res;
           const services = Array.isArray(data) ? data : [];
@@ -96,13 +96,13 @@ export default function ServiceSelect({
   };
 
   const handleSaveService = async (serviceData: Record<string, any>) => {
-    await shm_request('/shm/v1/admin/service', {
+    await shm_request('shm/v1/admin/service', {
       method: 'POST',
       body: JSON.stringify(serviceData),
     });
 
     if (value) {
-      const res = await shm_request(`/shm/v1/admin/service?service_id=${value}&limit=1`);
+      const res = await shm_request(`shm/v1/admin/service?service_id=${value}&limit=1`);
       const data = res.data || res;
       const services = Array.isArray(data) ? data : [];
       if (services.length > 0) {
@@ -114,7 +114,7 @@ export default function ServiceSelect({
   };
 
   const handleDeleteService = async (id: number) => {
-    await shm_request(`/shm/v1/admin/service/${id}`, {
+    await shm_request(`shm/v1/admin/service/${id}`, {
       method: 'DELETE',
     });
     onServiceUpdated?.();

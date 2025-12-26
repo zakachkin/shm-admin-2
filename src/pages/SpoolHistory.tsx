@@ -65,7 +65,7 @@ function SpoolHistory() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/spool/history?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/spool/history?limit=${l}&offset=${o}`;
 
     const combinedFilters = { ...f, ...externalFilters };
     if (Object.keys(combinedFilters).length > 0) {

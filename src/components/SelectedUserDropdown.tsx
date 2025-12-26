@@ -216,7 +216,7 @@ export default function SelectedUserDropdown() {
         }}
         onRefresh={async () => {
           if (selectedUser?.user_id) {
-            const userData = await shm_request(`/shm/v1/admin/user?user_id=${selectedUser.user_id}`);
+            const userData = await shm_request(`shm/v1/admin/user?user_id=${selectedUser.user_id}`);
             if (userData.user) {
               const { setSelectedUser } = useSelectedUserStore.getState();
               setSelectedUser(userData.user);

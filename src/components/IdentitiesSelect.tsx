@@ -56,7 +56,7 @@ export default function IdentitiesSelect({
     setLoading(true);
     onLoadingChange?.(true);
     try {
-      const res = await shm_request('/shm/v1/admin/server/identity?limit=1000');
+      const res = await shm_request('shm/v1/admin/server/identity?limit=1000');
       const { data } = normalizeListResponse(res);
       setIdentities(data);
     } catch (error) {
@@ -72,7 +72,7 @@ export default function IdentitiesSelect({
       if (!found && identities.length > 0 && !loading) {
         lastLoadedIdRef.current = value;
         setLoadingIdentity(true);
-        shm_request(`/shm/v1/admin/server/identity?id=${value}&limit=1`)
+        shm_request(`shm/v1/admin/server/identity?id=${value}&limit=1`)
           .then(res => {
             const { data } = normalizeListResponse(res);
             if (data.length > 0) {

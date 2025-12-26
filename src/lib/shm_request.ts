@@ -50,7 +50,7 @@ export function normalizeListResponse<T = any>(res: any): ApiListResponse<T> {
 }
 
 export async function shm_login(login: string, password: string): Promise<any> {
-  const response = await fetch('/shm/v1/user/auth', {
+  const response = await fetch('shm/v1/user/auth', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ export async function shm_login(login: string, password: string): Promise<any> {
     throw new Error('Не получен session_id');
   }
 
-  const userResponse = await fetch('/shm/v1/user', {
+  const userResponse = await fetch('shm/v1/user', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

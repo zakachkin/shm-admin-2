@@ -32,7 +32,7 @@ export default function ConfigModal({ open, onClose, data, onSave }: ConfigModal
     setSaving(true);
 
     try {
-      await shm_request('/shm/v1/admin/config', {
+      await shm_request('shm/v1/admin/config', {
         method: 'POST',
         body: JSON.stringify(formData),
       });
@@ -52,7 +52,7 @@ export default function ConfigModal({ open, onClose, data, onSave }: ConfigModal
     setDeleting(true);
 
     try {
-      await shm_request(`/shm/v1/admin/config?key=${encodeURIComponent(formData.key)}`, {
+      await shm_request(`shm/v1/admin/config?key=${encodeURIComponent(formData.key)}`, {
         method: 'DELETE',
       });
       setConfirmDeleteOpen(false);

@@ -105,6 +105,11 @@ const navigation: MenuItem[] = [
     href: '/settings',
     icon: Wrench
   },
+  {
+    name: 'SHM Cloud',
+    href: '/cloud',
+    icon: Wrench
+  },
 ];
 
 function ThemeToggle() {
@@ -241,7 +246,7 @@ function Layout() {
   const handleTemplateSave = async (templateData: any) => {
     try {
       const isNewTemplate = templateData?.is_add === 1 || templateData?.is_add === true;
-      const data = await shm_request('/shm/v1/admin/template', {
+      const data = await shm_request('shm/v1/admin/template', {
         method: isNewTemplate ? 'PUT' : 'POST',
         body: JSON.stringify(templateData)
       });
@@ -255,7 +260,7 @@ function Layout() {
 
   const handleTemplateDelete = async (id: string) => {
     try {
-      await shm_request(`/shm/v1/admin/template?id=${id}`, {
+      await shm_request(`shm/v1/admin/template?id=${id}`, {
         method: 'DELETE'
       });
       toast.success('Шаблон удален');

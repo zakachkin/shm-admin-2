@@ -35,7 +35,7 @@ export default function IdentityCreateModal({
 
     setGenerating(true);
     try {
-      const res = await shm_request('/shm/v1/admin/server/identity/generate');
+      const res = await shm_request('shm/v1/admin/server/identity/generate');
       const keyData = Array.isArray(res.data) ? res.data[0] : res.data;
 
       setFormData(prev => ({

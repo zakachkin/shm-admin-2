@@ -60,7 +60,7 @@ export default function TemplateSelect({
       abortControllerRef.current = new AbortController();
       setLoadingTemplate(true);
 
-      shm_request(`/shm/v1/admin/template?id=${value}`)
+      shm_request(`shm/v1/admin/template?id=${value}`)
         .then(res => {
           const data = res.data || res;
           const templates = Array.isArray(data) ? data : [];
@@ -90,7 +90,7 @@ export default function TemplateSelect({
   useEffect(() => {
     if (viewMode === 'list' && allTemplates.length === 0) {
       setLoading(true);
-      shm_request('/shm/v1/admin/template?limit=0')
+      shm_request('shm/v1/admin/template?limit=0')
         .then(res => {
           const data = res.data || res;
           const templates = Array.isArray(data) ? data : [];
@@ -112,7 +112,7 @@ export default function TemplateSelect({
     setLoading(true);
     onLoadingChange?.(true);
 
-    shm_request(`/shm/v1/admin/template?id=${encodeURIComponent(query)}`)
+    shm_request(`shm/v1/admin/template?id=${encodeURIComponent(query)}`)
       .then(res => {
         const data = res.data || res;
         const templates = Array.isArray(data) ? data : [];
@@ -245,7 +245,7 @@ export default function TemplateSelect({
   const handleSave = async (templateData: Record<string, any>) => {
     try {
       const method = templateData.is_add ? 'PUT' : 'POST';
-      await shm_request('/shm/v1/admin/template', {
+      await shm_request('shm/v1/admin/template', {
         method,
         body: JSON.stringify(templateData),
       });

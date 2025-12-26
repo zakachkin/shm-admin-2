@@ -36,7 +36,7 @@ function Storage() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/storage/manage?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/storage/manage?limit=${l}&offset=${o}`;
 
     const combinedFilters = { ...f, ...externalFilters };
     if (Object.keys(combinedFilters).length > 0) {
@@ -112,7 +112,7 @@ function Storage() {
         onClose={() => setModalOpen(false)}
         data={selectedRow}
         onDelete={async (name) => {
-          await shm_request(`/shm/v1/admin/storage/manage/${name}?user_id=${selectedRow.user_id}`, {
+          await shm_request(`shm/v1/admin/storage/manage/${name}?user_id=${selectedRow.user_id}`, {
             method: 'DELETE',
           });
           fetchData(limit, offset, filters, sortField, sortDirection);

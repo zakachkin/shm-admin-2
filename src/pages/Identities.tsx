@@ -26,7 +26,7 @@ function Identities() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/server/identity?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/server/identity?limit=${l}&offset=${o}`;
 
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
@@ -75,7 +75,7 @@ function Identities() {
   };
 
   const handleSaveEdit = async (identityData: any) => {
-    await shm_request('/shm/v1/admin/server/identity', {
+    await shm_request('shm/v1/admin/server/identity', {
       method: 'POST',
       body: JSON.stringify(identityData),
     });
@@ -88,7 +88,7 @@ function Identities() {
       fingerprint: identityData.fingerprint || '',
     };
 
-    await shm_request('/shm/v1/admin/server/identity', {
+    await shm_request('shm/v1/admin/server/identity', {
       method: 'PUT',
       body: JSON.stringify(dataToSend),
     });
@@ -98,7 +98,7 @@ function Identities() {
   const handleDelete = async () => {
     if (!selectedRow?.id) return;
 
-    await shm_request(`/shm/v1/admin/server/identity?id=${selectedRow.id}`, {
+    await shm_request(`shm/v1/admin/server/identity?id=${selectedRow.id}`, {
       method: 'DELETE',
     });
     fetchData(limit, offset, filters, sortField, sortDirection);

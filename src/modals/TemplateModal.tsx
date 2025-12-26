@@ -87,7 +87,7 @@ export default function TemplateModal({
                 detectLanguage(newActiveTab.template.data || '');
               } else {
                 setLoading(true);
-                shm_request(`/shm/v1/admin/template?id=${newActiveTab.template.id}`)
+                shm_request(`shm/v1/admin/template?id=${newActiveTab.template.id}`)
                   .then(res => {
                     const templateData = res.data?.[0] || res.data;
                     setFormData({ ...templateData, is_add: 0 });
@@ -137,7 +137,7 @@ export default function TemplateModal({
       }
 
       setLoading(true);
-      shm_request(`/shm/v1/admin/template?id=${data.id}`)
+      shm_request(`shm/v1/admin/template?id=${data.id}`)
         .then(res => {
           const templateData = res.data?.[0] || res.data;
           setFormData({ ...templateData, is_add: 0 });
@@ -212,7 +212,7 @@ export default function TemplateModal({
     }
 
     setLoading(true);
-    shm_request(`/shm/v1/admin/template?id=${tabTemplate.id}`)
+    shm_request(`shm/v1/admin/template?id=${tabTemplate.id}`)
       .then(res => {
         const templateData = res.data?.[0] || res.data;
         setFormData({ ...templateData, is_add: 0 });
@@ -296,7 +296,7 @@ export default function TemplateModal({
     }
 
     setLoading(true);
-    shm_request(`/shm/v1/admin/template?id=${template.id}`)
+    shm_request(`shm/v1/admin/template?id=${template.id}`)
       .then(res => {
         const templateData = res.data?.[0] || res.data;
         const newTab = {
@@ -340,7 +340,7 @@ export default function TemplateModal({
           detectLanguage(newActiveTab.template.data || '');
         } else {
           setLoading(true);
-          shm_request(`/shm/v1/admin/template?id=${newActiveTab.template.id}`)
+          shm_request(`shm/v1/admin/template?id=${newActiveTab.template.id}`)
             .then(res => {
               const templateData = res.data?.[0] || res.data;
               setFormData({ ...templateData, is_add: 0 });
@@ -427,7 +427,7 @@ export default function TemplateModal({
 
     setLoading(true);
     try {
-      const response = await shm_request(`/shm/v1/admin/template?id=${formData.id}`, {
+      const response = await shm_request(`shm/v1/admin/template?id=${formData.id}`, {
         method: 'GET',
       });
       const templateData = response.data?.[0] || response.data;

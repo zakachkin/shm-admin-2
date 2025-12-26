@@ -38,7 +38,7 @@ function Bonuses() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/user/bonus?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/user/bonus?limit=${l}&offset=${o}`;
 
     const combinedFilters = { ...f, ...externalFilters };
     if (Object.keys(combinedFilters).length > 0) {
@@ -132,7 +132,7 @@ function Bonuses() {
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onSave={async (data) => {
-          await shm_request(`/shm/v1/admin/user/bonus`, {
+          await shm_request(`shm/v1/admin/user/bonus`, {
             method: 'PUT',
             body: JSON.stringify(data),
           });

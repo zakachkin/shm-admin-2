@@ -46,7 +46,7 @@ export default function ConfigCreateModal({ open, onClose, onSave }: ConfigCreat
     setSaving(true);
 
     try {
-      await shm_request('/shm/v1/admin/config', {
+      await shm_request('shm/v1/admin/config', {
         method: 'PUT',
         body: JSON.stringify(formData),
       });

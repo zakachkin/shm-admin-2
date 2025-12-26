@@ -30,7 +30,7 @@ function Events() {
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/service/event?limit=${l}&offset=${o}`;
+    let url = `shm/v1/admin/service/event?limit=${l}&offset=${o}`;
 
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
@@ -83,7 +83,7 @@ function Events() {
   };
 
   const handleSaveEdit = async (eventData: any) => {
-    await shm_request('/shm/v1/admin/service/event', {
+    await shm_request('shm/v1/admin/service/event', {
       method: 'POST',
       body: JSON.stringify(eventData),
     });
@@ -91,7 +91,7 @@ function Events() {
   };
 
   const handleSaveNew = async (eventData: any) => {
-    await shm_request('/shm/v1/admin/service/event', {
+    await shm_request('shm/v1/admin/service/event', {
       method: 'PUT',
       body: JSON.stringify(eventData),
     });
@@ -101,7 +101,7 @@ function Events() {
   const handleDelete = async () => {
     if (!selectedRow?.id) return;
 
-    await shm_request(`/shm/v1/admin/service/event?id=${selectedRow.id}`, {
+    await shm_request(`shm/v1/admin/service/event?id=${selectedRow.id}`, {
       method: 'DELETE',
     });
     fetchData(limit, offset, filters, sortField, sortDirection);

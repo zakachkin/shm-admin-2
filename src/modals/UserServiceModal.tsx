@@ -61,7 +61,7 @@ export default function UserServiceModal({
   useEffect(() => {
     if (open && services.length === 0) {
       setLoadingServices(true);
-      shm_request('/shm/v1/admin/service?limit=100')
+      shm_request('shm/v1/admin/service?limit=100')
         .then(res => {
           const items = res.data || res;
           setServices(Array.isArray(items) ? items : []);
@@ -140,7 +140,7 @@ export default function UserServiceModal({
 
   const handleBlock = async () => {
     try {
-      await shm_request('/shm/v1/admin/user/service/stop', {
+      await shm_request('shm/v1/admin/user/service/stop', {
         method: 'POST',
         body: JSON.stringify({
           user_id: formData.user_id,
@@ -158,7 +158,7 @@ export default function UserServiceModal({
 
   const handleActivate = async () => {
     try {
-      await shm_request('/shm/v1/admin/user/service/activate', {
+      await shm_request('shm/v1/admin/user/service/activate', {
         method: 'POST',
         body: JSON.stringify({
           user_id: formData.user_id,
@@ -176,7 +176,7 @@ export default function UserServiceModal({
 
   const handleSetStatus = async (status: string) => {
     try {
-      await shm_request('/shm/v1/admin/user/service/status', {
+      await shm_request('shm/v1/admin/user/service/status', {
         method: 'POST',
         body: JSON.stringify({
           user_id: formData.user_id,
@@ -197,7 +197,7 @@ export default function UserServiceModal({
 
     try {
       const res = await shm_request(
-        `/shm/v1/admin/user/service/withdraw?user_service_id=${formData.user_service_id}&limit=1&sort_field=withdraw_date&sort_direction=desc`
+        `shm/v1/admin/user/service/withdraw?user_service_id=${formData.user_service_id}&limit=1&sort_field=withdraw_date&sort_direction=desc`
       );
       const data = res.data || res;
       const withdraws = Array.isArray(data) ? data : [];
@@ -214,7 +214,7 @@ export default function UserServiceModal({
   };
 
   const handleSaveWithdraw = async (withdrawData: Record<string, any>) => {
-    await shm_request('/shm/v1/admin/user/service/withdraw', {
+    await shm_request('shm/v1/admin/user/service/withdraw', {
       method: 'POST',
       body: JSON.stringify(withdrawData),
     });

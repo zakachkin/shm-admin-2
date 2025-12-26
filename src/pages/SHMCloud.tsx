@@ -135,7 +135,7 @@ function SHMCloud() {
     try {
       const res = await shm_request('/shm/v1/admin/cloud/user');
       const userData = res.data || res;
-
+      
       if (Array.isArray(userData) && userData.length > 0) {
         const user = userData[0];
         setCloudUser(user);
@@ -164,7 +164,7 @@ function SHMCloud() {
         method: 'POST',
         body: JSON.stringify(loginData),
       });
-
+      
       await checkAuth();
       toast.success('Успешная авторизация');
       setLoginData({ login: '', password: '' });
@@ -180,7 +180,7 @@ function SHMCloud() {
         method: 'PUT',
         body: JSON.stringify(registerData),
       });
-
+      
       toast.success('Регистрация успешна. Войдите в систему.');
       setShowLogin(true);
       setRegisterData({ login: '', password: '' });
@@ -219,7 +219,7 @@ function SHMCloud() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" 
                style={{ borderColor: 'var(--accent-primary)' }}></div>
           <p style={{ color: 'var(--theme-content-text-muted)' }}>Загрузка...</p>
         </div>
@@ -231,7 +231,7 @@ function SHMCloud() {
     return (
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h1
+          <h1 
             className="text-2xl font-bold flex items-center gap-3"
             style={{ color: 'var(--theme-content-text)' }}
           >
@@ -254,7 +254,7 @@ function SHMCloud() {
                 <LogIn className="w-4 h-4 inline mr-2" />
                 Вход
               </button>
-              <button
+              {/* <button
                 onClick={() => setShowLogin(false)}
                 className={`flex-1 py-2 px-4 rounded transition-colors ${!showLogin ? '' : 'opacity-60'}`}
                 style={{
@@ -264,7 +264,7 @@ function SHMCloud() {
               >
                 <UserPlus className="w-4 h-4 inline mr-2" />
                 Регистрация
-              </button>
+              </button> */}
             </div>
 
             {showLogin ? (
@@ -355,7 +355,7 @@ function SHMCloud() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1
+        <h1 
           className="text-2xl font-bold flex items-center gap-3"
           style={{ color: 'var(--theme-content-text)' }}
         >
@@ -405,17 +405,17 @@ function SHMCloud() {
           </div>
         </div>
       </div>
-
+      
       {}
       <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--theme-content-text)' }}>
         Сервисы
       </h2>
-
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {TARIFFS.map((tariff) => {
           const Icon = tariff.icon;
           const buttonColor = tariff.id === 'free' ? '#fbbf24' : tariff.color;
-
+          
           return (
             <div key={tariff.id} className="rounded-lg border overflow-hidden" style={cardStyles}>
               <div className="p-6 text-center" style={{ backgroundColor: tariff.color }}>
@@ -447,7 +447,7 @@ function SHMCloud() {
                 })}
               </div>
               <div className="p-6 pt-0">
-                <button
+                <button 
                   className="w-full py-3 rounded font-semibold transition-opacity hover:opacity-80"
                   style={{ backgroundColor: buttonColor, color: 'white' }}
                 >

@@ -35,7 +35,7 @@ export default function StorageModal({
       const isJson = data.settings?.json === 1;
       setIsJsonMode(isJson);
 
-      shm_request(`/shm/v1/storage/manage/${data.name}?user_id=${data.user_id}`)
+      shm_request(`shm/v1/storage/manage/${data.name}?user_id=${data.user_id}`)
       .then(res => {
           let actualData = res;
 
@@ -92,7 +92,7 @@ export default function StorageModal({
 
     setSaving(true);
     try {
-      await shm_request('/shm/v1/admin/storage/manage', {
+      await shm_request('shm/v1/admin/storage/manage', {
         method: 'POST',
         body: JSON.stringify({
           name: viewData.name,

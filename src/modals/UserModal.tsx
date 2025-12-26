@@ -411,7 +411,7 @@ export default function UserModal({
         onClose={() => setPayModalOpen(false)}
         onSave={async (payData) => {
           const dataWithUser = { ...payData, user_id: formData.user_id };
-          await shm_request('/shm/v1/admin/user/payment', {
+          await shm_request('shm/v1/admin/user/payment', {
             method: 'PUT',
             body: JSON.stringify(dataWithUser),
           });
@@ -428,7 +428,7 @@ export default function UserModal({
         onClose={() => setBonusModalOpen(false)}
         onSave={async (bonusData) => {
           const dataWithUser = { ...bonusData, user_id: formData.user_id };
-          await shm_request('/shm/v1/admin/user/bonus', {
+          await shm_request('shm/v1/admin/user/bonus', {
             method: 'PUT',
             body: JSON.stringify(dataWithUser),
           });

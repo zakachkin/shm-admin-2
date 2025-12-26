@@ -44,7 +44,7 @@ export const ChildServicesModal: React.FC<ChildServicesModalProps> = ({
   const loadChildServices = async () => {
     try {
       setLoading(true);
-      const response = await shm_request(`/shm/v1/admin/service/children?service_id=${serviceId}`);
+      const response = await shm_request(`shm/v1/admin/service/children?service_id=${serviceId}`);
       const normalized = normalizeListResponse(response);
       setChildServices(normalized.data || []);
     } catch (error) {
@@ -102,7 +102,7 @@ export const ChildServicesModal: React.FC<ChildServicesModalProps> = ({
   const handleSave = async () => {
     try {
       setLoading(true);
-      await shm_request('/shm/v1/admin/service/children', {
+      await shm_request('shm/v1/admin/service/children', {
         method: 'POST',
         body: JSON.stringify({
           service_id: serviceId,

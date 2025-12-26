@@ -40,14 +40,14 @@ export default function SpoolCreateModal({
 
   useEffect(() => {
     if (open) {
-      shm_request('/shm/v1/admin/server/group?limit=1000')
+      shm_request('shm/v1/admin/server/group?limit=1000')
         .then(res => {
           const groups = Array.isArray(res.data) ? res.data : res.data?.data || [];
           setServerGroups(groups);
         })
         .catch(() => setServerGroups([]));
 
-      shm_request('/shm/v1/admin/template?limit=1000')
+      shm_request('shm/v1/admin/template?limit=1000')
         .then(res => {
           const temps = Array.isArray(res.data) ? res.data : res.data?.data || [];
           setTemplates(temps);

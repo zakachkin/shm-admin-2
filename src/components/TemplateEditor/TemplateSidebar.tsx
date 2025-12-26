@@ -64,7 +64,7 @@ export default function TemplateSidebar({
   const loadTemplates = async () => {
     setLoading(true);
     try {
-      const res = await shm_request('/shm/v1/admin/template?limit=0');
+      const res = await shm_request('shm/v1/admin/template?limit=0');
       const data = res.data || res;
       const templateList = Array.isArray(data) ? data : [];
       setTemplates(templateList);

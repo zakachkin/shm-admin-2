@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  base: './',
   build: {
     target: 'es2020',
     minify: 'terser',
@@ -24,6 +25,6 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
   },
   server: {
-    hmr: false,
+    hmr: true,
   },
 });
