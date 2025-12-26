@@ -199,28 +199,28 @@ function Dashboard() {
           loading={loading}
         />
         <StatCard
-          title="Выручка (списания)"
+          title="Списания (7 дней)"
           value={analytics ? formatMoney(analytics.revenue.totalWithdraws) : '...'}
           icon={ArrowUpRight}
           color="emerald"
           loading={loading}
         />
         <StatCard
-          title="Бонусы"
+          title="Бонусы (7 дней)"
           value={analytics ? formatMoney(analytics.revenue.totalBonusWithdraws) : '...'}
           icon={ArrowDownRight}
           color="rose"
           loading={loading}
         />
         <StatCard
-          title="Возвраты"
+          title="Возвраты (7 дней)"
           value={analytics ? formatMoney(analytics.revenue.totalRefunds) : '...'}
           icon={ArrowDownRight}
           color="rose"
           loading={loading}
         />
         <StatCard
-          title="Чистая выручка"
+          title="Чистая выручка (7 дней)"
           value={analytics ? formatMoney(analytics.revenue.netRevenue) : '...'}
           icon={DollarSign}
           color="emerald"
