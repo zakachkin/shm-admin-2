@@ -17,6 +17,19 @@ const canEdit = (editor: MonacoEditor, monacoInstance: MonacoInstance) => {
 };
 
 export const addClipboardActions = (editor: MonacoEditor, monacoInstance: MonacoInstance) => {
+  const builtinIds = [
+    'editor.action.clipboardCopyAction',
+    'editor.action.clipboardCutAction',
+    'editor.action.clipboardPasteAction',
+  ];
+
+  builtinIds.forEach((id) => {
+    const action = editor.getAction(id);
+    if (action && typeof (action as { dispose?: () => void }).dispose === 'function') {
+      (action as { dispose: () => void }).dispose();
+    }
+  });
+
   editor.addAction({
     id: 'clipboard-copy',
     label: 'Copy',
