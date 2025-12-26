@@ -69,21 +69,25 @@ export const addClipboardActions = (editor: MonacoEditor, monacoInstance: Monaco
   wrapAction(
     'editor.action.clipboardCutAction',
     async () => {
-      if (!canEdit(editor, monacoInstance)) {
+      try {
+        if (!canEdit(editor, monacoInstance)) {
+          return false;
+        }
+
+        const selection = editor.getSelection();
+        const text = getSelectionText(editor);
+        if (!selection || !text || !navigator.clipboard?.writeText) {
+          return false;
+        }
+
+        await navigator.clipboard.writeText(text);
+        editor.executeEdits('clipboard.cut', [
+          { range: selection, text: '', forceMoveMarkers: true },
+        ]);
+        return true;
+      } catch {
         return false;
       }
-
-      const selection = editor.getSelection();
-      const text = getSelectionText(editor);
-      if (!selection || !text || !navigator.clipboard?.writeText) {
-        return false;
-      }
-
-      await navigator.clipboard.writeText(text);
-      editor.executeEdits('clipboard.cut', [
-        { range: selection, text: '', forceMoveMarkers: true },
-      ]);
-      return true;
     },
     true,
   );
@@ -91,28 +95,32 @@ export const addClipboardActions = (editor: MonacoEditor, monacoInstance: Monaco
   wrapAction(
     'editor.action.clipboardPasteAction',
     async () => {
-      if (!canEdit(editor, monacoInstance)) {
+      try {
+        if (!canEdit(editor, monacoInstance)) {
+          return false;
+        }
+
+        if (!navigator.clipboard?.readText) {
+          return false;
+        }
+
+        const selection = editor.getSelection();
+        if (!selection) {
+          return false;
+        }
+
+        const text = await navigator.clipboard.readText();
+        if (!text) {
+          return false;
+        }
+
+        editor.executeEdits('clipboard.paste', [
+          { range: selection, text, forceMoveMarkers: true },
+        ]);
+        return true;
+      } catch {
         return false;
       }
-
-      if (!navigator.clipboard?.readText) {
-        return false;
-      }
-
-      const selection = editor.getSelection();
-      if (!selection) {
-        return false;
-      }
-
-      const text = await navigator.clipboard.readText();
-      if (!text) {
-        return false;
-      }
-
-      editor.executeEdits('clipboard.paste', [
-        { range: selection, text, forceMoveMarkers: true },
-      ]);
-      return true;
     },
     true,
   );
