@@ -84,19 +84,26 @@ export function registerTTCompletion(monaco: any) {
   const getSuggestions = (model: any, position: any) => {
     const lineContent = model.getLineContent(position.lineNumber);
     const before = lineContent.slice(0, position.column - 1);
-    const lastOpen = before.lastIndexOf('{{');
-    const lastClose = before.lastIndexOf('}}');
+    const lastOpen = Math.max(before.lastIndexOf('{{'), before.lastIndexOf('[%'));
+    const lastClose = Math.max(before.lastIndexOf('}}'), before.lastIndexOf('%]'));
     const inTag = lastOpen > lastClose;
 
     if (!inTag) {
       return [];
     }
 
-    const dotMatch = /([A-Za-z0-9_]+)\.$/.exec(before.trim());
+    const trimmed = before.replace(/\s+$/, '');
+    const ifMatch = /(?:^|[^A-Za-z0-9_])IF\s*$/i.test(trimmed);
+    if (ifMatch) {
+      return allSuggestions;
+    }
+
+    const dotMatch = /([A-Za-z0-9_.]+)\.$/.exec(trimmed);
     const groupPrefix = dotMatch ? `${dotMatch[1]}.` : null;
 
     if (groupPrefix) {
-      return allSuggestions.filter((item) => String(item.label).startsWith(groupPrefix));
+      const filtered = allSuggestions.filter((item) => String(item.label).startsWith(groupPrefix));
+      return filtered.length > 0 ? filtered : allSuggestions;
     }
 
     if (before.trim().endsWith('.')) {
@@ -109,7 +116,7 @@ export function registerTTCompletion(monaco: any) {
   const languages = ['tt', 'plaintext', 'html', 'json', 'javascript', 'shell', 'perl'];
   languages.forEach((language) => {
     monaco.languages.registerCompletionItemProvider(language, {
-      triggerCharacters: ['{', '.'],
+      triggerCharacters: ['{', '[', '.', ' ', 'I'],
       provideCompletionItems: (model: any, position: any) => ({
         suggestions: getSuggestions(model, position),
       }),
