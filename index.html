@@ -6,6 +6,23 @@
     <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SHM Admin</title>
+    <script>
+      (() => {
+        if (window.location.pathname === '/login') {
+          return;
+        }
+        try {
+          const raw = localStorage.getItem('shm-auth-storage');
+          const parsed = raw ? JSON.parse(raw) : null;
+          const sessionId = parsed?.state?.sessionId || null;
+          if (!sessionId) {
+            window.location.replace('/login');
+          }
+        } catch (e) {
+          window.location.replace('/login');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
