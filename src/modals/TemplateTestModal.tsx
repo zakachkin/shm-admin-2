@@ -32,11 +32,19 @@ export default function TemplateTestModal({
       out += `\n${' '.repeat(indent)}`;
     };
 
-    const normalized = input.replace(/^\$VAR\d+\s*=\s*/i, (match) => `${match.trim()}\n`);
+    let startIndex = 0;
+    const prefixMatch = input.match(/^\$VAR\d+\s*=\s*/i);
+    if (prefixMatch) {
+      out += prefixMatch[0].trim();
+      out += '\n';
+      indent = indentStep;
+      out += ' '.repeat(indent);
+      startIndex = prefixMatch[0].length;
+    }
 
-    for (let i = 0; i < normalized.length; i += 1) {
-      const ch = normalized[i];
-      const next = normalized[i + 1];
+    for (let i = startIndex; i < input.length; i += 1) {
+      const ch = input[i];
+      const next = input[i + 1];
 
       if (inString) {
         out += ch;
