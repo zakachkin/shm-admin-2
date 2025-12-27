@@ -520,17 +520,23 @@ body {
 }
 
 .tt-editor .monaco-editor .suggest-widget {
-  padding-bottom: 22px;
+  padding-bottom: 36px;
 }
 
 .tt-editor .monaco-editor .suggest-widget::after {
   content: "Полное описание метода - Ctrl+Shift+H";
   position: absolute;
-  left: 10px;
-  bottom: 4px;
-  font-size: 11px;
-  color: var(--theme-content-text-muted);
-  opacity: 0.9;
+  left: 8px;
+  right: 8px;
+  bottom: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--theme-content-text);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  opacity: 0.95;
   pointer-events: none;
 }
 
