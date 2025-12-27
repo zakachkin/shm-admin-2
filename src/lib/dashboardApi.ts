@@ -12,6 +12,8 @@ export interface DashboardAnalytics {
   revenue: {
     totalRevenue: number;
     totalWithdraws: number;
+    totalBonusWithdraws: number;
+    totalRefunds: number;
     netRevenue: number;
   };
   services: {
@@ -25,19 +27,21 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - period);
-
+    
     const formatDate = (date: Date) => date.toISOString().split('T')[0];
     const start = formatDate(startDate);
     const stop = formatDate(endDate);
-
+    
+    console.log(`[Dashboard] Fetching data for period: ${start} to ${stop}`);
+    
     // Параллельные запросы к API - только данные за период
     const results = await Promise.allSettled([
-      shm_request('shm/v1/admin/user?limit=1'),
-      shm_request(`shm/v1/admin/user?start=${start}&stop=${stop}&field=created&limit=9999`),
-      shm_request(`shm/v1/admin/user/service?start=${start}&stop=${stop}&field=created&limit=5000`),
-      shm_request('shm/v1/admin/server?limit=1'),
-      shm_request(`shm/v1/admin/user/pay?start=${start}&stop=${stop}&field=date&limit=9999`),
-      shm_request(`shm/v1/admin/user/service/withdraw?start=${start}&stop=${stop}&field=create_date&limit=9999`),
+      shm_request('/shm/v1/admin/user?limit=1'),
+      shm_request(`/shm/v1/admin/user?start=${start}&stop=${stop}&field=created&limit=9999`),
+      shm_request(`/shm/v1/admin/user/service?start=${start}&stop=${stop}&field=created&limit=5000`),
+      shm_request('/shm/v1/admin/server?limit=1'),
+      shm_request(`/shm/v1/admin/user/pay?start=${start}&stop=${stop}&field=date&limit=9999`),
+      shm_request(`/shm/v1/admin/user/service/withdraw?start=${start}&stop=${stop}&field=create_date&limit=9999`),
     ]);
 
     const [
@@ -48,7 +52,7 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
       paymentsRes,
       withdrawsRes,
     ] = results.map((result) => (result.status === 'fulfilled' ? result.value : null));
-
+    
     // Нормализация данных
     const totalUsersCount = usersCountRes?.items || usersCountRes?.total || 0;
     const usersNew = usersNewRes ? normalizeListResponse(usersNewRes).data : [];
@@ -57,32 +61,47 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     const payments = paymentsRes ? normalizeListResponse(paymentsRes).data : [];
     const withdraws = withdrawsRes ? normalizeListResponse(withdrawsRes).data : [];
 
-    // Фильтрация "реальных" платежей (без manual)
-    const realPayments = payments.filter((p: any) =>
-      p.pay_system_id &&
-      p.pay_system_id !== '' &&
-      p.pay_system_id !== '0' &&
-      p.pay_system_id.toLowerCase() !== 'manual'
-    );
+    const isCompletedWithdraw = (withdraw: any) => {
+      const status = String(withdraw?.status || '').toUpperCase();
+      return status === 'COMPLETED';
+    };
+    const completedWithdraws = withdraws.filter(isCompletedWithdraw);
+    
+    const getPaymentAmount = (payment: any) => {
+      const amount = parseFloat(payment.money || 0);
+      return Number.isFinite(amount) ? amount : 0;
+    };
 
-    // Подсчеты
-    const totalRevenue = realPayments.reduce((sum: number, p: any) => sum + parseFloat(p.money || 0), 0);
-    const totalWithdraws = withdraws.reduce((sum: number, w: any) => sum + parseFloat(w.cost || 0), 0);
+    // Net revenue: manual payments included
+    const totalRevenue = payments.reduce((sum: number, p: any) => {
+      const amount = getPaymentAmount(p);
+      return sum + (amount > 0 ? amount : 0);
+    }, 0);
+    const totalRefunds = payments.reduce((sum: number, p: any) => {
+      const amount = getPaymentAmount(p);
+      return sum + (amount < 0 ? Math.abs(amount) : 0);
+    }, 0);
+    const totalWithdraws = completedWithdraws.reduce((sum: number, w: any) => sum + parseFloat(w.cost || 0), 0);
+    const totalBonusWithdraws = completedWithdraws.reduce((sum: number, w: any) => sum + parseFloat(w.bonus || 0), 0);
     const activeUserServices = userServicesNew.filter((us: any) => us.status === 'ACTIVE' || us.status === 'active').length;
-
+    
     // Группировка платежей по датам
     const paymentsByDate: Record<string, number> = {};
-    realPayments.forEach((p: any) => {
+    payments.forEach((p: any) => {
+      const amount = getPaymentAmount(p);
+      if (amount <= 0) {
+        return;
+      }
       const date = p.date.split('T')[0];
-      paymentsByDate[date] = (paymentsByDate[date] || 0) + parseFloat(p.money || 0);
+      paymentsByDate[date] = (paymentsByDate[date] || 0) + amount;
     });
-
+    
     // Статистика по статусам сервисов
     const servicesByStatus: Record<string, number> = {};
     userServicesNew.forEach((us: any) => {
       servicesByStatus[us.status] = (servicesByStatus[us.status] || 0) + 1;
     });
-
+    
     const result: DashboardAnalytics = {
       counts: {
         totalUsers: totalUsersCount,
@@ -90,20 +109,27 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
         totalServers: totalServersCount,
       },
       payments: {
-        timeline: Object.entries(paymentsByDate).map(([date, value]) => ({ date, value })),
+        timeline: Object.entries(paymentsByDate)
+          .sort(([a], [b]) => String(a).localeCompare(String(b)))
+          .map(([date, value]) => ({ date, value })),
       },
       revenue: {
         totalRevenue,
         totalWithdraws,
-        netRevenue: totalRevenue - totalWithdraws,
+        totalBonusWithdraws,
+        totalRefunds,
+        netRevenue: totalWithdraws - totalBonusWithdraws - totalRefunds,
       },
       services: {
         byStatus: Object.entries(servicesByStatus).map(([name, value]) => ({ name, value })),
       },
     };
+    
+    console.log('[Dashboard] Analytics fetched successfully');
     return result;
-
+    
   } catch (error) {
+    console.error('[Dashboard API] Error:', error);
     throw error;
   }
 }

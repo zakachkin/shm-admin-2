@@ -8,128 +8,198 @@ function normalizePrefixes(prefix: string | string[]): string[] {
   return Array.isArray(prefix) ? prefix : [prefix];
 }
 
-export function registerTTCompletion(monaco: any, enableForAllLanguages: boolean = false) {
-  if (!monaco) {
+type TokenAtPosition = {
+  token: string;
+  startColumn: number;
+  endColumn: number;
+};
+
+const methodDescriptions = new Map<string, string>();
+
+const addDescription = (key: string, description?: string) => {
+  if (!key || !description || methodDescriptions.has(key)) {
     return;
   }
+  methodDescriptions.set(key, description);
+};
 
-  // Всегда создаем темы заново для корректной работы
-  monaco.editor.defineTheme('tt-dark', {
-    base: 'vs-dark',
-    inherit: true,
-    rules: [
-      { token: 'keyword', foreground: '#569CD6', fontStyle: 'bold' },
-      { token: 'string', foreground: '#CE9178' },
-      { token: 'comment', foreground: '#6A9955', fontStyle: 'italic' },
-      { token: 'tag', foreground: '#92C5F8' },
-      { token: 'number', foreground: '#B5CEA8' },
-      { token: 'variable', foreground: '#9CDCFE' },
-      { token: 'operator', foreground: '#D4D4D4' },
-      { token: 'delimiter', foreground: '#DCDCAA' },
-      { token: 'text', foreground: '#D4D4D4' }
-    ],
-    colors: {}
-  });
+const collectLookupKeys = (prefix: string) => {
+  const trimmed = prefix.trim();
+  const keys = new Set<string>();
+  if (trimmed) {
+    keys.add(trimmed);
+  }
 
-  monaco.editor.defineTheme('tt-light', {
-    base: 'vs',
-    inherit: true,
-    rules: [
-      { token: 'keyword', foreground: '#0000FF', fontStyle: 'bold' },
-      { token: 'string', foreground: '#A31515' },
-      { token: 'comment', foreground: '#008000', fontStyle: 'italic' },
-      { token: 'tag', foreground: '#800080' },
-      { token: 'number', foreground: '#098658' },
-      { token: 'variable', foreground: '#001080' },
-      { token: 'operator', foreground: '#000000' },
-      { token: 'delimiter', foreground: '#0451A5' },
-      { token: 'text', foreground: '#000000' }
-    ],
-    colors: {}
-  });
+  const methodMatch = /tt_method\s*-\s*([A-Za-z0-9_.]+)/i.exec(trimmed);
+  if (methodMatch?.[1]) {
+    keys.add(methodMatch[1]);
+  }
 
-  // Проверяем, инициализирована ли уже система TT (только один раз для языка tt и UI)
-  if (!(monaco as any).__ttLanguageRegistered) {
-    (monaco as any).__ttLanguageRegistered = true;
+  const tokens = trimmed.match(/[A-Za-z0-9_.]+/g);
+  if (tokens && tokens.length > 0) {
+    keys.add(tokens[0]);
+    const lastToken = tokens[tokens.length - 1];
+    if (trimmed.includes(' ') || lastToken.includes('.')) {
+      keys.add(lastToken);
+    }
+  }
 
-    monaco.languages.register({
-      id: 'tt',
-      extensions: ['.tt', '.tt2'],
-      aliases: ['Template Toolkit', 'tt'],
-      mimetypes: ['text/x-tt']
+  return [...keys];
+};
+
+Object.values(ttSnippets).forEach((snippet) => {
+  const prefixes = normalizePrefixes(snippet.prefix);
+  prefixes.forEach((prefix) => {
+    collectLookupKeys(String(prefix)).forEach((key) => {
+      addDescription(key, snippet.description);
     });
+  });
+});
 
-    // Определяем токенизатор для синтаксической подсветки
+const isTokenChar = (char: string) => /[A-Za-z0-9_.]/.test(char);
+
+const getTokenAtPosition = (model: any, position: any): TokenAtPosition | null => {
+  const line = model.getLineContent(position.lineNumber);
+  if (!line) {
+    return null;
+  }
+
+  let index = position.column - 1;
+  if (index >= line.length) {
+    index = line.length - 1;
+  }
+  if (index < 0) {
+    return null;
+  }
+
+  if (!isTokenChar(line[index])) {
+    if (index === 0 || !isTokenChar(line[index - 1])) {
+      return null;
+    }
+    index -= 1;
+  }
+
+  let start = index;
+  while (start > 0 && isTokenChar(line[start - 1])) {
+    start -= 1;
+  }
+
+  let end = index;
+  while (end < line.length - 1 && isTokenChar(line[end + 1])) {
+    end += 1;
+  }
+
+  const token = line.slice(start, end + 1);
+  return {
+    token,
+    startColumn: start + 1,
+    endColumn: end + 2,
+  };
+};
+
+const registerTTHover = (monaco: any) => {
+  if (!monaco || (monaco as any).__ttHoverRegistered) {
+    return;
+  }
+  (monaco as any).__ttHoverRegistered = true;
+
+  const languages = ['tt', 'plaintext', 'html', 'json', 'javascript', 'shell', 'perl'];
+  languages.forEach((language) => {
+    monaco.languages.registerHoverProvider(language, {
+      provideHover: (model: any, position: any) => {
+        const token = getTokenAtPosition(model, position);
+        if (!token) {
+          return null;
+        }
+        const description = methodDescriptions.get(token.token);
+        if (!description) {
+          return null;
+        }
+        return {
+          range: new monaco.Range(position.lineNumber, token.startColumn, position.lineNumber, token.endColumn),
+          contents: [{ value: `**${token.token}**\n\n${description}` }],
+        };
+      },
+    });
+  });
+};
+
+export function registerTTMethodHelp(editor: any, monaco: any) {
+  if (!editor || (editor as any).__ttMethodHelpRegistered) {
+    return;
+  }
+  (editor as any).__ttMethodHelpRegistered = true;
+  registerTTHover(monaco);
+
+  editor.addAction({
+    id: 'tt.showMethodDescription',
+    label: 'Show method description',
+    keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyH],
+    run: () => {
+      editor.trigger('keyboard', 'editor.action.showHover', null);
+    },
+  });
+}
+
+export function registerTTCompletion(monaco: any) {
+  if (!monaco || (monaco as any).__ttCompletionRegistered) {
+    return;
+  }
+  (monaco as any).__ttCompletionRegistered = true;
+
+  if (!monaco.languages.getLanguages().some((lang: any) => lang.id === 'tt')) {
+    monaco.languages.register({ id: 'tt' });
+  }
+
+  if (!(monaco as any).__ttSyntaxRegistered) {
+    (monaco as any).__ttSyntaxRegistered = true;
     monaco.languages.setMonarchTokensProvider('tt', {
       tokenizer: {
         root: [
-          // Template Toolkit директивы - более точные паттерны
-          [/\{\{\s*(BLOCK|END|FOR|FOREACH|WHILE|IF|ELSIF|ELSE|UNLESS|SWITCH|CASE|DEFAULT|INCLUDE|PROCESS|INSERT|WRAPPER|FILTER|MACRO|CALL|SET|GET|TRY|CATCH|THROW|LAST|NEXT|STOP|RETURN|CLEAR|META|TAGS|PERL|RAWPERL)\b/, 'keyword'],
-          [/\[%\s*(BLOCK|END|FOR|FOREACH|WHILE|IF|ELSIF|ELSE|UNLESS|SWITCH|CASE|DEFAULT|INCLUDE|PROCESS|INSERT|WRAPPER|FILTER|MACRO|CALL|SET|GET|TRY|CATCH|THROW|LAST|NEXT|STOP|RETURN|CLEAR|META|TAGS|PERL|RAWPERL)\b/, 'keyword'],
-
-          // Template Toolkit переменные и выражения
-          [/\{\{[^}]*\}\}/, 'string'],
-          [/\[%[^%]*%\]/, 'string'],
-
-          // Комментарии Template Toolkit
-          [/\{\{#[^}]*#\}\}/, 'comment'],
-          [/\[%#[^%]*#%\]/, 'comment'],
-
-          // Переменные и операторы внутри TT блоков
-          [/\{\{/, { token: 'delimiter', bracket: '@open', next: '@ttBlock' }],
-          [/\[%/, { token: 'delimiter', bracket: '@open', next: '@ttBlock' }],
-
-          // HTML теги
-          [/<\/?[a-zA-Z][\w:.-]*\/?>/, 'tag'],
-
-          // Строки
-          [/"([^"\\]|\\.)*"/, 'string'],
-          [/'([^'\\]|\\.)*'/, 'string'],
-
-          // Числа
-          [/\b\d+(\.\d+)?\b/, 'number'],
-
-          // Обычный текст
-          [/[^{<\["']+/, 'text']
+          [/\{\{/, { token: 'delimiter.bracket', next: '@tt' }],
+          [/[^{}]+/, ''],
         ],
-
-        ttBlock: [
-          // Закрывающие теги
-          [/\}\}/, { token: 'delimiter', bracket: '@close', next: '@pop' }],
-          [/%\]/, { token: 'delimiter', bracket: '@close', next: '@pop' }],
-
-          // Ключевые слова внутри блоков
-          [/(BLOCK|END|FOR|FOREACH|WHILE|IF|ELSIF|ELSE|UNLESS|SWITCH|CASE|DEFAULT|INCLUDE|PROCESS|INSERT|WRAPPER|FILTER|MACRO|CALL|SET|GET|TRY|CATCH|THROW|LAST|NEXT|STOP|RETURN|CLEAR|META|TAGS|PERL|RAWPERL)\b/, 'keyword'],
-
-          // Операторы и пунктуация
-          [/[=!<>]=?/, 'operator'],
-          [/[+\-*\/]/, 'operator'],
-          [/[()[\]{}|]/, 'delimiter'],
-
-          // Переменные (начинающиеся с букв)
-          [/[a-zA-Z_]\w*/, 'variable'],
-
-          // Строки внутри блоков
+        tt: [
+          [/\}\}/, { token: 'delimiter.bracket', next: '@pop' }],
+          [/\s+/, 'white'],
+          [/#.*$/, 'comment'],
           [/"([^"\\]|\\.)*"/, 'string'],
           [/'([^'\\]|\\.)*'/, 'string'],
-
-          // Числа
           [/\b\d+(\.\d+)?\b/, 'number'],
-
-          // Пробелы
-          [/\s+/, 'white']
-        ]
-      }
+          [/\b(?:IF|ELSIF|ELSE|UNLESS|FOREACH|FOR|WHILE|END|BLOCK|CALL|SET|DEFAULT|INCLUDE|PROCESS|WRAPPER|FILTER|MACRO|USE|NEXT|LAST|STOP|RETURN|BREAK|CONTINUE|SWITCH|CASE|PERL|TRY|CATCH|FINAL|INSERT)\b/i, 'keyword'],
+          [/\b(?:true|false|undef|null)\b/i, 'constant'],
+          [/[=<>!~?:&|+\-*/%]+/, 'operator'],
+          [/[()[\],.]/, 'delimiter'],
+          [/@[A-Za-z_][\w.]*/, 'variable'],
+          [/[A-Za-z_][\w.]*/, 'identifier'],
+          [/./, ''],
+        ],
+      },
     });
 
-
+    monaco.languages.setLanguageConfiguration('tt', {
+      brackets: [
+        ['{', '}'],
+        ['[', ']'],
+        ['(', ')'],
+      ],
+      autoClosingPairs: [
+        { open: '{{', close: '}}' },
+        { open: '{', close: '}' },
+        { open: '[', close: ']' },
+        { open: '(', close: ')' },
+        { open: '"', close: '"', notIn: ['string', 'comment'] },
+        { open: "'", close: "'", notIn: ['string', 'comment'] },
+      ],
+      surroundingPairs: [
+        { open: '{', close: '}' },
+        { open: '[', close: ']' },
+        { open: '(', close: ')' },
+        { open: '"', close: '"' },
+        { open: "'", close: "'" },
+      ],
+    });
   }
-
-  // Очищаем старые провайдеры если они были
-  if ((monaco as any).__ttProviders) {
-    (monaco as any).__ttProviders.forEach((disposable: any) => disposable.dispose());
-  }
-  (monaco as any).__ttProviders = [];
 
   const allSuggestions = Object.entries(ttSnippets).flatMap(([key, snippet]) => {
     const body = normalizeBody(snippet.body);
@@ -147,19 +217,26 @@ export function registerTTCompletion(monaco: any, enableForAllLanguages: boolean
   const getSuggestions = (model: any, position: any) => {
     const lineContent = model.getLineContent(position.lineNumber);
     const before = lineContent.slice(0, position.column - 1);
-    const lastOpen = before.lastIndexOf('{{');
-    const lastClose = before.lastIndexOf('}}');
+    const lastOpen = Math.max(before.lastIndexOf('{{'), before.lastIndexOf('[%'));
+    const lastClose = Math.max(before.lastIndexOf('}}'), before.lastIndexOf('%]'));
     const inTag = lastOpen > lastClose;
 
     if (!inTag) {
       return [];
     }
 
-    const dotMatch = /([A-Za-z0-9_]+)\.$/.exec(before.trim());
+    const trimmed = before.replace(/\s+$/, '');
+    const ifMatch = /(?:^|[^A-Za-z0-9_])IF\s*$/i.test(trimmed);
+    if (ifMatch) {
+      return allSuggestions;
+    }
+
+    const dotMatch = /([A-Za-z0-9_.]+)\.$/.exec(trimmed);
     const groupPrefix = dotMatch ? `${dotMatch[1]}.` : null;
 
     if (groupPrefix) {
-      return allSuggestions.filter((item) => String(item.label).startsWith(groupPrefix));
+      const filtered = allSuggestions.filter((item) => String(item.label).startsWith(groupPrefix));
+      return filtered.length > 0 ? filtered : allSuggestions;
     }
 
     if (before.trim().endsWith('.')) {
@@ -169,18 +246,29 @@ export function registerTTCompletion(monaco: any, enableForAllLanguages: boolean
     return allSuggestions;
   };
 
-  // Определяем языки для регистрации провайдеров автодополнения
-  const languagesToRegister = enableForAllLanguages
-    ? ['tt', 'plaintext', 'html', 'json', 'javascript', 'shell', 'perl']
-    : ['tt']; // Только для 'tt' если не включен флаг для всех языков
+  const languages = ['tt', 'plaintext', 'html', 'json', 'javascript', 'shell', 'perl'];
+  languages.forEach((language) => {
+    monaco.languages.registerCompletionItemProvider(language, {
+      triggerCharacters: ['{', '[', '.', ' ', 'I'],
+      provideCompletionItems: (model: any, position: any) => {
+        const word = model.getWordUntilPosition(position);
+        const range = {
+          startLineNumber: position.lineNumber,
+          startColumn: word.startColumn,
+          endLineNumber: position.lineNumber,
+          endColumn: word.endColumn,
+        };
 
-  languagesToRegister.forEach((language) => {
-    const disposable = monaco.languages.registerCompletionItemProvider(language, {
-      triggerCharacters: ['{', '.'],
-      provideCompletionItems: (model: any, position: any) => ({
-        suggestions: getSuggestions(model, position),
-      }),
+        const suggestions = getSuggestions(model, position).map((item: any) => ({
+          ...item,
+          range,
+        }));
+
+        return { suggestions };
+      },
     });
-    (monaco as any).__ttProviders.push(disposable);
   });
+
+  registerTTHover(monaco);
 }
+

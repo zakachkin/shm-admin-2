@@ -9,9 +9,12 @@ import {
   TrendingUp,
   ArrowRight,
   DollarSign,
+  Plus,
   RefreshCw,
   ArrowUpRight,
   ArrowDownRight,
+  Gift,
+  RotateCcw,
 } from 'lucide-react';
 import { StatCard, StatCardGrid, ChartCard } from '../components/analytics';
 import { AreaLineChart, BarChart } from '../components/charts';
@@ -140,26 +143,40 @@ function Dashboard() {
       </StatCardGrid>
 
       {/* Финансовые метрики */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mt-6">
         <StatCard
-          title="Выручка (7 дней)"
+          title="Пополнения (7 дней)"
           value={analytics ? formatMoney(analytics.revenue.totalRevenue) : '...'}
-          icon={DollarSign}
+          icon={Plus}
           color="emerald"
           loading={loading}
         />
         <StatCard
           title="Списания (7 дней)"
           value={analytics ? formatMoney(analytics.revenue.totalWithdraws) : '...'}
+          icon={ArrowUpRight}
+          color="emerald"
+          loading={loading}
+        />
+        <StatCard
+          title="Бонусы (7 дней)"
+          value={analytics ? formatMoney(analytics.revenue.totalBonusWithdraws) : '...'}
           icon={ArrowDownRight}
           color="rose"
           loading={loading}
         />
         <StatCard
-          title="Чистая прибыль"
+          title="Возвраты (7 дней)"
+          value={analytics ? formatMoney(analytics.revenue.totalRefunds) : '...'}
+          icon={ArrowDownRight}
+          color="rose"
+          loading={loading}
+        />
+        <StatCard
+          title="Чистая выручка (7 дней)"
           value={analytics ? formatMoney(analytics.revenue.netRevenue) : '...'}
-          icon={analytics && analytics.revenue.netRevenue >= 0 ? ArrowUpRight : ArrowDownRight}
-          color={analytics && analytics.revenue.netRevenue >= 0 ? 'emerald' : 'rose'}
+          icon={DollarSign}
+          color="emerald"
           loading={loading}
         />
       </div>
