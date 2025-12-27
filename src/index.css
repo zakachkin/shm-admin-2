@@ -520,11 +520,10 @@ body {
 }
 
 .tt-editor .monaco-editor .suggest-widget {
-  margin-bottom: 0;
+  overflow: visible;
 }
 
-.tt-editor .monaco-editor .suggest-widget::after {
-  content: "Полное описание метода - Ctrl+Shift+H";
+.tt-editor .monaco-editor .suggest-widget .tt-suggest-panel {
   position: absolute;
   left: 0;
   right: 0;

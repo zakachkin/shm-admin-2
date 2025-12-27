@@ -131,12 +131,53 @@ export function registerTTMethodHelp(editor: any, monaco: any) {
   (editor as any).__ttMethodHelpRegistered = true;
   registerTTHover(monaco);
 
+  const showSuggestDescription = () => {
+    const domNode = editor.getDomNode();
+    const widget =
+      (domNode ? domNode.querySelector('.suggest-widget') : null) ||
+      document.querySelector('.monaco-editor .suggest-widget');
+    if (!widget) {
+      return false;
+    }
+
+    const row =
+      widget.querySelector('.monaco-list-row.focused') ||
+      widget.querySelector('.monaco-list-row[aria-selected="true"]') ||
+      widget.querySelector('.monaco-list-row');
+    if (!row) {
+      return false;
+    }
+
+    const labelNode =
+      row.querySelector('.label-name') ||
+      row.querySelector('.label-title') ||
+      row.querySelector('.monaco-highlighted-label');
+    const label = labelNode?.textContent?.trim() || '';
+    const lookup = label.replace(/\s+/g, ' ').trim();
+    const description =
+      methodDescriptions.get(lookup) ||
+      methodDescriptions.get(lookup.split(' ')[0]) ||
+      row.querySelector('.label-description')?.textContent?.trim() ||
+      'Описание недоступно';
+
+    let panel = widget.querySelector('.tt-suggest-panel') as HTMLElement | null;
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.className = 'tt-suggest-panel';
+      widget.appendChild(panel);
+    }
+    panel.textContent = description;
+    return true;
+  };
+
   editor.addAction({
     id: 'tt.showMethodDescription',
     label: 'Show method description',
     keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyH],
     run: () => {
-      editor.trigger('keyboard', 'editor.action.showHover', null);
+      if (!showSuggestDescription()) {
+        editor.trigger('keyboard', 'editor.action.showHover', null);
+      }
     },
   });
 
@@ -146,7 +187,9 @@ export function registerTTMethodHelp(editor: any, monaco: any) {
       if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.code === 'KeyH') {
         event.preventDefault();
         event.stopPropagation();
-        editor.trigger('keyboard', 'editor.action.showHover', null);
+        if (!showSuggestDescription()) {
+          editor.trigger('keyboard', 'editor.action.showHover', null);
+        }
       }
     };
     domNode.addEventListener('keydown', handler, true);
