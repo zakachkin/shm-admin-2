@@ -519,6 +519,21 @@ body {
   background-color: var(--theme-content-text-muted);
 }
 
+.tt-editor .monaco-editor .suggest-widget {
+  padding-bottom: 22px;
+}
+
+.tt-editor .monaco-editor .suggest-widget::after {
+  content: "Полное описание метода - Ctrl+Shift+H";
+  position: absolute;
+  left: 10px;
+  bottom: 4px;
+  font-size: 11px;
+  color: var(--theme-content-text-muted);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
 /* Toast overrides */
 .toaster-container {
   font-family: inherit !important;
