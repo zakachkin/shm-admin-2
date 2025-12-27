@@ -205,7 +205,10 @@ export function registerTTCompletion(monaco: any) {
     const body = normalizeBody(snippet.body);
     const prefixes = normalizePrefixes(snippet.prefix);
     return prefixes.map((prefix) => ({
-      label: prefix,
+      label: {
+        label: String(prefix),
+        description: snippet.description || key,
+      },
       kind: monaco.languages.CompletionItemKind.Snippet,
       detail: snippet.description || key,
       documentation: snippet.description || key,
