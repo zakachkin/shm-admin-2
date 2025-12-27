@@ -139,6 +139,23 @@ export function registerTTMethodHelp(editor: any, monaco: any) {
       editor.trigger('keyboard', 'editor.action.showHover', null);
     },
   });
+
+  const domNode = editor.getDomNode();
+  if (domNode && !(editor as any).__ttMethodHelpKeyHandler) {
+    const handler = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.code === 'KeyH') {
+        event.preventDefault();
+        event.stopPropagation();
+        editor.trigger('keyboard', 'editor.action.showHover', null);
+      }
+    };
+    domNode.addEventListener('keydown', handler, true);
+    (editor as any).__ttMethodHelpKeyHandler = handler;
+    editor.onDidDispose(() => {
+      domNode.removeEventListener('keydown', handler, true);
+      (editor as any).__ttMethodHelpKeyHandler = null;
+    });
+  }
 }
 
 export function registerTTCompletion(monaco: any) {
