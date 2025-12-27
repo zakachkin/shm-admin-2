@@ -529,6 +529,8 @@ body {
   right: 0;
   top: 100%;
   width: 100%;
+  margin-left: -1px;
+  margin-right: -1px;
   box-sizing: border-box;
   padding: 6px 10px;
   font-size: 12px;
