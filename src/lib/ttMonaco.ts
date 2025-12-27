@@ -199,6 +199,22 @@ export function registerTTMethodHelp(editor: any, monaco: any) {
       (editor as any).__ttMethodHelpKeyHandler = null;
     });
   }
+
+  if (domNode && !(editor as any).__ttSuggestSelectionHandler) {
+    const handler = () => {
+      showSuggestDescription();
+    };
+    domNode.addEventListener('keyup', handler, true);
+    domNode.addEventListener('click', handler, true);
+    domNode.addEventListener('mousemove', handler, true);
+    (editor as any).__ttSuggestSelectionHandler = handler;
+    editor.onDidDispose(() => {
+      domNode.removeEventListener('keyup', handler, true);
+      domNode.removeEventListener('click', handler, true);
+      domNode.removeEventListener('mousemove', handler, true);
+      (editor as any).__ttSuggestSelectionHandler = null;
+    });
+  }
 }
 
 export function registerTTCompletion(monaco: any) {
