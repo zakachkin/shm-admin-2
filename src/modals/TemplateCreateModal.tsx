@@ -4,7 +4,7 @@ import { Plus, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Editor from '@monaco-editor/react';
 import JsonEditor from '../components/JsonEditor';
-import { registerTTCompletion } from '../lib/ttMonaco';
+import { registerTTCompletion, registerTTMethodHelp } from '../lib/ttMonaco';
 import { addClipboardActions } from '../lib/monacoClipboard';
 
 interface TemplateCreateModalProps {
@@ -156,6 +156,9 @@ export default function TemplateCreateModal({
             ))}
           </div>
         </div>
+        <div className="text-xs mb-2" style={{ color: 'var(--theme-content-text-muted)' }}>
+          Подсказка: полное описание метода - Ctrl+Shift+H
+        </div>
 
         {}
         <div className="flex items-start gap-3">
@@ -183,6 +186,7 @@ export default function TemplateCreateModal({
               onMount={(editor, monaco) => {
                 editorRef.current = editor;
                 registerTTCompletion(monaco);
+                registerTTMethodHelp(editor, monaco);
                 addClipboardActions(editor, monaco);
               }}
             />

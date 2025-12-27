@@ -9,7 +9,7 @@ import TemplateTestModal from './TemplateTestModal';
 import { shm_request } from '../lib/shm_request';
 import { useThemeStore } from '../store/themeStore';
 import TemplateSidebar from '../components/TemplateEditor/TemplateSidebar';
-import { registerTTCompletion } from '../lib/ttMonaco';
+import { registerTTCompletion, registerTTMethodHelp } from '../lib/ttMonaco';
 import { addClipboardActions } from '../lib/monacoClipboard';
 
 interface TemplateModalProps {
@@ -912,9 +912,11 @@ export default function TemplateModal({
                         AUTO
                       </button>
                     </div>
+                  <div className="text-xs mb-3" style={{ color: 'var(--theme-content-text-muted)' }}>
+                    Подсказка: полное описание метода - Ctrl+Shift+H
                   </div>
-
-                  {}
+                  </div>
+{}
                   <div className="flex-1 flex items-start gap-3 mb-3 min-h-0">
                     <div className="flex-1 border rounded overflow-hidden h-full" style={{ borderColor: 'var(--theme-input-border)', backgroundColor: 'var(--theme-input-bg)' }}>
                       <Editor
@@ -937,13 +939,13 @@ export default function TemplateModal({
                         onMount={(editor, monaco) => {
                           editorRef.current = editor;
                           registerTTCompletion(monaco);
+                          registerTTMethodHelp(editor, monaco);
                           addClipboardActions(editor, monaco);
                         }}
                       />
                     </div>
                   </div>
-
-                  {}
+{}
                   <div className="flex items-start gap-3">
                     <label className="w-24 text-sm font-medium shrink-0 pt-2" style={{ color: 'var(--theme-content-text-muted)' }}>
                       Settings
@@ -1037,9 +1039,11 @@ export default function TemplateModal({
                 AUTO
               </button>
             </div>
+          <div className="text-xs mb-2" style={{ color: 'var(--theme-content-text-muted)' }}>
+            Подсказка: полное описание метода - Ctrl+Shift+H
           </div>
-
-          {}
+          </div>
+{}
           <div className="flex items-start gap-3">
             <label className="w-24 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
               Р”Р°РЅРЅС‹Рµ
@@ -1065,13 +1069,13 @@ export default function TemplateModal({
                 onMount={(editor, monaco) => {
                   editorRef.current = editor;
                   registerTTCompletion(monaco);
-                          addClipboardActions(editor, monaco);
+                  registerTTMethodHelp(editor, monaco);
+                  addClipboardActions(editor, monaco);
                 }}
               />
             </div>
           </div>
-
-          {}
+{}
           <div className="flex items-start gap-3">
             <label className="w-24 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
               Settings
