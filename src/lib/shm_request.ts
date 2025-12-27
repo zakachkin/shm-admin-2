@@ -1,7 +1,25 @@
 import { useAuthStore } from '../store/authStore';
 
+const RATE_LIMIT_MS = 200;
+let lastRequestTime = 0;
+let rateLimitChain: Promise<void> = Promise.resolve();
+
+const scheduleRequest = () => {
+  rateLimitChain = rateLimitChain.then(async () => {
+    const now = Date.now();
+    const wait = Math.max(0, RATE_LIMIT_MS - (now - lastRequestTime));
+    if (wait > 0) {
+      await new Promise((resolve) => setTimeout(resolve, wait));
+    }
+    lastRequestTime = Date.now();
+  });
+  return rateLimitChain;
+};
+
 export async function shm_request<T = any>(url: string, options?: RequestInit): Promise<T> {
   const sessionId = useAuthStore.getState().getSessionId();
+
+  await scheduleRequest();
 
   const response = await fetch(url, {
     credentials: 'include',
@@ -40,6 +58,8 @@ export async function shm_request_with_status<T = any>(
   options?: RequestInit
 ): Promise<{ status: number; data: T }> {
   const sessionId = useAuthStore.getState().getSessionId();
+
+  await scheduleRequest();
 
   const response = await fetch(url, {
     credentials: 'include',
