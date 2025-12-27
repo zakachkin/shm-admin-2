@@ -31,10 +31,19 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
 
     set({ loading: true });
     try {
-      // Получаем настройки компании из SHM API
-      const result = await shm_request('shm/v1/company');
-      if (result.status === 200 && result.data?.[0]) {
-        const company = result.data[0];
+      // Получаем настройки компании из SHM API (admin/config)
+      const result = await shm_request('shm/v1/admin/config?key=company');
+      const configItem = normalizeListResponse(result).data?.[0];
+      const rawValue = configItem?.value ?? configItem?.data ?? configItem;
+      let company = rawValue;
+      if (typeof rawValue === 'string') {
+        try {
+          company = JSON.parse(rawValue);
+        } catch {
+          company = null;
+        }
+      }
+      if (company?.name || company?.title) {
         const branding = {
           name: company.name || DEFAULT_BRANDING.name,
           logoUrl: company.logoUrl || DEFAULT_BRANDING.logoUrl,
