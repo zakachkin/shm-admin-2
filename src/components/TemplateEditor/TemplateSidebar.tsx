@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { FileText, Search, Loader2, Plus } from 'lucide-react';
 import { shm_request } from '../../lib/shm_request';
 
@@ -14,12 +14,14 @@ interface TemplateSidebarProps {
   activeTemplateId?: string;
   onTemplateSelect: (template: Template) => void;
   onNewTemplate: () => void;
+  searchInputRef?: React.RefObject<HTMLInputElement>;
 }
 
 export default function TemplateSidebar({
   activeTemplateId,
   onTemplateSelect,
   onNewTemplate,
+  searchInputRef,
 }: TemplateSidebarProps) {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(false);
@@ -127,6 +129,7 @@ export default function TemplateSidebar({
           />
           <input
             type="text"
+            ref={searchInputRef}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Поиск..."
