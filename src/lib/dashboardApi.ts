@@ -49,7 +49,7 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     const results = await Promise.allSettled([
       shm_request('/shm/v1/admin/user?limit=1'),
       shm_request(`/shm/v1/admin/user?start=${start}&stop=${stop}&field=created&limit=9999`),
-      shm_request(`/shm/v1/admin/user/service?start=${start}&stop=${stop}&field=created&limit=5000`),
+      shm_request_with_status(`/shm/v1/admin/user/service?start=${start}&stop=${stop}&field=created&limit=5000`),
       shm_request_with_status('/shm/v1/admin/server?limit=1'),
       shm_request(`/shm/v1/admin/user/pay?start=${start}&stop=${stop}&field=date&limit=9999`),
       shm_request(`/shm/v1/admin/user/service/withdraw?start=${start}&stop=${stop}&field=create_date&limit=9999`),
@@ -67,7 +67,9 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     // Нормализация данных
     const totalUsersCount = usersCountRes?.items || usersCountRes?.total || 0;
     const usersNew = usersNewRes ? normalizeListResponse(usersNewRes).data : [];
-    const userServicesNew = userServicesNewRes ? normalizeListResponse(userServicesNewRes).data : [];
+    const userServicesPayload =
+      userServicesNewRes && userServicesNewRes.status === 429 ? null : userServicesNewRes?.data;
+    const userServicesNew = userServicesPayload ? normalizeListResponse(userServicesPayload).data : [];
     const serversCountPayload =
       serversCountRes && serversCountRes.status === 429 ? null : serversCountRes?.data;
     const totalServersCount = serversCountPayload?.items || serversCountPayload?.total || 0;
