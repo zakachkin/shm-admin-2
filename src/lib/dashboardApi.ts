@@ -61,11 +61,7 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     const payments = paymentsRes ? normalizeListResponse(paymentsRes).data : [];
     const withdraws = withdrawsRes ? normalizeListResponse(withdrawsRes).data : [];
 
-    const isCompletedWithdraw = (withdraw: any) => {
-      const status = String(withdraw?.status || '').toUpperCase();
-      return status === 'COMPLETED';
-    };
-    const completedWithdraws = withdraws.filter(isCompletedWithdraw);
+    const completedWithdraws = withdraws.filter((withdraw: any) => withdraw?.end_data != null);
     
     const getPaymentAmount = (payment: any) => {
       const amount = parseFloat(payment.money || 0);
