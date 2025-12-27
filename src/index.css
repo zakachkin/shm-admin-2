@@ -525,12 +525,10 @@ body {
 
 .tt-editor .monaco-editor .suggest-widget .tt-suggest-panel {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: -1px;
+  right: auto;
   top: 100%;
-  width: 100%;
-  margin-left: -1px;
-  margin-right: -1px;
+  width: calc(100% + 2px);
   box-sizing: border-box;
   padding: 6px 10px;
   font-size: 12px;
