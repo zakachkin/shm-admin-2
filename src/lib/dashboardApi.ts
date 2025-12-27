@@ -1,4 +1,4 @@
-import { shm_request, normalizeListResponse } from './shm_request';
+import { shm_request, normalizeListResponse, shm_request_with_status } from './shm_request';
 
 export interface DashboardAnalytics {
   counts: {
@@ -46,7 +46,7 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
       shm_request('shm/v1/admin/user?limit=1'),
       shm_request(`shm/v1/admin/user?start=${start}&stop=${stop}&field=created&limit=9999`),
       shm_request(`shm/v1/admin/user/service?start=${start}&stop=${stop}&field=created&limit=5000`),
-      shm_request('shm/v1/admin/server?limit=1'),
+      shm_request_with_status('shm/v1/admin/server?limit=1'),
       shm_request(`shm/v1/admin/user/pay?start=${start}&stop=${stop}&field=date&limit=9999`),
       shm_request(`shm/v1/admin/user/service/withdraw?start=${start}&stop=${stop}&field=create_date&limit=9999`),
     ]);
@@ -64,7 +64,9 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     const totalUsersCount = usersCountRes?.items || usersCountRes?.total || 0;
     const usersNew = usersNewRes ? normalizeListResponse(usersNewRes).data : [];
     const userServicesNew = userServicesNewRes ? normalizeListResponse(userServicesNewRes).data : [];
-    const totalServersCount = serversCountRes?.items || serversCountRes?.total || 0;
+    const serversCountPayload =
+      serversCountRes && serversCountRes.status === 429 ? null : serversCountRes?.data;
+    const totalServersCount = serversCountPayload?.items || serversCountPayload?.total || 0;
     const payments = paymentsRes ? normalizeListResponse(paymentsRes).data : [];
     const withdraws = withdrawsRes ? normalizeListResponse(withdrawsRes).data : [];
 

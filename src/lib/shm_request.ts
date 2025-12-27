@@ -37,6 +37,39 @@ export async function shm_request<T = any>(url: string, options?: RequestInit): 
 
 }
 
+export async function shm_request_with_status<T = any>(
+  url: string,
+  options?: RequestInit
+): Promise<{ status: number; data: T }> {
+  const sessionId = useAuthStore.getState().getSessionId();
+
+  const response = await fetch(url, {
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(sessionId ? { 'session-id': sessionId } : {}),
+      ...(options?.headers || {}),
+    },
+    ...options,
+  });
+
+  if (response.status === 401) {
+    useAuthStore.getState().logout();
+    window.location.href = '/login';
+    throw new Error('Unauthorized');
+  }
+
+  const contentType = response.headers.get('content-type');
+  let data: any;
+  if (contentType?.includes('application/json')) {
+    data = await response.json();
+  } else {
+    data = await response.text();
+  }
+
+  return { status: response.status, data };
+}
+
 export interface ApiListResponse<T = any> {
   data: T[];
   total: number;
