@@ -201,35 +201,27 @@ export function registerTTMethodHelp(editor: any, monaco: any) {
   }
 
   if (domNode && !(editor as any).__ttSuggestSelectionHandler) {
-    const handler = () => {
-      showSuggestDescription();
+    let rafId: number | null = null;
+    const schedule = () => {
+      if (rafId != null) {
+        return;
+      }
+      rafId = window.requestAnimationFrame(() => {
+        rafId = null;
+        showSuggestDescription();
+      });
     };
-    domNode.addEventListener('keyup', handler, true);
-    domNode.addEventListener('click', handler, true);
-    domNode.addEventListener('mousemove', handler, true);
-    (editor as any).__ttSuggestSelectionHandler = handler;
+    domNode.addEventListener('keyup', schedule, true);
+    domNode.addEventListener('click', schedule, true);
+    (editor as any).__ttSuggestSelectionHandler = schedule;
     editor.onDidDispose(() => {
-      domNode.removeEventListener('keyup', handler, true);
-      domNode.removeEventListener('click', handler, true);
-      domNode.removeEventListener('mousemove', handler, true);
+      domNode.removeEventListener('keyup', schedule, true);
+      domNode.removeEventListener('click', schedule, true);
+      if (rafId != null) {
+        window.cancelAnimationFrame(rafId);
+        rafId = null;
+      }
       (editor as any).__ttSuggestSelectionHandler = null;
-    });
-  }
-
-  if (domNode && !(editor as any).__ttSuggestObserver) {
-    const observer = new MutationObserver(() => {
-      showSuggestDescription();
-    });
-    observer.observe(domNode, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      characterData: true,
-    });
-    (editor as any).__ttSuggestObserver = observer;
-    editor.onDidDispose(() => {
-      observer.disconnect();
-      (editor as any).__ttSuggestObserver = null;
     });
   }
 }
