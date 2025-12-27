@@ -25,6 +25,7 @@ COPY entry.sh /entry.sh
 RUN chmod +x /entry.sh
 
 COPY --from=builder /app/dist /app
+COPY --from=builder /app/swagger /app/swagger
 
 WORKDIR /app
 
