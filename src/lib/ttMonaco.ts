@@ -215,6 +215,23 @@ export function registerTTMethodHelp(editor: any, monaco: any) {
       (editor as any).__ttSuggestSelectionHandler = null;
     });
   }
+
+  if (domNode && !(editor as any).__ttSuggestObserver) {
+    const observer = new MutationObserver(() => {
+      showSuggestDescription();
+    });
+    observer.observe(domNode, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      characterData: true,
+    });
+    (editor as any).__ttSuggestObserver = observer;
+    editor.onDidDispose(() => {
+      observer.disconnect();
+      (editor as any).__ttSuggestObserver = null;
+    });
+  }
 }
 
 export function registerTTCompletion(monaco: any) {
