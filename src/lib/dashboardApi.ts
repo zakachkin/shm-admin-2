@@ -64,8 +64,9 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
       p.pay_system_id !== '0' &&
       p.pay_system_id.toLowerCase() !== 'manual'
     );
-    const completedWithdraws = withdraws.filter((withdraw: any) => withdraw?.end_data != null);
-
+    const completedWithdraws = withdraws.filter(
+      (withdraw: any) => withdraw?.end_data != null || withdraw?.end_date != null
+    );
     const getPaymentAmount = (payment: any) => {
       const amount = parseFloat(payment.money || 0);
       return Number.isFinite(amount) ? amount : 0;
