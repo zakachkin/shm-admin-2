@@ -64,17 +64,23 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
       p.pay_system_id !== '0' &&
       p.pay_system_id.toLowerCase() !== 'manual'
     );
+    const completedWithdraws = withdraws.filter((withdraw: any) => withdraw?.end_data != null);
+
+    const getPaymentAmount = (payment: any) => {
+      const amount = parseFloat(payment.money || 0);
+      return Number.isFinite(amount) ? amount : 0;
+    };
 
     // Подсчеты
-    const totalRevenue = realPayments.reduce((sum: number, p: any) => sum + parseFloat(p.money || 0), 0);
-    const totalWithdraws = withdraws.reduce((sum: number, w: any) => sum + parseFloat(w.cost || 0), 0);
+    const totalRevenue = realPayments.reduce((sum: number, p: any) => sum + getPaymentAmount(p), 0);
+    const totalWithdraws = completedWithdraws.reduce((sum: number, w: any) => sum + parseFloat(w.cost || 0), 0);
     const activeUserServices = userServicesNew.filter((us: any) => us.status === 'ACTIVE' || us.status === 'active').length;
 
     // Группировка платежей по датам
     const paymentsByDate: Record<string, number> = {};
     realPayments.forEach((p: any) => {
       const date = p.date.split('T')[0];
-      paymentsByDate[date] = (paymentsByDate[date] || 0) + parseFloat(p.money || 0);
+      paymentsByDate[date] = (paymentsByDate[date] || 0) + getPaymentAmount(p);
     });
 
     // Статистика по статусам сервисов
