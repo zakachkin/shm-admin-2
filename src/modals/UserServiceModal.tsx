@@ -132,16 +132,14 @@ export default function UserServiceModal({
     try {
       try {
         await applyChange('shm/v1/admin/user/service', {
-          user_id: formData.user_id,
-          user_service_id: formData.user_service_id,
+          ...formData,
           service_id: pendingServiceId,
           finish_active: 0,
         });
       } catch (error) {
         try {
           await applyChange('shm/v1/admin/user/service', {
-            user_id: formData.user_id,
-            user_service_id: formData.user_service_id,
+            ...formData,
             tariff: pendingServiceId,
             finish_active: 0,
           });
