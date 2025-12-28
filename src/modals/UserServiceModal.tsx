@@ -377,7 +377,7 @@ export default function UserServiceModal({
                   color: 'var(--theme-button-secondary-text)',
                 }}
               >
-                Сменить сразу
+                Сменить сейчас
               </button>
               {changingService && (
                 <div className="text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
