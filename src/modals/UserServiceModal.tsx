@@ -49,6 +49,7 @@ export default function UserServiceModal({
   const [changingService, setChangingService] = useState(false);
   const [pendingServiceId, setPendingServiceId] = useState<number | null>(null);
   const [pendingServiceName, setPendingServiceName] = useState<string | null>(null);
+  const [pendingServiceName, setPendingServiceName] = useState<string | null>(null);
   const [confirmChangeOpen, setConfirmChangeOpen] = useState(false);
 
   const statusMenuRef = useRef<HTMLDivElement>(null);
@@ -103,6 +104,12 @@ export default function UserServiceModal({
 
   const handleServiceChange = (serviceId: number | null) => {
     setPendingServiceId(serviceId);
+    if (!serviceId) {
+      setPendingServiceName(null);
+      return;
+    }
+    const nextService = services.find((item) => item.service_id === serviceId);
+    setPendingServiceName(nextService?.name ?? null);
   };
 
   const handleInstantChangeService = async () => {
@@ -379,8 +386,7 @@ export default function UserServiceModal({
           <div className="flex-1">
             <ServiceSelect
               value={formData.service_id}
-              readonly={false}
-              onChange={() => {}}
+              readonly={true}
               onServiceUpdated={onRefresh}
             />
             {changingService && (
@@ -533,7 +539,7 @@ export default function UserServiceModal({
               const val = e.target.value;
               const nextValue = val === '' ? null : val === '-1' ? -1 : Number(val);
               handleChange('next', nextValue);
-              setPendingServiceId(typeof nextValue === 'number' && nextValue > 0 ? nextValue : null);
+              handleServiceChange(typeof nextValue === 'number' && nextValue > 0 ? nextValue : null);
             }}
             className="flex-1 px-3 py-2 text-sm rounded border"
             style={inputStyles}
@@ -586,7 +592,7 @@ export default function UserServiceModal({
           await handleInstantChangeService();
         }}
         title="Сменить тариф сейчас"
-        message={`Сменить тариф на ${pendingServiceId ? `#${pendingServiceId}` : ''} без ожидания окончания текущего?`}
+        message={`Сменить тариф на ${pendingServiceName ? `"${pendingServiceName}"` : pendingServiceId ? `#${pendingServiceId}` : ''} без ожидания окончания текущего?`}
         confirmText="Сменить"
         cancelText="Отмена"
         variant="warning"
