@@ -36,7 +36,7 @@ export default function ServiceSelect({
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
   useEffect(() => {
-    if (readonly && value && !selectedService) {
+    if (readonly && value && (!selectedService || selectedService.service_id !== value)) {
       setLoadingService(true);
       onLoadingChange?.(true);
 
@@ -53,6 +53,9 @@ export default function ServiceSelect({
           setLoadingService(false);
           onLoadingChange?.(false);
         });
+    }
+    if (readonly && !value) {
+      setSelectedService(null);
     }
   }, [value, readonly]);
 
