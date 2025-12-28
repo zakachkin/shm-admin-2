@@ -129,7 +129,7 @@ export default function UserServiceModal({
         dry_run: '0',
         format: 'default',
       });
-      await shm_request(`/shm/v1/template/Admin/change_tariff?${params.toString()}`);
+      await shm_request(`/shm/v1/template/Admins/user_change_tariff?${params.toString()}`);
 
       const verify = await shm_request(
         `shm/v1/admin/user/service?user_id=${formData.user_id}&user_service_id=${formData.user_service_id}&limit=1`,
