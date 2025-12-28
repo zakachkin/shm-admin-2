@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Settings, Copy, Check } from 'lucide-react';
+import toast from 'react-hot-toast';
 import Modal from './Modal';
 import JSONEditor from 'jsoneditor';
 import 'jsoneditor/dist/jsoneditor.css';
@@ -106,6 +107,36 @@ export default function JsonEditor({
     }
   };
 
+  const handlePaste = async () => {
+    if (readonly) {
+      return;
+    }
+
+    let text = '';
+    try {
+      if (navigator.clipboard?.readText) {
+        text = await navigator.clipboard.readText();
+      }
+    } catch {
+    }
+
+    if (!text) {
+      const manual = window.prompt('Вставьте JSON:', '');
+      if (manual === null) {
+        return;
+      }
+      text = manual;
+    }
+
+    try {
+      const parsed = JSON.parse(text);
+      dataRef.current = parsed;
+      editorRef.current?.set(parsed);
+    } catch {
+      toast.error('Невалидный JSON');
+    }
+  };
+
   const getPreview = () => {
     if (data === null || data === undefined) return '';
     try {
@@ -183,6 +214,20 @@ export default function JsonEditor({
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 {copied ? 'Скопировано' : 'Копировать'}
               </button>
+              {!readonly && (
+                <button
+                  type="button"
+                  onClick={handlePaste}
+                  className="px-3 py-2 rounded border"
+                  style={{
+                    backgroundColor: 'var(--bg-secondary)',
+                    borderColor: 'var(--border-color)',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  Вставить
+                </button>
+              )}
             </div>
             <div className="flex gap-2">
               <button
