@@ -46,6 +46,7 @@ export default function UserServiceModal({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const [withdrawData, setWithdrawData] = useState<Record<string, any> | null>(null);
+  const [changingService, setChangingService] = useState(false);
 
   const statusMenuRef = useRef<HTMLDivElement>(null);
 
@@ -95,6 +96,44 @@ export default function UserServiceModal({
 
   const handleChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleServiceChange = async (serviceId: number | null, service: any) => {
+    if (!serviceId || serviceId === formData.service_id) {
+      return;
+    }
+
+    if (!formData.user_service_id || !formData.user_id) {
+      toast.error('Недостаточно данных для смены тарифа');
+      return;
+    }
+
+    const previousServiceId = formData.service_id;
+    setChangingService(true);
+    try {
+      await shm_request('shm/v1/admin/user/service', {
+        method: 'POST',
+        body: JSON.stringify({
+          user_id: formData.user_id,
+          user_service_id: formData.user_service_id,
+          service_id: serviceId,
+          finish_active: 0,
+        }),
+      });
+
+      setFormData(prev => ({
+        ...prev,
+        service_id: serviceId,
+        name: service?.name ?? prev.name,
+      }));
+      toast.success('Тариф изменен');
+      onRefresh?.();
+    } catch (error) {
+      setFormData(prev => ({ ...prev, service_id: previousServiceId }));
+      toast.error('Не удалось сменить тариф');
+    } finally {
+      setChangingService(false);
+    }
   };
 
   const handleSave = async () => {
@@ -317,9 +356,15 @@ export default function UserServiceModal({
           <div className="flex-1">
             <ServiceSelect
               value={formData.service_id}
-              readonly
+              readonly={false}
+              onChange={handleServiceChange}
               onServiceUpdated={onRefresh}
             />
+            {changingService && (
+              <div className="mt-1 text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
+                Меняем тариф...
+              </div>
+            )}
           </div>
         </div>
 
