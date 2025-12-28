@@ -283,19 +283,21 @@ export default function UserServiceModal({
   const renderFooter = () => (
     <div className="flex justify-between w-full">
       <div>
-        <button
-          type="button"
-          onClick={() => setConfirmChangeOpen(true)}
-          disabled={changingService || !pendingServiceId || pendingServiceId === formData.service_id}
-          className="px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50"
-          style={{
-            backgroundColor: 'var(--theme-button-secondary-bg)',
-            color: 'var(--theme-button-secondary-text)',
-            border: '1px solid var(--theme-button-secondary-border)',
-          }}
-        >
-          Сменить сейчас
-        </button>
+        {pendingServiceId && pendingServiceId !== formData.service_id && (
+          <button
+            type="button"
+            onClick={() => setConfirmChangeOpen(true)}
+            disabled={changingService}
+            className="px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50"
+            style={{
+              backgroundColor: 'var(--theme-button-secondary-bg)',
+              color: 'var(--theme-button-secondary-text)',
+              border: '1px solid var(--theme-button-secondary-border)',
+            }}
+          >
+            Сменить сейчас
+          </button>
+        )}
         {onDelete && canDelete && (
           <button
             onClick={handleDelete}
