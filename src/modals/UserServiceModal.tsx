@@ -47,6 +47,7 @@ export default function UserServiceModal({
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const [withdrawData, setWithdrawData] = useState<Record<string, any> | null>(null);
   const [changingService, setChangingService] = useState(false);
+  const [pendingServiceId, setPendingServiceId] = useState<number | null>(null);
 
   const statusMenuRef = useRef<HTMLDivElement>(null);
 
@@ -98,8 +99,12 @@ export default function UserServiceModal({
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleServiceChange = async (serviceId: number | null, service: any) => {
-    if (!serviceId || serviceId === formData.service_id) {
+  const handleServiceChange = (serviceId: number | null) => {
+    setPendingServiceId(serviceId);
+  };
+
+  const handleInstantChangeService = async () => {
+    if (!pendingServiceId || pendingServiceId === formData.service_id) {
       return;
     }
 
@@ -116,16 +121,16 @@ export default function UserServiceModal({
         body: JSON.stringify({
           user_id: formData.user_id,
           user_service_id: formData.user_service_id,
-          service_id: serviceId,
+          service_id: pendingServiceId,
           finish_active: 0,
         }),
       });
 
       setFormData(prev => ({
         ...prev,
-        service_id: serviceId,
-        name: service?.name ?? prev.name,
+        service_id: pendingServiceId,
       }));
+      setPendingServiceId(null);
       toast.success('Тариф изменен');
       onRefresh?.();
     } catch (error) {
@@ -355,16 +360,31 @@ export default function UserServiceModal({
           </label>
           <div className="flex-1">
             <ServiceSelect
-              value={formData.service_id}
+              value={pendingServiceId ?? formData.service_id}
               readonly={false}
-              onChange={handleServiceChange}
+              onChange={(serviceId) => handleServiceChange(serviceId)}
               onServiceUpdated={onRefresh}
             />
-            {changingService && (
-              <div className="mt-1 text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
-                Меняем тариф...
-              </div>
-            )}
+            <div className="mt-2 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleInstantChangeService}
+                disabled={changingService || !pendingServiceId || pendingServiceId === formData.service_id}
+                className="px-3 py-2 rounded border text-sm disabled:opacity-50"
+                style={{
+                  backgroundColor: 'var(--theme-button-secondary-bg)',
+                  borderColor: 'var(--theme-button-secondary-border)',
+                  color: 'var(--theme-button-secondary-text)',
+                }}
+              >
+                Сменить сразу
+              </button>
+              {changingService && (
+                <div className="text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
+                  Меняем тариф...
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
