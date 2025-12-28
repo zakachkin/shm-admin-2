@@ -49,7 +49,6 @@ export default function UserServiceModal({
   const [changingService, setChangingService] = useState(false);
   const [pendingServiceId, setPendingServiceId] = useState<number | null>(null);
   const [pendingServiceName, setPendingServiceName] = useState<string | null>(null);
-  const [pendingServiceName, setPendingServiceName] = useState<string | null>(null);
   const [confirmChangeOpen, setConfirmChangeOpen] = useState(false);
 
   const statusMenuRef = useRef<HTMLDivElement>(null);
