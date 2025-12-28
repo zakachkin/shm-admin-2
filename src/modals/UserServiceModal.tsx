@@ -121,7 +121,6 @@ export default function UserServiceModal({
       return;
     }
 
-    const previousServiceId = formData.service_id;
     setChangingService(true);
     try {
       await shm_request('shm/v1/admin/user/service', {
@@ -134,15 +133,26 @@ export default function UserServiceModal({
         }),
       });
 
-      setFormData(prev => ({
-        ...prev,
-        service_id: pendingServiceId,
-      }));
-      setPendingServiceId(null);
-      toast.success('Тариф изменен');
-      onRefresh?.();
+      const verify = await shm_request(
+        `shm/v1/admin/user/service?user_id=${formData.user_id}&user_service_id=${formData.user_service_id}&limit=1`,
+      );
+      const verifyData = verify.data || verify;
+      const verifyList = Array.isArray(verifyData) ? verifyData : [];
+      const updated = verifyList[0];
+      if (updated?.service_id === pendingServiceId) {
+        setFormData(prev => ({
+          ...prev,
+          service_id: updated.service_id,
+          name: updated.name ?? prev.name,
+        }));
+        setPendingServiceId(null);
+        setPendingServiceName(null);
+        toast.success('Тариф изменен');
+        onRefresh?.();
+      } else {
+        toast.error('Тариф не изменен, проверьте доступность тарифа');
+      }
     } catch (error) {
-      setFormData(prev => ({ ...prev, service_id: previousServiceId }));
       toast.error('Не удалось сменить тариф');
     } finally {
       setChangingService(false);
