@@ -123,16 +123,17 @@ export default function UserServiceModal({
 
     setChangingService(true);
     try {
-      const params = new URLSearchParams({
-        user_id: String(formData.user_id),
-        tariff: String(pendingServiceId),
-        dry_run: '0',
-        format: 'default',
+      await shm_request('shm/v1/admin/user/service', {
+        method: 'POST',
+        body: JSON.stringify({
+          user_id: formData.user_id,
+          user_service_id: formData.user_service_id,
+          change: {
+            service_id: pendingServiceId,
+            finish_active: 0,
+          },
+        }),
       });
-      if (formData.user_service_id) {
-        params.set('usi', String(formData.user_service_id));
-      }
-      await shm_request(`/shm/v1/template/Admins/user_change_tariff?${params.toString()}`);
 
       const maxAttempts = 10;
       const delayMs = 2000;
