@@ -123,15 +123,13 @@ export default function UserServiceModal({
 
     setChangingService(true);
     try {
-      await shm_request('shm/v1/admin/user/service', {
+      await shm_request('shm/v1/admin/user/service/change', {
         method: 'POST',
         body: JSON.stringify({
           user_id: formData.user_id,
           user_service_id: formData.user_service_id,
-          change: {
-            service_id: pendingServiceId,
-            finish_active: 0,
-          },
+          service_id: pendingServiceId,
+          finish_active: 0,
         }),
       });
 
