@@ -103,8 +103,26 @@ export default function UserServiceModal({
 
   const handleServiceChange = (serviceId: number | null, service: any) => {
     setPendingServiceId(serviceId);
-    setPendingServiceName(service?.name ?? null);
+    if (service?.name) {
+      setPendingServiceName(service.name);
+      return;
+    }
+    if (serviceId) {
+      const fallback = services.find((item) => item.service_id === serviceId);
+      setPendingServiceName(fallback?.name ?? null);
+      return;
+    }
+    setPendingServiceName(null);
   };
+
+  useEffect(() => {
+    if (pendingServiceId && !pendingServiceName) {
+      const fallback = services.find((item) => item.service_id === pendingServiceId);
+      if (fallback?.name) {
+        setPendingServiceName(fallback.name);
+      }
+    }
+  }, [pendingServiceId, pendingServiceName, services]);
 
   const handleInstantChangeService = async () => {
     if (!pendingServiceId || pendingServiceId === formData.service_id) {
