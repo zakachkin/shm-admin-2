@@ -130,8 +130,21 @@ export default function JsonEditor({
 
     try {
       const parsed = JSON.parse(text);
-      dataRef.current = parsed;
-      editorRef.current?.set(parsed);
+      const current = editorRef.current?.get() ?? {};
+      if (!current || typeof current !== 'object' || Array.isArray(current)) {
+        toast.error('Settings должен быть объектом для вставки дочернего значения');
+        return;
+      }
+
+      const baseKey = 'pasted';
+      let key = baseKey;
+      if (Object.prototype.hasOwnProperty.call(current, baseKey)) {
+        key = `${baseKey}_${Date.now()}`;
+      }
+
+      const next = { ...current, [key]: parsed };
+      dataRef.current = next;
+      editorRef.current?.set(next);
     } catch {
       toast.error('Невалидный JSON');
     }
