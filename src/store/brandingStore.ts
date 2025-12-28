@@ -27,7 +27,8 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
   loaded: false,
 
   fetchBranding: async () => {
-    if (get().loaded) return;
+    const state = get();
+    if (state.loaded || state.loading) return;
 
     set({ loading: true });
     try {
