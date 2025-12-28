@@ -131,24 +131,31 @@ export default function UserServiceModal({
       });
       await shm_request(`/shm/v1/template/Admins/user_change_tariff?${params.toString()}`);
 
-      await new Promise((resolve) => setTimeout(resolve, 3500));
+      const maxAttempts = 10;
+      const delayMs = 2000;
+      let updated: any = null;
 
-      const verify = await shm_request(
-        `shm/v1/admin/user/service?user_id=${formData.user_id}&user_service_id=${formData.user_service_id}&limit=1`,
-      );
-      const verifyData = verify.data || verify;
-      const verifyList = Array.isArray(verifyData) ? verifyData : [];
-      const updated = verifyList[0];
-      if (updated?.service_id === pendingServiceId) {
-        setFormData(updated);
-        setPendingServiceId(null);
-        setPendingServiceName(null);
-        toast.success('Тариф изменен');
-        onRefresh?.();
-      } else {
-        setFormData(updated ?? formData);
-        toast.error('Тариф не изменен, проверьте доступность тарифа');
+      for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        const verify = await shm_request(
+          `shm/v1/admin/user/service?user_id=${formData.user_id}&user_service_id=${formData.user_service_id}&limit=1`,
+        );
+        const verifyData = verify.data || verify;
+        const verifyList = Array.isArray(verifyData) ? verifyData : [];
+        updated = verifyList[0];
+
+        if (updated?.service_id === pendingServiceId) {
+          setFormData(updated);
+          setPendingServiceId(null);
+          setPendingServiceName(null);
+          toast.success('Тариф изменен');
+          onRefresh?.();
+          return;
+        }
       }
+
+      setFormData(updated ?? formData);
+      toast('Изменение тарифа в процессе. Проверьте позже.');
     } catch (error) {
       toast.error('Не удалось сменить тариф');
     } finally {
