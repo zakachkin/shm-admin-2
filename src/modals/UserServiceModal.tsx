@@ -101,28 +101,9 @@ export default function UserServiceModal({
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleServiceChange = (serviceId: number | null, service: any) => {
+  const handleServiceChange = (serviceId: number | null) => {
     setPendingServiceId(serviceId);
-    if (service?.name) {
-      setPendingServiceName(service.name);
-      return;
-    }
-    if (serviceId) {
-      const fallback = services.find((item) => item.service_id === serviceId);
-      setPendingServiceName(fallback?.name ?? null);
-      return;
-    }
-    setPendingServiceName(null);
   };
-
-  useEffect(() => {
-    if (pendingServiceId && !pendingServiceName) {
-      const fallback = services.find((item) => item.service_id === pendingServiceId);
-      if (fallback?.name) {
-        setPendingServiceName(fallback.name);
-      }
-    }
-  }, [pendingServiceId, pendingServiceName, services]);
 
   const handleInstantChangeService = async () => {
     if (!pendingServiceId || pendingServiceId === formData.service_id) {
@@ -152,7 +133,6 @@ export default function UserServiceModal({
         service_id: pendingServiceId,
       }));
       setPendingServiceId(null);
-      setPendingServiceName(null);
       toast.success('Тариф изменен');
       onRefresh?.();
     } catch (error) {
@@ -398,9 +378,9 @@ export default function UserServiceModal({
           </label>
           <div className="flex-1">
             <ServiceSelect
-              value={pendingServiceId ?? formData.service_id}
+              value={formData.service_id}
               readonly={false}
-              onChange={(serviceId, service) => handleServiceChange(serviceId, service)}
+              onChange={() => {}}
               onServiceUpdated={onRefresh}
             />
             {changingService && (
@@ -551,7 +531,9 @@ export default function UserServiceModal({
             value={formData.next ?? ''}
             onChange={(e) => {
               const val = e.target.value;
-              handleChange('next', val === '' ? null : val === '-1' ? -1 : Number(val));
+              const nextValue = val === '' ? null : val === '-1' ? -1 : Number(val);
+              handleChange('next', nextValue);
+              setPendingServiceId(typeof nextValue === 'number' && nextValue > 0 ? nextValue : null);
             }}
             className="flex-1 px-3 py-2 text-sm rounded border"
             style={inputStyles}
@@ -604,7 +586,7 @@ export default function UserServiceModal({
           await handleInstantChangeService();
         }}
         title="Сменить тариф сейчас"
-        message={`Сменить тариф на ${pendingServiceName ? `"${pendingServiceName}"` : `#${pendingServiceId ?? ''}`} без ожидания окончания текущего?`}
+        message={`Сменить тариф на ${pendingServiceId ? `#${pendingServiceId}` : ''} без ожидания окончания текущего?`}
         confirmText="Сменить"
         cancelText="Отмена"
         variant="warning"
