@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CreditCard, Calendar, CheckCircle, XCircle, ExternalLink, ArrowLeft } from 'lucide-react';
 import { shm_request } from '../lib/shm_request';
 import toast from 'react-hot-toast';
@@ -25,6 +26,7 @@ export interface SubscriptionPlan {
 }
 
 function Subscription() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
@@ -56,7 +58,7 @@ function Subscription() {
     try {
       const response = await shm_request('shm/v1/admin/cloud/proxy/service/sub/get');
       console.log('Subscription response:', response);
-      
+
       // Проверяем, есть ли ошибка в ответе
       if (response.error) {
         console.log('Response has error:', response.error, 'status:', response.status);
@@ -77,12 +79,12 @@ function Subscription() {
       }
     } catch (error: any) {
       console.error('Subscription loading exception:', error);
-      
+
       // Парсим JSON из текста ошибки
       try {
         const errorText = error.message || String(error);
         const errorData = JSON.parse(errorText);
-        
+
         // Если это 404 (подписка не найдена), показываем форму без ошибки
         if (errorData.status === 404 || errorData.status === '404') {
           setShowSubscriptionForm(true);
@@ -136,11 +138,11 @@ function Subscription() {
     } catch (error: any) {
       const errorData = error.data || error.response?.data || {};
       let errorMessage = errorData.error || 'Ошибка оформления подписки';
-      
+
       if (errorData.error === 'insufficient money') {
         errorMessage = 'Недостаточно средств на балансе для оформления подписки. Необходимо пополнить баланс, после чего повторить заказ услуги.';
       }
-      
+
       setSubscriptionError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -166,7 +168,7 @@ function Subscription() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" 
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
                style={{ borderColor: 'var(--accent-primary)' }}></div>
           <p style={{ color: 'var(--theme-content-text-muted)' }}>Загрузка...</p>
         </div>
@@ -177,15 +179,15 @@ function Subscription() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 
+        <h1
           className="text-2xl font-bold flex items-center gap-3"
           style={{ color: 'var(--theme-content-text)' }}
         >
           <CreditCard className="w-7 h-7" style={{ color: 'var(--theme-primary-color)' }} />
           Подписка
         </h1>
-        <Link 
-          to="/cloud"
+        <button
+          onClick={() => navigate(-1)}
           className="px-4 py-2 rounded flex items-center gap-2"
           style={{
             backgroundColor: 'var(--theme-button-secondary-bg)',
@@ -195,7 +197,7 @@ function Subscription() {
         >
           <ArrowLeft className="w-4 h-4" />
           Назад
-        </Link>
+        </button>
       </div>
 
       {/* Информация о преимуществах подписки */}
@@ -257,10 +259,10 @@ function Subscription() {
                   ) : (
                     <XCircle className="w-4 h-4" style={{ color: 'var(--accent-danger)' }} />
                   )}
-                  <span style={{ 
-                    color: subscriptionInfo.status === 'ACTIVE' 
-                      ? 'var(--accent-success)' 
-                      : 'var(--accent-danger)' 
+                  <span style={{
+                    color: subscriptionInfo.status === 'ACTIVE'
+                      ? 'var(--accent-success)'
+                      : 'var(--accent-danger)'
                   }}>
                     {subscriptionInfo.status}
                   </span>
@@ -314,7 +316,7 @@ function Subscription() {
           <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--theme-content-text)' }}>
             Оформление подписки
           </h3>
-          
+
           {subscriptionError && (
             <div className="p-4 rounded mb-4" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--accent-danger)' }}>
               {subscriptionError}

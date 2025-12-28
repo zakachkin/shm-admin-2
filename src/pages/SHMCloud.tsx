@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Cloud, LogIn, LogOut, UserPlus, Plus, Check, X, ShoppingCart, CreditCard, FileText, CheckCircle, XCircle, Settings } from 'lucide-react';
+import { Cloud, LogIn, LogOut, UserPlus, Plus, Check, X, ShoppingCart, CreditCard, FileText, CheckCircle, XCircle, Settings, RefreshCw } from 'lucide-react';
 import { shm_request } from '../lib/shm_request';
 import toast from 'react-hot-toast';
 import { ShmCloudPaymentModal } from '../modals/ShmCloudPaymentModal';
@@ -23,6 +23,7 @@ function SHMCloud() {
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [showIpResetModal, setShowIpResetModal] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -156,6 +157,19 @@ function SHMCloud() {
       setLoginData({ login: '', password: '' });
     } catch (error: any) {
       toast.error(error.data?.error || 'Ошибка сброса IP адреса');
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await checkAuth();
+      await loadSubscriptionInfo();
+      toast.success('Данные обновлены');
+    } catch (error) {
+      toast.error('Ошибка обновления данных');
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -395,15 +409,32 @@ function SHMCloud() {
                     </>
                   ) : (
                     <>
-                      <XCircle className="w-4 h-4" style={{ color: 'var(--accent-danger)' }} />
-                      <span className="text-sm" style={{ color: 'var(--accent-danger)' }}>
+                      <XCircle className="w-4 h-4" style={{ color: 'var(--accent-warning)' }} />
+                      <span className="text-sm" style={{ color: 'var(--accent-warning)' }}>
                         Подписка неактивна
                       </span>
                     </>
                   )}
                 </div>
               )}
+
             </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium"
+              style={{
+                backgroundColor: 'var(--theme-button-secondary-bg)',
+                color: 'var(--theme-button-secondary-text)',
+                border: '1px solid var(--theme-button-secondary-border)',
+                opacity: refreshing ? 0.6 : 1,
+              }}
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              Обновить
+            </button>
             <button
               onClick={() => setPaymentModalOpen(true)}
               className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-secondary"

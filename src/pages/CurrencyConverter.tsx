@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TrendingUp, RefreshCw, ArrowLeft, Save, Undo2 } from 'lucide-react';
 import { shm_request } from '../lib/shm_request';
 import toast from 'react-hot-toast';
@@ -41,6 +42,7 @@ interface CurrencyWithChanges extends Currency {
 }
 
 function CurrencyConverter() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [currencies, setCurrencies] = useState<CurrencyWithChanges[]>([]);
   const [error, setError] = useState('');
@@ -258,18 +260,18 @@ function CurrencyConverter() {
             <TrendingUp className="w-7 h-7" style={{ color: 'var(--theme-primary-color)' }} />
             Конвертер валют
           </h1>
-          <Link
-            to="/cloud"
-            className="px-4 py-2 rounded flex items-center gap-2"
-            style={{
-              backgroundColor: 'var(--theme-button-secondary-bg)',
-              color: 'var(--theme-button-secondary-text)',
-              border: '1px solid var(--theme-button-secondary-border)',
-            }}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Назад
-          </Link>
+        <button
+          onClick={() => navigate(-1)}
+          className="px-4 py-2 rounded flex items-center gap-2"
+          style={{
+            backgroundColor: 'var(--theme-button-secondary-bg)',
+            color: 'var(--theme-button-secondary-text)',
+            border: '1px solid var(--theme-button-secondary-border)',
+          }}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Назад
+        </button>
         </div>
 
         <div
