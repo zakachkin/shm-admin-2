@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import SelectedUserDropdown from './SelectedUserDropdown';
 import {
@@ -8,34 +8,22 @@ import {
   Settings,
   LogOut,
   Menu,
-  X,
   ChevronRight,
   ChevronDown,
   Home,
   Cloud,
-  ListOrdered,
-  CreditCard,
-  Gift,
-  HardDrive,
-  Tag,
-  Calendar,
-  Layers,
-  Key,
-  Clock,
-  Archive,
   FileText,
-  Cog,
   Activity,
-  Palette,
   Sun,
   Moon,
   Monitor,
-  TrendingUp,
-  Wrench,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useBrandingStore } from '../store/brandingStore';
 import { useThemeStore, ThemeMode } from '../store/themeStore';
+import { useSettingsStore } from '../store/settingsStore';
 import toast from 'react-hot-toast';
 import TemplateModal from '../modals/TemplateModal';
 import { shm_request } from '../lib/shm_request';
@@ -179,12 +167,16 @@ function Layout() {
   const { user, logout } = useAuthStore();
   const { branding, fetchBranding } = useBrandingStore();
   const { colors, applyTheme } = useThemeStore();
+  const { sidebarCollapsed, setSidebarCollapsed } = useSettingsStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openMenus, setOpenMenus] = useState<string[]>(['Пользователи']);
   const [manuallyClosed, setManuallyClosed] = useState<string[]>([]);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [menuPosition, setMenuPosition] = useState<{ top: number } | null>(null);
   const [selectedData, setSelectedData] = useState<any>(null);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  const hoverTimeoutRef = useRef<number | null>(null);
 
   const showSwagger = import.meta.env.VITE_SHOW_SWAGGER === 'true';
   const menuItems = showSwagger
@@ -200,7 +192,12 @@ function Layout() {
     };
 
     window.addEventListener('openTemplate', handleOpenTemplate);
-    return () => window.removeEventListener('openTemplate', handleOpenTemplate);
+    return () => {
+      window.removeEventListener('openTemplate', handleOpenTemplate);
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
   }, [fetchBranding, applyTheme]);
 
   useEffect(() => {
@@ -286,47 +283,42 @@ function Layout() {
         />
       )}
 
-      {}
-      <aside
-        className={`fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+      {}<aside
+        className={`fixed inset-y-0 left-0 z-30 transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        } ${
+          sidebarCollapsed ? 'lg:w-16' : 'lg:w-64'
+        } w-64`}
         style={{
           backgroundColor: 'var(--theme-sidebar-bg)',
           borderRight: '1px solid var(--theme-sidebar-border)',
         }}
       >
         <div className="flex flex-col h-full">
-          {}
-          <div
-            className="flex items-center justify-between h-16 px-4"
-            style={{ borderBottom: '1px solid var(--theme-sidebar-border)' }}
-          >
-            <Link to="/" className="flex items-center gap-3">
-              {branding.logoUrl ? (
-                <img src={branding.logoUrl} alt="Logo" className="w-8 h-8 object-contain" />
-              ) : (
-                <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{ background: `linear-gradient(135deg, ${colors.primaryColor}, ${colors.primaryColorHover})` }}
-                >
-                  <Home className="w-5 h-5 text-white" />
-                </div>
-              )}
-              <span className="text-lg font-bold" style={{ color: 'var(--theme-header-text)' }}>
-                {branding.name}
-              </span>
-            </Link>
+          {/* Кнопка сворачивания сайдбара */}
+          <div className="hidden lg:flex items-center justify-between p-4" style={{ borderBottom: '1px solid var(--theme-sidebar-border)' }}>
+            {!sidebarCollapsed && (
+              <Link to="/"  className="flex items-center gap-2">
+                {branding.logoUrl ? (
+                  <img src={branding.logoUrl} alt="Logo" className="h-8 w-8 object-contain" />
+                ) : (
+                  <Settings className="w-6 h-6" style={{ color: 'var(--theme-primary-color)' }} />
+                )}
+                <span className="font-semibold text-lg" style={{ color: 'var(--theme-header-text)' }}>
+                  {branding.name}
+                </span>
+              </Link>
+            )}
             <button
-              className="lg:hidden"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="p-2 rounded-lg transition-colors hover:bg-opacity-80"
               style={{ color: 'var(--theme-sidebar-text)' }}
-              onClick={() => setSidebarOpen(false)}
+              title={sidebarCollapsed ? 'Развернуть сайдбар' : 'Свернуть сайдбар'}
             >
-              <X className="w-6 h-6" />
+              {sidebarCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
             </button>
           </div>
 
-          {}
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto py-4 px-2">
             {menuItems.map((item) => {
@@ -343,34 +335,125 @@ function Layout() {
                     rel={item.href === '/swagger' ? 'noopener noreferrer' : undefined}
                     onClick={() => setSidebarOpen(false)}
                     className={`nav-item ${active ? 'active' : ''}`}
+                    style={{
+                      justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                    }}
+                    title={sidebarCollapsed ? item.name : undefined}
                   >
                     <Icon className="w-5 h-5" />
-                    <span className="flex-1">{item.name}</span>
+                    <span className={`flex-1 ${sidebarCollapsed ? 'lg:hidden' : ''}`}>{item.name}</span>
                   </Link>
                 );
               }
 
               return (
-                <div key={item.name} className="mb-1">
+                <div
+                  key={item.name}
+                  className="mb-1"
+                  onMouseEnter={(e) => {
+                    if (sidebarCollapsed) {
+                      if (hoverTimeoutRef.current) {
+                        clearTimeout(hoverTimeoutRef.current);
+                      }
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      setHoveredItem(item.name);
+                      setMenuPosition({ top: rect.top });
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    if (sidebarCollapsed) {
+                      hoverTimeoutRef.current = window.setTimeout(() => {
+                        setHoveredItem(null);
+                        setMenuPosition(null);
+                      }, 150);
+                    }
+                  }}
+                >
                   <button
                     onClick={() => toggleMenu(item.name)}
                     className={`nav-item w-full`}
                     style={{
                       color: active ? 'var(--theme-sidebar-text-active)' : undefined,
                       borderLeft: active ? '2px solid var(--theme-primary-color)' : undefined,
+                      justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
                     }}
+                    title={sidebarCollapsed ? item.name : undefined}
                   >
                     <Icon className="w-5 h-5" />
-                    <span className="flex-1 text-left">{item.name}</span>
-                    {isOpen ? (
-                      <ChevronDown className="w-4 h-4" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4" />
-                    )}
+                    <span className={`flex-1 text-left ${sidebarCollapsed ? 'lg:hidden' : ''}`}>{item.name}</span>
+                    <span className={sidebarCollapsed ? 'lg:hidden' : ''}>
+                      {isOpen ? (
+                        <ChevronDown className="w-4 h-4" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4" />
+                      )}
+                    </span>
                   </button>
+
+                  {/* Всплывающее подменю при свернутом сайдбаре */}
+                  {sidebarCollapsed && item.children && hoveredItem === item.name && menuPosition && (
+                    <div
+                      className="fixed z-[100] rounded-lg shadow-xl border py-2 min-w-[200px]"
+                      style={{
+                        backgroundColor: 'var(--theme-card-bg)',
+                        borderColor: 'var(--theme-card-border)',
+                        left: '64px',
+                        top: `${menuPosition.top}px`,
+                      }}
+                      onMouseEnter={() => {
+                        if (hoverTimeoutRef.current) {
+                          clearTimeout(hoverTimeoutRef.current);
+                        }
+                        setHoveredItem(item.name);
+                      }}
+                      onMouseLeave={() => {
+                        hoverTimeoutRef.current = window.setTimeout(() => {
+                          setHoveredItem(null);
+                          setMenuPosition(null);
+                        }, 150);
+                      }}
+                    >
+                      <div className="px-3 py-2 border-b font-semibold text-sm" style={{ borderColor: 'var(--theme-card-border)', color: 'var(--theme-content-text)' }}>
+                        {item.name}
+                      </div>
+                      <div className="max-h-[400px] overflow-y-auto">
+                        {item.children.map((child) => (
+                          <Link
+                            key={child.href}
+                            to={child.href}
+                            onClick={() => {
+                              setSidebarOpen(false);
+                              setHoveredItem(null);
+                              setMenuPosition(null);
+                            }}
+                            className="block px-4 py-2 text-sm transition-colors"
+                            style={{
+                              color: isActive(child.href)
+                                ? 'var(--theme-sidebar-text-active)'
+                                : 'var(--theme-content-text)',
+                              backgroundColor: isActive(child.href)
+                                ? 'var(--theme-sidebar-item-active-bg)'
+                                : 'transparent',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-item-hover-bg)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = isActive(child.href)
+                                ? 'var(--theme-sidebar-item-active-bg)'
+                                : 'transparent';
+                            }}
+                          >
+                            {child.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {isOpen && item.children && (
                     <div
-                      className="ml-4 mt-1 space-y-1 pl-3"
+                      className={`ml-4 mt-1 space-y-1 pl-3 ${sidebarCollapsed ? 'lg:hidden' : ''}`}
                       style={{ borderLeft: '1px solid var(--theme-sidebar-border)' }}
                     >
                       {item.children.map((child) => (
@@ -401,30 +484,50 @@ function Layout() {
 
           {}
           <div className="p-4" style={{ borderTop: '1px solid var(--theme-sidebar-border)' }}>
-            <div className="flex items-center gap-3 mb-3">
+            <div className={sidebarCollapsed ? 'lg:hidden' : ''}>
+              <div className="flex items-center gap-3 mb-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                  style={{ background: `linear-gradient(135deg, ${colors.primaryColor}, ${colors.primaryColorHover})` }}
+                >
+                  {user?.login?.charAt(0).toUpperCase() || 'A'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate" style={{ color: 'var(--theme-header-text)' }}>
+                    {user?.login || '-'}
+                  </p>
+                  <p className="text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
+                    ID: {user?.user_id || '-'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors"
+                style={{ color: 'var(--theme-sidebar-text)' }}
+              >
+                <LogOut className="w-4 h-4" />
+                Выйти
+              </button>
+            </div>
+
+            <div className={`flex-col items-center gap-3 ${sidebarCollapsed ? 'hidden lg:flex' : 'hidden'}`}>
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
                 style={{ background: `linear-gradient(135deg, ${colors.primaryColor}, ${colors.primaryColorHover})` }}
+                title={user?.login || '-'}
               >
                 {user?.login?.charAt(0).toUpperCase() || 'A'}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate" style={{ color: 'var(--theme-header-text)' }}>
-                  {user?.login || '-'}
-                </p>
-                <p className="text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
-                  ID: {user?.user_id || '-'}
-                </p>
-              </div>
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-lg transition-colors"
+                style={{ color: 'var(--theme-sidebar-text)' }}
+                title="Выйти"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
             </div>
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors"
-              style={{ color: 'var(--theme-sidebar-text)' }}
-            >
-              <LogOut className="w-4 h-4" />
-              Выйти
-            </button>
           </div>
         </div>
       </aside>

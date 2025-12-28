@@ -151,7 +151,7 @@ export default function PromoCreateModal({
       onClose={onClose}
       title="Создание промокода"
       footer={renderFooter()}
-      size="md"
+      size="lg"
     >
       <div className="space-y-4">
         {}
