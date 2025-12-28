@@ -122,45 +122,14 @@ export default function UserServiceModal({
     }
 
     setChangingService(true);
-    const applyChange = async (url: string, body: Record<string, any>) => {
-      await shm_request(url, {
-        method: 'POST',
-        body: JSON.stringify(body),
-      });
-    };
-
     try {
-      try {
-        await applyChange('shm/v1/admin/user/service', {
-          ...formData,
-          service_id: pendingServiceId,
-          finish_active: 0,
-        });
-      } catch (error) {
-        try {
-          await applyChange('shm/v1/admin/user/service', {
-            ...formData,
-            tariff: pendingServiceId,
-            finish_active: 0,
-          });
-        } catch (serviceFallbackError) {
-          try {
-            await applyChange('shm/v1/admin/user/service/change', {
-              user_service_id: formData.user_service_id,
-              field: 'service_id',
-              value: pendingServiceId,
-              finish_active: 0,
-            });
-          } catch (fallbackError) {
-            await applyChange('shm/v1/admin/user/service/change', {
-              user_id: formData.user_id,
-              user_service_id: formData.user_service_id,
-              service_id: pendingServiceId,
-              finish_active: 0,
-            });
-          }
-        }
-      }
+      const params = new URLSearchParams({
+        user_id: String(formData.user_id),
+        tariff: String(pendingServiceId),
+        dry_run: '0',
+        format: 'default',
+      });
+      await shm_request(`/shm/v1/template/Admin/change_tariff?${params.toString()}`);
 
       const verify = await shm_request(
         `shm/v1/admin/user/service?user_id=${formData.user_id}&user_service_id=${formData.user_service_id}&limit=1`,
