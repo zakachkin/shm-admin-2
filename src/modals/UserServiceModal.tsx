@@ -48,6 +48,7 @@ export default function UserServiceModal({
   const [withdrawData, setWithdrawData] = useState<Record<string, any> | null>(null);
   const [changingService, setChangingService] = useState(false);
   const [pendingServiceId, setPendingServiceId] = useState<number | null>(null);
+  const [pendingServiceName, setPendingServiceName] = useState<string | null>(null);
   const [confirmChangeOpen, setConfirmChangeOpen] = useState(false);
 
   const statusMenuRef = useRef<HTMLDivElement>(null);
@@ -100,8 +101,9 @@ export default function UserServiceModal({
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleServiceChange = (serviceId: number | null) => {
+  const handleServiceChange = (serviceId: number | null, service: any) => {
     setPendingServiceId(serviceId);
+    setPendingServiceName(service?.name ?? null);
   };
 
   const handleInstantChangeService = async () => {
@@ -132,6 +134,7 @@ export default function UserServiceModal({
         service_id: pendingServiceId,
       }));
       setPendingServiceId(null);
+      setPendingServiceName(null);
       toast.success('Тариф изменен');
       onRefresh?.();
     } catch (error) {
@@ -379,7 +382,7 @@ export default function UserServiceModal({
             <ServiceSelect
               value={pendingServiceId ?? formData.service_id}
               readonly={false}
-              onChange={(serviceId) => handleServiceChange(serviceId)}
+              onChange={(serviceId, service) => handleServiceChange(serviceId, service)}
               onServiceUpdated={onRefresh}
             />
             {changingService && (
@@ -583,7 +586,7 @@ export default function UserServiceModal({
           await handleInstantChangeService();
         }}
         title="Сменить тариф сейчас"
-        message={`Сменить тариф на #${pendingServiceId ?? ''} без ожидания окончания текущего?`}
+        message={`Сменить тариф на ${pendingServiceName ? `"${pendingServiceName}"` : `#${pendingServiceId ?? ''}`} без ожидания окончания текущего?`}
         confirmText="Сменить"
         cancelText="Отмена"
         variant="warning"
