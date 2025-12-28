@@ -129,6 +129,9 @@ export default function UserServiceModal({
         dry_run: '0',
         format: 'default',
       });
+      if (formData.user_service_id) {
+        params.set('usi', String(formData.user_service_id));
+      }
       await shm_request(`/shm/v1/template/Admins/user_change_tariff?${params.toString()}`);
 
       const maxAttempts = 10;
