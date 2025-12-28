@@ -123,7 +123,7 @@ export default function UserServiceModal({
 
     setChangingService(true);
     const applyChange = async (url: string, body: Record<string, any>) => {
-      return shm_request(url, {
+      await shm_request(url, {
         method: 'POST',
         body: JSON.stringify(body),
       });
@@ -138,12 +138,21 @@ export default function UserServiceModal({
           finish_active: 0,
         });
       } catch (error) {
-        await applyChange('shm/v1/admin/user/service/change', {
-          user_service_id: formData.user_service_id,
-          field: 'service_id',
-          value: pendingServiceId,
-          finish_active: 0,
-        });
+        try {
+          await applyChange('shm/v1/admin/user/service/change', {
+            user_service_id: formData.user_service_id,
+            field: 'service_id',
+            value: pendingServiceId,
+            finish_active: 0,
+          });
+        } catch (fallbackError) {
+          await applyChange('shm/v1/admin/user/service/change', {
+            user_id: formData.user_id,
+            user_service_id: formData.user_service_id,
+            service_id: pendingServiceId,
+            finish_active: 0,
+          });
+        }
       }
 
       const verify = await shm_request(
