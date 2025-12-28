@@ -367,7 +367,7 @@ export default function UserServiceModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={`Услуга #${data?.user_service_id || ''}: ${data?.name || ''}`}
+      title={`Услуга #${formData.user_service_id || data?.user_service_id || ''}: ${formData.name || data?.name || ''}`}
       footer={contentReady ? renderFooter() : undefined}
       size="xl"
     >
