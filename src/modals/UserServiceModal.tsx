@@ -138,7 +138,7 @@ export default function UserServiceModal({
           user_id: formData.user_id,
           user_service_id: formData.user_service_id,
           service_id: pendingServiceId,
-          finish_active: 0,
+          finish_active: 1,
         }),
       });
 
