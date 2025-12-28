@@ -123,15 +123,6 @@ export default function UserServiceModal({
 
     setChangingService(true);
     try {
-      await shm_request('shm/v1/admin/user/service/stop', {
-        method: 'POST',
-        body: JSON.stringify({
-          user_id: formData.user_id,
-          user_service_id: formData.user_service_id,
-          auto_bill: 0,
-        }),
-      });
-
       await shm_request('shm/v1/admin/user/service/change', {
         method: 'POST',
         body: JSON.stringify({
@@ -139,15 +130,6 @@ export default function UserServiceModal({
           user_service_id: formData.user_service_id,
           service_id: pendingServiceId,
           finish_active: 1,
-        }),
-      });
-
-      await shm_request('shm/v1/admin/user/service/activate', {
-        method: 'POST',
-        body: JSON.stringify({
-          user_id: formData.user_id,
-          user_service_id: formData.user_service_id,
-          auto_bill: 1,
         }),
       });
 
