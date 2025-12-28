@@ -27,6 +27,8 @@ const DEFAULT_BRANDING: BrandingSettings = {
   loginSubtitle: 'Войдите в систему управления',
 };
 
+let brandingFetchPromise: Promise<void> | null = null;
+
 export const useBrandingStore = create<BrandingState>((set, get) => ({
   branding: DEFAULT_BRANDING,
   loading: false,
@@ -34,41 +36,47 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
 
   fetchBranding: async () => {
     const state = get();
-    if (state.loaded || state.loading) return;
+    if (state.loaded) return;
+    if (brandingFetchPromise) return brandingFetchPromise;
 
-    set({ loading: true });
-    try {
-      // Получаем настройки компании из SHM API (admin/config)
-      const result = await shm_request('shm/v1/admin/config?key=company');
-      const configItem = normalizeListResponse(result).data?.[0];
-      const rawValue = configItem?.value ?? configItem?.data ?? configItem;
-      let company = rawValue;
-      if (typeof rawValue === 'string') {
-        try {
-          company = JSON.parse(rawValue);
-        } catch {
-          company = null;
+    brandingFetchPromise = (async () => {
+      set({ loading: true });
+      try {
+        // ?????>�?�O?o?c?? ???o�?�'�????u?o?n ?o?????o?o???n?n ?n?u SHM API (admin/config)
+        const result = await shm_request('shm/v1/admin/config?key=company');
+        const configItem = normalizeListResponse(result).data?.[0];
+        const rawValue = configItem?.value ?? configItem?.data ?? configItem;
+        let company = rawValue;
+        if (typeof rawValue === 'string') {
+          try {
+            company = JSON.parse(rawValue);
+          } catch {
+            company = null;
+          }
         }
-      }
-      if (company?.name || company?.title) {
-        const branding = {
-          ...DEFAULT_BRANDING,
-          appName: company.name || DEFAULT_BRANDING.appName,
-          appTitle: company.title || DEFAULT_BRANDING.appTitle,
-        };
-        set({ branding, loaded: true });
-        document.title = branding.appTitle;
-      } else {
+        if (company?.name || company?.title) {
+          const branding = {
+            ...DEFAULT_BRANDING,
+            appName: company.name || DEFAULT_BRANDING.appName,
+            appTitle: company.title || DEFAULT_BRANDING.appTitle,
+          };
+          set({ branding, loaded: true });
+          document.title = branding.appTitle;
+        } else {
+          set({ branding: DEFAULT_BRANDING, loaded: true });
+          document.title = DEFAULT_BRANDING.appTitle;
+        }
+      } catch (error) {
+        // ???n�:?? ?n??????�??n�?�??c?? ??�??n?+?o?n (???o?o�??n???c�?, 401 ???>�? ???c?o??�'??�??n?u?????o????�<�:)
         set({ branding: DEFAULT_BRANDING, loaded: true });
         document.title = DEFAULT_BRANDING.appTitle;
+      } finally {
+        set({ loading: false });
+        brandingFetchPromise = null;
       }
-    } catch (error) {
-      // Тихо игнорируем ошибки (например, 401 для неавторизованных)
-      set({ branding: DEFAULT_BRANDING, loaded: true });
-      document.title = DEFAULT_BRANDING.appTitle;
-    } finally {
-      set({ loading: false });
-    }
+    })();
+
+    return brandingFetchPromise;
   },
 
   refetchBranding: async () => {
@@ -139,3 +147,4 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
     }
   },
 }));
+
