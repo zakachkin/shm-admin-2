@@ -49,6 +49,11 @@ export default function PayCreateModal({
       toast.error('Выберите действие');
       return;
     }
+    const rawMoney = String(formData.money ?? '').trim();
+    if (rawMoney.startsWith('-')) {
+      toast.error('Сумма не может быть отрицательной');
+      return;
+    }
     if (!formData.money || Number(formData.money) === 0) {
       toast.error('Введите сумму платежа');
       return;

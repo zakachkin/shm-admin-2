@@ -6,12 +6,23 @@ import { PayModal, PayCreateModal } from '../modals';
 import { Plus } from 'lucide-react';
 import { useSelectedUserStore } from '../store/selectedUserStore';
 
+const paySystemLabels: Record<string, string> = {
+  manual: 'Ручное пополнение',
+  withdraw: 'Ручное списание',
+};
+
 const payColumns = [
   { key: 'id', label: 'ID', visible: true, sortable: true },
   { key: 'user_id', label: 'Пользователь', visible: true, sortable: true },
   { key: 'money', label: 'Сумма', visible: true, sortable: true },
   { key: 'date', label: 'Дата', visible: true, sortable: true },
-  { key: 'pay_system_id', label: 'Плат. система', visible: false, sortable: true },
+  {
+    key: 'pay_system_id',
+    label: 'Плат. система',
+    visible: false,
+    sortable: true,
+    render: (value: string) => paySystemLabels[value] || value,
+  },
   { key: 'comment', label: 'Комментарий', visible: false, sortable: false },
 ];
 
