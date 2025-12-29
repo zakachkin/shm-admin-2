@@ -155,8 +155,8 @@ export default function PayCreateModal({
             style={inputStyles}
           >
             <option value="">Выберите действие:</option>
-            <option value="manual">Пополнение</option>
-            <option value="withdraw">Списание</option>
+            <option value="manual">Ручное пополнение</option>
+            <option value="withdraw">Ручное списание</option>
           </select>
         </div>
 
