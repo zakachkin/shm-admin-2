@@ -167,7 +167,7 @@ export default function IdentityCreateModal({
       onClose={onClose}
       title="Создание ключа"
       footer={renderFooter()}
-      size="lg"
+      size="xl"
     >
       <div className="space-y-4">
         {}

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CreditCard, Calendar, CheckCircle, XCircle, ExternalLink, ArrowLeft } from 'lucide-react';
 import { shm_request } from '../lib/shm_request';
 import toast from 'react-hot-toast';
@@ -25,6 +26,7 @@ export interface SubscriptionPlan {
 }
 
 function Subscription() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
@@ -32,6 +34,7 @@ function Subscription() {
   const [showSubscriptionForm, setShowSubscriptionForm] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
   const [orderingSubscription, setOrderingSubscription] = useState(false);
+  const pollingIntervalRef = useRef<number | null>(null);
 
   const cardStyles = {
     backgroundColor: 'var(--theme-card-bg)',
@@ -48,15 +51,47 @@ function Subscription() {
   useEffect(() => {
     loadSubscriptionInfo();
     loadSubscriptionPlans();
+
+    // Очистка интервала при размонтировании компонента
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
   }, []);
 
-  const loadSubscriptionInfo = async () => {
-    setLoading(true);
+  // Эффект для автоматического обновления в зависимости от статуса
+  useEffect(() => {
+    // Очищаем предыдущий интервал
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+
+    if (subscriptionInfo && subscriptionInfo.status === 'PROGRESS') {
+      // Обновляем каждую секунду для статуса "В процессе"
+      pollingIntervalRef.current = setInterval(() => {
+        loadSubscriptionInfo(true); // Передаем флаг фонового обновления
+      }, 1000);
+    }
+
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, [subscriptionInfo?.status]);
+
+  const loadSubscriptionInfo = async (isBackgroundUpdate = false) => {
+    // Показываем загрузку только если это не фоновое обновление
+    if (!isBackgroundUpdate) {
+      setLoading(true);
+    }
 
     try {
       const response = await shm_request('shm/v1/admin/cloud/proxy/service/sub/get');
       console.log('Subscription response:', response);
-      
+
       // Проверяем, есть ли ошибка в ответе
       if (response.error) {
         console.log('Response has error:', response.error, 'status:', response.status);
@@ -74,15 +109,20 @@ function Subscription() {
         const data = response.data || response;
         setSubscriptionInfo(data);
         setShowSubscriptionForm(false);
+
+        // Если статус стал ACTIVE, показываем уведомление только при фоновом обновлении
+        if (isBackgroundUpdate && data.status === 'ACTIVE' && subscriptionInfo?.status !== 'ACTIVE') {
+          toast.success('Подписка успешно активирована!');
+        }
       }
     } catch (error: any) {
       console.error('Subscription loading exception:', error);
-      
+
       // Парсим JSON из текста ошибки
       try {
         const errorText = error.message || String(error);
         const errorData = JSON.parse(errorText);
-        
+
         // Если это 404 (подписка не найдена), показываем форму без ошибки
         if (errorData.status === 404 || errorData.status === '404') {
           setShowSubscriptionForm(true);
@@ -96,7 +136,9 @@ function Subscription() {
         setSubscriptionError('Ошибка загрузки информации о подписке');
       }
     } finally {
-      setLoading(false);
+      if (!isBackgroundUpdate) {
+        setLoading(false);
+      }
     }
   };
 
@@ -130,17 +172,18 @@ function Subscription() {
           toast.error(errorMsg);
         } else {
           toast.success('Подписка успешно оформлена');
+          // Начинаем опрашивать статус
           await loadSubscriptionInfo();
         }
       }
     } catch (error: any) {
       const errorData = error.data || error.response?.data || {};
       let errorMessage = errorData.error || 'Ошибка оформления подписки';
-      
+
       if (errorData.error === 'insufficient money') {
         errorMessage = 'Недостаточно средств на балансе для оформления подписки. Необходимо пополнить баланс, после чего повторить заказ услуги.';
       }
-      
+
       setSubscriptionError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -162,11 +205,40 @@ function Subscription() {
     }
   };
 
+  // Функция для перевода статусов
+  const getStatusText = (status: string) => {
+    const statusMap: Record<string, string> = {
+      'ACTIVE': 'Активно',
+      'PROGRESS': 'В процессе',
+      'NOT PAID': 'Не оплачено',
+    };
+    return statusMap[status] || status;
+  };
+
+  // Функция для получения цвета статуса
+  const getStatusColor = (status: string) => {
+    if (status === 'ACTIVE') return 'var(--accent-success)';
+    if (status === 'PROGRESS') return 'var(--accent-warning)';
+    if (status === 'NOT PAID') return 'var(--accent-primary)';
+    return 'var(--theme-content-text-muted)';
+  };
+
+  // Функция для получения иконки статуса
+  const getStatusIcon = (status: string) => {
+    if (status === 'ACTIVE') {
+      return <CheckCircle className="w-4 h-4" style={{ color: 'var(--accent-success)' }} />;
+    }
+    if (status === 'PROGRESS') {
+      return <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: 'var(--accent-warning)' }}></div>;
+    }
+    return <XCircle className="w-4 h-4" style={{ color: 'var(--accent-danger)' }} />;
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" 
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
                style={{ borderColor: 'var(--accent-primary)' }}></div>
           <p style={{ color: 'var(--theme-content-text-muted)' }}>Загрузка...</p>
         </div>
@@ -177,15 +249,15 @@ function Subscription() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 
+        <h1
           className="text-2xl font-bold flex items-center gap-3"
           style={{ color: 'var(--theme-content-text)' }}
         >
           <CreditCard className="w-7 h-7" style={{ color: 'var(--theme-primary-color)' }} />
           Подписка
         </h1>
-        <Link 
-          to="/cloud"
+        <button
+          onClick={() => navigate(-1)}
           className="px-4 py-2 rounded flex items-center gap-2"
           style={{
             backgroundColor: 'var(--theme-button-secondary-bg)',
@@ -195,7 +267,7 @@ function Subscription() {
         >
           <ArrowLeft className="w-4 h-4" />
           Назад
-        </Link>
+        </button>
       </div>
 
       {/* Информация о преимуществах подписки */}
@@ -252,17 +324,9 @@ function Subscription() {
                   Статус:
                 </label>
                 <div className="flex items-center gap-2">
-                  {subscriptionInfo.status === 'ACTIVE' ? (
-                    <CheckCircle className="w-4 h-4" style={{ color: 'var(--accent-success)' }} />
-                  ) : (
-                    <XCircle className="w-4 h-4" style={{ color: 'var(--accent-danger)' }} />
-                  )}
-                  <span style={{ 
-                    color: subscriptionInfo.status === 'ACTIVE' 
-                      ? 'var(--accent-success)' 
-                      : 'var(--accent-danger)' 
-                  }}>
-                    {subscriptionInfo.status}
+                  {getStatusIcon(subscriptionInfo.status)}
+                  <span style={{ color: getStatusColor(subscriptionInfo.status) }}>
+                    {getStatusText(subscriptionInfo.status)}
                   </span>
                 </div>
               </div>
@@ -298,8 +362,8 @@ function Subscription() {
               >
                 <option value={-1}>Не продлевать</option>
                 {subscriptionPlans.map((plan) => (
-                  <option key={plan.service_id} value={plan.service_id}>
-                    {plan.name} - {plan.price} руб.
+                  <option key={plan.service_id} value={plan.next ?? plan.service_id}>
+                    {plan.name} - {plan.price_next ?? plan.price} руб.
                   </option>
                 ))}
               </select>
@@ -314,7 +378,7 @@ function Subscription() {
           <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--theme-content-text)' }}>
             Оформление подписки
           </h3>
-          
+
           {subscriptionError && (
             <div className="p-4 rounded mb-4" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--accent-danger)' }}>
               {subscriptionError}

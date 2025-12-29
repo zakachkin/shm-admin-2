@@ -2,11 +2,8 @@ import { create } from 'zustand';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
 
 export interface BrandingSettings {
-  appName: string;
-  appTitle: string;
+  name: string;
   logoUrl: string;
-  primaryColor: string;
-  loginSubtitle: string;
 }
 
 interface BrandingState {
@@ -20,11 +17,8 @@ interface BrandingState {
 }
 
 const DEFAULT_BRANDING: BrandingSettings = {
-  appName: 'SHM Admin',
-  appTitle: 'SHM Admin',
+  name: 'SHM Admin',
   logoUrl: '',
-  primaryColor: '#22d3ee',
-  loginSubtitle: 'Войдите в систему управления',
 };
 
 export const useBrandingStore = create<BrandingState>((set, get) => ({
@@ -51,20 +45,19 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
       }
       if (company?.name || company?.title) {
         const branding = {
-          ...DEFAULT_BRANDING,
-          appName: company.name || DEFAULT_BRANDING.appName,
-          appTitle: company.title || DEFAULT_BRANDING.appTitle,
+          name: company.name || DEFAULT_BRANDING.name,
+          logoUrl: company.logoUrl || DEFAULT_BRANDING.logoUrl,
         };
         set({ branding, loaded: true });
-        document.title = branding.appTitle;
+        document.title = branding.name;
       } else {
         set({ branding: DEFAULT_BRANDING, loaded: true });
-        document.title = DEFAULT_BRANDING.appTitle;
+        document.title = DEFAULT_BRANDING.name;
       }
     } catch (error) {
       // Тихо игнорируем ошибки (например, 401 для неавторизованных)
       set({ branding: DEFAULT_BRANDING, loaded: true });
-      document.title = DEFAULT_BRANDING.appTitle;
+      document.title = DEFAULT_BRANDING.name;
     } finally {
       set({ loading: false });
     }
@@ -82,8 +75,8 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
 
       // Сохраняем в SHM API через admin/config
       const configData = {
-        name: newBranding.appName,
-        title: newBranding.appTitle || newBranding.appName,
+        name: newBranding.name,
+        logoUrl: newBranding.logoUrl,
       };
 
       const result = await shm_request('shm/v1/admin/config', {
@@ -97,7 +90,7 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
       // Проверяем статус ответа
       if (result.status === 200) {
         set({ branding: newBranding });
-        document.title = newBranding.appTitle || newBranding.appName;
+        document.title = newBranding.name;
       } else {
         throw new Error(`API returned status ${result.status}`);
       }
@@ -112,8 +105,8 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
     set({ loading: true });
     try {
       const defaultConfig = {
-        name: DEFAULT_BRANDING.appName,
-        title: DEFAULT_BRANDING.appTitle,
+        name: DEFAULT_BRANDING.name,
+        logoUrl: DEFAULT_BRANDING.logoUrl,
       };
 
       const result = await shm_request('shm/v1/admin/config', {
@@ -127,7 +120,7 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
       // Проверяем статус ответа
       if (result.status === 200) {
         set({ branding: DEFAULT_BRANDING });
-        document.title = DEFAULT_BRANDING.appTitle;
+        document.title = DEFAULT_BRANDING.name;
       } else {
         throw new Error(`API returned status ${result.status}`);
       }

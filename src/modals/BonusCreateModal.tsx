@@ -105,7 +105,7 @@ export default function BonusCreateModal({
       onClose={onClose}
       title="Начисление бонуса"
       footer={renderFooter()}
-      size="md"
+      size="lg"
     >
       <div className="space-y-4">
         {}

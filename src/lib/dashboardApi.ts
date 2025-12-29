@@ -4,7 +4,6 @@ export interface DashboardAnalytics {
   counts: {
     totalUsers: number;
     activeUserServices: number;
-    totalServers: number;
   };
   payments: {
     timeline: { date: string; value: number; label?: string }[];
@@ -47,19 +46,17 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     
     // Параллельные запросы к API - только данные за период
     const results = await Promise.allSettled([
-      shm_request_with_status('/shm/v1/admin/user?limit=1'),
-      shm_request_with_status(`/shm/v1/admin/user?start=${start}&stop=${stop}&field=created&limit=9999`),
-      shm_request_with_status(`/shm/v1/admin/user/service?start=${start}&stop=${stop}&field=created&limit=5000`),
-      shm_request_with_status('/shm/v1/admin/server?limit=1'),
-      shm_request_with_status(`/shm/v1/admin/user/pay?start=${start}&stop=${stop}&field=date&limit=9999`),
-      shm_request_with_status(`/shm/v1/admin/user/service/withdraw?start=${start}&stop=${stop}&field=create_date&limit=9999`),
+      shm_request_with_status('shm/v1/admin/user?limit=1'),
+      shm_request_with_status(`shm/v1/admin/user?start=${start}&stop=${stop}&field=created&limit=9999`),
+      shm_request_with_status(`shm/v1/admin/user/service?start=${start}&stop=${stop}&field=created&limit=5000`),
+      shm_request_with_status(`shm/v1/admin/user/pay?start=${start}&stop=${stop}&field=date&limit=9999`),
+      shm_request_with_status(`shm/v1/admin/user/service/withdraw?start=${start}&stop=${stop}&field=create_date&limit=9999`),
     ]);
 
     const [
       usersCountRes,
       usersNewRes,
       userServicesNewRes,
-      serversCountRes,
       paymentsRes,
       withdrawsRes,
     ] = results.map((result) => (result.status === 'fulfilled' ? result.value : null));
@@ -69,15 +66,12 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     const usersNewPayload = usersNewRes && usersNewRes.status === 429 ? null : usersNewRes?.data;
     const userServicesPayload =
       userServicesNewRes && userServicesNewRes.status === 429 ? null : userServicesNewRes?.data;
-    const serversCountPayload =
-      serversCountRes && serversCountRes.status === 429 ? null : serversCountRes?.data;
     const paymentsPayload = paymentsRes && paymentsRes.status === 429 ? null : paymentsRes?.data;
     const withdrawsPayload = withdrawsRes && withdrawsRes.status === 429 ? null : withdrawsRes?.data;
 
     const totalUsersCount = usersCountPayload?.items || usersCountPayload?.total || 0;
     const usersNew = usersNewPayload ? normalizeListResponse(usersNewPayload).data : [];
     const userServicesNew = userServicesPayload ? normalizeListResponse(userServicesPayload).data : [];
-    const totalServersCount = serversCountPayload?.items || serversCountPayload?.total || 0;
     const payments = paymentsPayload ? normalizeListResponse(paymentsPayload).data : [];
     const withdraws = withdrawsPayload ? normalizeListResponse(withdrawsPayload).data : [];
 
@@ -102,7 +96,6 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     const totalWithdraws = completedWithdraws.reduce((sum: number, w: any) => sum + parseFloat(w.cost || 0), 0);
     const totalBonusWithdraws = completedWithdraws.reduce((sum: number, w: any) => sum + parseFloat(w.bonus || 0), 0);
     const activeUserServices = userServicesNew.filter((us: any) => us.status === 'ACTIVE' || us.status === 'active').length;
-    
     // Группировка платежей по датам
     const paymentsByDate: Record<string, number> = {};
     payments.forEach((p: any) => {
@@ -124,7 +117,6 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
       counts: {
         totalUsers: totalUsersCount,
         activeUserServices: activeUserServices,
-        totalServers: totalServersCount,
       },
       payments: {
         timeline: Object.entries(paymentsByDate)

@@ -2,17 +2,17 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface SettingsState {
-  showHelp: boolean;
-  setShowHelp: (show: boolean) => void;
+  sidebarCollapsed: boolean;
+  setSidebarCollapsed: (collapsed: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
-      showHelp: false,
+      sidebarCollapsed: false,
 
-      setShowHelp: (show) => {
-        set({ showHelp: show });
+      setSidebarCollapsed: (collapsed) => {
+        set({ sidebarCollapsed: collapsed });
       },
     }),
     {
