@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
+import { useAuthStore } from './authStore';
 
 export interface BrandingSettings {
   appName: string;
@@ -42,6 +43,12 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
     brandingFetchPromise = (async () => {
       set({ loading: true });
       try {
+        const sessionId = useAuthStore.getState().getSessionId();
+        if (!sessionId) {
+          set({ branding: DEFAULT_BRANDING, loaded: true });
+          document.title = DEFAULT_BRANDING.appTitle;
+          return;
+        }
         // ?????>‘?‘O?o?c?? ???o‘?‘'‘????u?o?n ?o?????o?o???n?n ?n?u SHM API (admin/config)
         const result = await shm_request('shm/v1/admin/config?key=company');
         const configItem = normalizeListResponse(result).data?.[0];
@@ -77,9 +84,7 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
     })();
 
     return brandingFetchPromise;
-  },
-
-  refetchBranding: async () => {
+  },refetchBranding: async () => {
     set({ loaded: false });
     await get().fetchBranding();
   },
