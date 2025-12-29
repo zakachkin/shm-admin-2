@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
+import { useAuthStore } from './authStore';
 
 export interface BrandingSettings {
   name: string;
@@ -28,10 +29,16 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
 
   fetchBranding: async () => {
     if (get().loaded) return;
+    const sessionId = useAuthStore.getState().getSessionId();
+    if (!sessionId) {
+      set({ branding: DEFAULT_BRANDING, loaded: true });
+      document.title = DEFAULT_BRANDING.name;
+      return;
+    }
 
     set({ loading: true });
     try {
-      // РџРѕР»СѓС‡Р°РµРј РЅР°СЃС‚СЂРѕР№РєРё РєРѕРјРїР°РЅРёРё РёР· SHM API (admin/config)
+      // Получаем настройки компании из SHM API (admin/config)
       const result = await shm_request('shm/v1/admin/config?key=company');
       const configItem = normalizeListResponse(result).data?.[0];
       const rawValue = configItem?.value ?? configItem?.data ?? configItem;
@@ -55,7 +62,7 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
         document.title = DEFAULT_BRANDING.name;
       }
     } catch (error) {
-      // РўРёС…Рѕ РёРіРЅРѕСЂРёСЂСѓРµРј РѕС€РёР±РєРё (РЅР°РїСЂРёРјРµСЂ, 401 РґР»СЏ РЅРµР°РІС‚РѕСЂРёР·РѕРІР°РЅРЅС‹С…)
+      // Тихо игнорируем ошибки (например, 401 для неавторизованных)
       set({ branding: DEFAULT_BRANDING, loaded: true });
       document.title = DEFAULT_BRANDING.name;
     } finally {
