@@ -221,7 +221,6 @@ export default function UserServiceModal({
   const handleChangeServiceSuccess = async () => {
     if (!formData.user_id || !formData.user_service_id) {
       onRefresh?.();
-      onClose();
       return;
     }
 
@@ -238,7 +237,6 @@ export default function UserServiceModal({
       // Ignore refresh errors; closing modal anyway.
     } finally {
       onRefresh?.();
-      onClose();
     }
   };
 
