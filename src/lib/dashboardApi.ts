@@ -97,7 +97,13 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     }, 0);
     const totalRefunds = payments.reduce((sum: number, p: any) => {
       const amount = getPaymentAmount(p);
-      return sum + (amount < 0 ? Math.abs(amount) : 0);
+      if (amount >= 0) {
+        return sum;
+      }
+      if (p?.pay_system_id === 'withdraw') {
+        return sum;
+      }
+      return sum + Math.abs(amount);
     }, 0);
     const totalWithdraws = completedWithdraws.reduce((sum: number, w: any) => sum + parseFloat(w.cost || 0), 0);
     const totalBonusWithdraws = completedWithdraws.reduce((sum: number, w: any) => sum + parseFloat(w.bonus || 0), 0);
