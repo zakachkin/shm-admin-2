@@ -140,7 +140,7 @@ export default function PayCreateModal({
         {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
-            Платёжная система *
+            Действие *
           </label>
           <select
             value={formData.pay_system_id}
@@ -148,8 +148,9 @@ export default function PayCreateModal({
             className="flex-1 px-3 py-2 text-sm rounded border"
             style={inputStyles}
           >
-            <option value="">Выберите систему</option>
-            <option value="manual">manual</option>
+            <option value="">Выберите действие:</option>
+            <option value="manual">Пополнение</option>
+            <option value="withdraw">Списание</option>
           </select>
         </div>
 
