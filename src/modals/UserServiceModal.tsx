@@ -218,6 +218,30 @@ export default function UserServiceModal({
     }
   };
 
+  const handleChangeServiceSuccess = async () => {
+    if (!formData.user_id || !formData.user_service_id) {
+      onRefresh?.();
+      onClose();
+      return;
+    }
+
+    try {
+      const res = await shm_request(
+        `shm/v1/admin/user/service?user_id=${formData.user_id}&user_service_id=${formData.user_service_id}&limit=1`
+      );
+      const payload = res.data || res;
+      const updated = Array.isArray(payload) ? payload[0] : payload;
+      if (updated) {
+        setFormData(updated);
+      }
+    } catch {
+      // Ignore refresh errors; closing modal anyway.
+    } finally {
+      onRefresh?.();
+      onClose();
+    }
+  };
+
   const handleSaveWithdraw = async (withdrawData: Record<string, any>) => {
     await shm_request('shm/v1/admin/user/service/withdraw', {
       method: 'POST',
@@ -544,10 +568,7 @@ export default function UserServiceModal({
         open={changeServiceModalOpen}
         onClose={() => setChangeServiceModalOpen(false)}
         userServiceData={formData}
-        onSuccess={() => {
-          onRefresh?.();
-          onClose();
-        }}
+        onSuccess={handleChangeServiceSuccess}
       />
     </Modal>
   );
