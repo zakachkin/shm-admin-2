@@ -46,7 +46,7 @@ export default function PayCreateModal({
       return;
     }
     if (!formData.pay_system_id) {
-      toast.error('Выберите платёжную систему');
+      toast.error('Выберите действие');
       return;
     }
     if (!formData.money || Number(formData.money) === 0) {
@@ -56,9 +56,15 @@ export default function PayCreateModal({
 
     setSaving(true);
     try {
+      let amount = Number(formData.money);
+      if (formData.pay_system_id === 'withdraw') {
+        amount = -Math.abs(amount);
+      } else {
+        amount = Math.abs(amount);
+      }
       const payload: any = {
         ...formData,
-        money: Number(formData.money),
+        money: amount,
       };
       if (!formData.comment?.text?.trim()) {
         delete payload.comment;
