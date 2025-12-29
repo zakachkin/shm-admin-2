@@ -6,7 +6,7 @@ services:
     pull_policy: always
     restart: always
     environment:
-      SHM_HOST: https://shm.bkcloud.ru
+      SHM_HOST: https://admin.myvpn24.ru
       VITE_SHOW_SWAGGER: "true"
       SHM_BASE_PATH: /
     ports:
