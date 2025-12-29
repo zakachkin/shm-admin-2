@@ -240,6 +240,7 @@ export default function UserServiceModal({
   const canDelete = formData.status === 'BLOCK' || formData.status === 'NOT PAID';
   const statusConfig = STATUS_CONFIG[formData.status] || { label: formData.status, color: '#6b7280', bgColor: '#f3f4f6' };
   const hasNextChanged = contentReady && formData.next !== initialNextRef.current;
+  const canChangeTariff = hasNextChanged && typeof formData.next === 'number' && formData.next > 0;
 
   const renderFooter = () => (
     <div className="flex justify-between w-full">
@@ -248,7 +249,8 @@ export default function UserServiceModal({
           <button
             type="button"
             onClick={() => setChangeServiceModalOpen(true)}
-            className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
+            disabled={!canChangeTariff}
+            className="px-4 py-2 rounded flex items-center gap-2 btn-primary disabled:opacity-50"
             style={{
               backgroundColor: 'var(--accent-primary)',
               borderColor: 'var(--accent-primary)',
