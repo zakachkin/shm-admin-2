@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
 import WithdrawModal from './WithdrawModal';
-import { Save, Trash2, X, Loader2, ChevronDown, Receipt } from 'lucide-react';
+import ChangeServiceModal from './ChangeServiceModal';
+import { Save, Trash2, X, Loader2, ChevronDown, Receipt, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import JsonEditor from '../components/JsonEditor';
 import UserSelect from '../components/UserSelect';
@@ -46,10 +47,7 @@ export default function UserServiceModal({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const [withdrawData, setWithdrawData] = useState<Record<string, any> | null>(null);
-  const [changingService, setChangingService] = useState(false);
-  const [pendingServiceId, setPendingServiceId] = useState<number | null>(null);
-  const [pendingServiceName, setPendingServiceName] = useState<string | null>(null);
-  const [confirmChangeOpen, setConfirmChangeOpen] = useState(false);
+  const [changeServiceModalOpen, setChangeServiceModalOpen] = useState(false);
 
   const statusMenuRef = useRef<HTMLDivElement>(null);
 
@@ -99,72 +97,6 @@ export default function UserServiceModal({
 
   const handleChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleServiceChange = (serviceId: number | null) => {
-    setPendingServiceId(serviceId);
-    if (!serviceId) {
-      setPendingServiceName(null);
-      return;
-    }
-    const nextService = services.find((item) => item.service_id === serviceId);
-    setPendingServiceName(nextService?.name ?? null);
-  };
-
-  const handleInstantChangeService = async () => {
-    if (!pendingServiceId || pendingServiceId === formData.service_id) {
-      return;
-    }
-
-    if (!formData.user_service_id || !formData.user_id) {
-      toast.error('Недостаточно данных для смены тарифа');
-      return;
-    }
-
-    setChangingService(true);
-    try {
-      await shm_request('shm/v1/admin/user/service', {
-        method: 'POST',
-        body: JSON.stringify({
-          user_id: formData.user_id,
-          user_service_id: formData.user_service_id,
-          change: {
-            service_id: pendingServiceId,
-            finish_active: 0,
-          },
-        }),
-      });
-
-      const maxAttempts = 10;
-      const delayMs = 2000;
-      let updated: any = null;
-
-      for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
-        const verify = await shm_request(
-          `shm/v1/admin/user/service?user_id=${formData.user_id}&user_service_id=${formData.user_service_id}&limit=1`,
-        );
-        const verifyData = verify.data || verify;
-        const verifyList = Array.isArray(verifyData) ? verifyData : [];
-        updated = verifyList[0];
-
-        if (updated?.service_id === pendingServiceId) {
-          setFormData(updated);
-          setPendingServiceId(null);
-          setPendingServiceName(null);
-          toast.success('Тариф изменен');
-          onRefresh?.();
-          return;
-        }
-      }
-
-      setFormData(updated ?? formData);
-      toast('Изменение тарифа в процессе. Проверьте позже.');
-    } catch (error) {
-      toast.error('Не удалось сменить тариф');
-    } finally {
-      setChangingService(false);
-    }
   };
 
   const handleSave = async () => {
@@ -308,27 +240,11 @@ export default function UserServiceModal({
   const renderFooter = () => (
     <div className="flex justify-between w-full">
       <div>
-        {pendingServiceId && pendingServiceId !== formData.service_id && (
-          <button
-            type="button"
-            onClick={() => setConfirmChangeOpen(true)}
-            disabled={changingService}
-            className="px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50"
-            style={{
-              backgroundColor: 'var(--theme-button-secondary-bg)',
-              color: 'var(--theme-button-secondary-text)',
-              border: '1px solid var(--theme-button-secondary-border)',
-            }}
-          >
-            Сменить сейчас
-          </button>
-        )}
         {onDelete && canDelete && (
           <button
             onClick={handleDelete}
             disabled={deleting}
             className="px-4 py-2 rounded flex items-center gap-2 bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
-            style={{ marginLeft: '8px' }}
           >
             <Trash2 className="w-4 h-4" />
             {deleting ? 'Удаление...' : 'Удалить'}
@@ -368,7 +284,7 @@ export default function UserServiceModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={`Услуга #${formData.user_service_id || data?.user_service_id || ''}: ${formData.name || data?.name || ''}`}
+      title={`Услуга #${data?.user_service_id || ''}: ${data?.name || ''}`}
       footer={contentReady ? renderFooter() : undefined}
       size="xl"
     >
@@ -398,24 +314,19 @@ export default function UserServiceModal({
         {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
-            Услуга
+            Услуга:
           </label>
           <div className="flex-1">
             <ServiceSelect
               value={formData.service_id}
-              readonly={true}
+              readonly
               onServiceUpdated={onRefresh}
             />
-            {changingService && (
-              <div className="mt-1 text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
-                Меняем тариф...
-              </div>
-            )}
           </div>
         </div>
 
         {}
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-3 gap-6">
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
               Статус
@@ -482,7 +393,7 @@ export default function UserServiceModal({
           </div>
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
-              Биллинг
+              Биллинг:
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -498,6 +409,25 @@ export default function UserServiceModal({
               )}
             </label>
           </div>
+          
+          <div className="flex items-center gap-3">
+          <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
+            Смена тарифа:
+            </label>
+            <button
+              type="button"
+              onClick={() => setChangeServiceModalOpen(true)}
+              className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
+              style={{
+                backgroundColor: 'var(--accent-primary)',
+                borderColor: 'var(--accent-primary)',
+                color: 'var(--accent-text)',
+              }}
+              title="Сменить тариф"
+            >
+              Сменить
+            </button>
+            </div>
         </div>
 
         {}
@@ -554,9 +484,7 @@ export default function UserServiceModal({
             value={formData.next ?? ''}
             onChange={(e) => {
               const val = e.target.value;
-              const nextValue = val === '' ? null : val === '-1' ? -1 : Number(val);
-              handleChange('next', nextValue);
-              handleServiceChange(typeof nextValue === 'number' && nextValue > 0 ? nextValue : null);
+              handleChange('next', val === '' ? null : val === '-1' ? -1 : Number(val));
             }}
             className="flex-1 px-3 py-2 text-sm rounded border"
             style={inputStyles}
@@ -601,27 +529,22 @@ export default function UserServiceModal({
       />
 
       {}
-      <ConfirmModal
-        open={confirmChangeOpen}
-        onClose={() => setConfirmChangeOpen(false)}
-        onConfirm={async () => {
-          setConfirmChangeOpen(false);
-          await handleInstantChangeService();
-        }}
-        title="Сменить тариф сейчас"
-        message={`Сменить тариф на ${pendingServiceName ? `"${pendingServiceName}"` : pendingServiceId ? `#${pendingServiceId}` : ''} без ожидания окончания текущего?`}
-        confirmText="Сменить"
-        cancelText="Отмена"
-        variant="warning"
-        loading={changingService}
-      />
-
-      {}
       <WithdrawModal
         open={withdrawModalOpen}
         onClose={() => setWithdrawModalOpen(false)}
         data={withdrawData}
         onSave={handleSaveWithdraw}
+      />
+
+      {}
+      <ChangeServiceModal
+        open={changeServiceModalOpen}
+        onClose={() => setChangeServiceModalOpen(false)}
+        userServiceData={formData}
+        onSuccess={() => {
+          onRefresh?.();
+          onClose();
+        }}
       />
     </Modal>
   );
