@@ -48,15 +48,18 @@ export default function UserServiceModal({
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const [withdrawData, setWithdrawData] = useState<Record<string, any> | null>(null);
   const [changeServiceModalOpen, setChangeServiceModalOpen] = useState(false);
+  const initialNextRef = useRef<number | null>(null);
 
   const statusMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (open && data) {
       setFormData({ ...data });
+      initialNextRef.current = data.next ?? null;
     } else if (!open) {
       setFormData({});
       setContentReady(false);
+      initialNextRef.current = null;
     }
   }, [data, open]);
 
@@ -236,15 +239,32 @@ export default function UserServiceModal({
 
   const canDelete = formData.status === 'BLOCK' || formData.status === 'NOT PAID';
   const statusConfig = STATUS_CONFIG[formData.status] || { label: formData.status, color: '#6b7280', bgColor: '#f3f4f6' };
+  const hasNextChanged = contentReady && formData.next !== initialNextRef.current;
 
   const renderFooter = () => (
     <div className="flex justify-between w-full">
       <div>
+        {hasNextChanged && (
+          <button
+            type="button"
+            onClick={() => setChangeServiceModalOpen(true)}
+            className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
+            style={{
+              backgroundColor: 'var(--accent-primary)',
+              borderColor: 'var(--accent-primary)',
+              color: 'var(--accent-text)',
+            }}
+            title="Сменить тариф"
+          >
+            Сменить тариф
+          </button>
+        )}
         {onDelete && canDelete && (
           <button
             onClick={handleDelete}
             disabled={deleting}
             className="px-4 py-2 rounded flex items-center gap-2 bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+            style={hasNextChanged ? { marginLeft: '8px' } : undefined}
           >
             <Trash2 className="w-4 h-4" />
             {deleting ? 'Удаление...' : 'Удалить'}
@@ -326,7 +346,7 @@ export default function UserServiceModal({
         </div>
 
         {}
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 gap-6">
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
               Статус
@@ -409,25 +429,6 @@ export default function UserServiceModal({
               )}
             </label>
           </div>
-          
-          <div className="flex items-center gap-3">
-          <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
-            Смена тарифа:
-            </label>
-            <button
-              type="button"
-              onClick={() => setChangeServiceModalOpen(true)}
-              className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
-              style={{
-                backgroundColor: 'var(--accent-primary)',
-                borderColor: 'var(--accent-primary)',
-                color: 'var(--accent-text)',
-              }}
-              title="Сменить тариф"
-            >
-              Сменить
-            </button>
-            </div>
         </div>
 
         {}
