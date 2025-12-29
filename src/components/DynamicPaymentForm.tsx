@@ -232,9 +232,8 @@ export const DynamicPaymentForm: React.FC<DynamicPaymentFormProps> = ({
             backgroundColor: 'rgba(59, 130, 246, 0.1)',
             color: 'var(--accent-primary)',
           }}
-        >
-          {schema.infoMessage}
-        </div>
+          dangerouslySetInnerHTML={{ __html: schema.infoMessage }}
+        />
       )}
 
       {schema.fields.map((field) => (
