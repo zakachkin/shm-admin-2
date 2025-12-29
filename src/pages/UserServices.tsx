@@ -164,6 +164,8 @@ function UserServices() {
     await shm_request(`shm/v1/admin/user/service?user_id=${selectedRow.user_id}&user_service_id=${selectedRow.user_service_id}`, {
       method: 'DELETE',
     });
+    setData(prev => prev.filter(item => item.user_service_id !== selectedRow.user_service_id));
+    setTotal(prev => Math.max(0, prev - 1));
     fetchData(limit, offset, filters, sortField, sortDirection);
   };
 
