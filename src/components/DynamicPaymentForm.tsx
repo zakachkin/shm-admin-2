@@ -235,6 +235,19 @@ export const DynamicPaymentForm: React.FC<DynamicPaymentFormProps> = ({
           dangerouslySetInnerHTML={{ __html: schema.infoMessage }}
         />
       )}
+      {schema.infoMessage && (
+        <style>
+          {`
+            .p-3.rounded.text-sm a {
+              color: #498fd9;
+              text-decoration: underline;
+            }
+            .p-3.rounded.text-sm a:hover {
+              color: #3a7bc8;
+            }
+          `}
+        </style>
+      )}
 
       {schema.fields.map((field) => (
         <div key={field.name}>
