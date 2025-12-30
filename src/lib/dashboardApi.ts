@@ -35,7 +35,7 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
       shm_request(`shm/v1/admin/user?start=${start}&stop=${stop}&field=created&limit=9999`),
       shm_request(`shm/v1/admin/user/service?start=${start}&stop=${stop}&field=created&limit=5000`),
       shm_request(`shm/v1/admin/user/pay?start=${start}&stop=${stop}&field=date&limit=9999`),
-      shm_request(`shm/v1/admin/user/service/withdraw?start=${start}&stop=${stop}&field=create_date&limit=9999`),
+      shm_request(`shm/v1/admin/user/service/withdraw?start=${start}&stop=${stop}&field=withdraw_date&limit=9999`),
     ]);
 
     const [
@@ -63,7 +63,7 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
 
     // Подсчеты
     const totalRevenue = realPayments.reduce((sum: number, p: any) => sum + parseFloat(p.money || 0), 0);
-    const totalWithdraws = withdraws.reduce((sum: number, w: any) => sum + parseFloat(w.cost || 0), 0);
+    const totalWithdraws = withdraws.reduce((sum: number, w: any) => sum + parseFloat(w.total || 0), 0);
     const activeUserServices = userServicesNew.filter((us: any) => us.status === 'ACTIVE').length;
 
     // Группировка платежей по датам
