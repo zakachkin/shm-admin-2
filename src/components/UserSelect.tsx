@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { User as UserIcon } from 'lucide-react';
+import { User as UserIcon, Search, List } from 'lucide-react';
 import { shm_request } from '../lib/shm_request';
 import { UserModal } from '../modals';
 
@@ -31,12 +31,15 @@ export default function UserSelect({
 }: UserSelectProps) {
   const [search, setSearch] = useState('');
   const [items, setItems] = useState<User[]>([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingUser, setLoadingUser] = useState(false);
   const [userModalOpen, setUserModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'search' | 'list'>('search');
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -84,6 +87,21 @@ export default function UserSelect({
       }
     };
   }, [value]);
+
+  useEffect(() => {
+    if (viewMode === 'list' && allUsers.length === 0) {
+      setLoading(true);
+      shm_request('shm/v1/admin/user?limit=0')
+        .then(res => {
+          const data = res.data || res;
+          const users = Array.isArray(data) ? data : [];
+          setAllUsers(users);
+          setItems(users);
+        })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    }
+  }, [viewMode, allUsers.length]);
 
   useEffect(() => {
     onLoadingChange?.(loadingUser);
@@ -306,49 +324,112 @@ export default function UserSelect({
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
-      <input
-        ref={inputRef}
-        type="text"
-        value={search}
-        onChange={handleSearchChange}
-        onFocus={() => items.length > 0 && setDropdownVisible(true)}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        autoComplete="off"
-        className="w-full px-3 py-2 text-sm rounded border"
-        style={inputStyles}
-      />
-
-      {loading && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-          <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin"
-               style={{ borderColor: 'var(--theme-input-border)', borderTopColor: 'transparent' }} />
-        </div>
-      )}
-
-      {dropdownVisible && items.length > 0 && (
-        <ul
-          className="absolute z-50 w-full mt-1 rounded border shadow-lg max-h-60 overflow-auto"
-          style={dropdownStyles}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => {
+            const newMode = viewMode === 'search' ? 'list' : 'search';
+            setViewMode(newMode);
+            if (newMode === 'list') {
+              setItems(allUsers);
+              setDropdownVisible(true);
+            } else {
+              setDropdownVisible(false);
+              setItems([]);
+            }
+          }}
+          className="p-2 rounded transition-colors"
+          style={{
+            backgroundColor: 'var(--theme-button-secondary-bg)',
+            color: 'var(--theme-button-secondary-text)',
+            border: '1px solid var(--theme-button-secondary-border)',
+          }}
+          title={viewMode === 'search' ? 'Переключить на список' : 'Переключить на поиск'}
         >
-          {items.map((item, index) => (
-            <li
-              key={item.user_id}
-              onClick={() => selectUser(item)}
-              onMouseEnter={() => setSelectedIndex(index)}
-              className={`px-3 py-2 cursor-pointer text-sm transition-colors ${
-                index === selectedIndex ? 'bg-opacity-20' : ''
-              }`}
-              style={{
-                backgroundColor: index === selectedIndex ? 'var(--accent-primary)' : 'transparent',
-                color: index === selectedIndex ? 'var(--accent-text)' : 'inherit',
-              }}
+          {viewMode === 'search' ? (
+            <Search className="w-4 h-4" />
+          ) : (
+            <List className="w-4 h-4" />
+          )}
+        </button>
+
+        <div className="relative flex-1">
+          <input
+            ref={inputRef}
+            type="text"
+            value={search}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              setSearch(newValue);
+              
+              if (viewMode === 'list') {
+                // Фильтруем локально в режиме списка
+                if (newValue.trim()) {
+                  const filtered = allUsers.filter(user => 
+                    formatUser(user).toLowerCase().includes(newValue.toLowerCase())
+                  );
+                  setItems(filtered);
+                } else {
+                  setItems(allUsers);
+                }
+                setDropdownVisible(true);
+              } else {
+                // Поиск по API в режиме поиска
+                setDropdownVisible(!!newValue);
+                if (searchTimeoutRef.current) {
+                  clearTimeout(searchTimeoutRef.current);
+                }
+                searchTimeoutRef.current = setTimeout(() => {
+                  searchUsers(newValue);
+                }, 300);
+              }
+            }}
+            onFocus={() => {
+              if (viewMode === 'list') {
+                setItems(allUsers);
+                setDropdownVisible(true);
+              } else if (items.length > 0) {
+                setDropdownVisible(true);
+              }
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder={viewMode === 'search' ? placeholder : 'Выберите пользователя'}
+            autoComplete="off"
+            className="w-full px-3 py-2 text-sm rounded border"
+            style={inputStyles}
+          />
+
+          {loading && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin"
+                   style={{ borderColor: 'var(--theme-input-border)', borderTopColor: 'transparent' }} />
+            </div>
+          )}
+
+          {dropdownVisible && items.length > 0 && (
+            <ul
+              className="absolute z-50 w-full mt-1 rounded border shadow-lg max-h-60 overflow-auto"
+              style={dropdownStyles}
             >
-              {formatUser(item)}
-            </li>
-          ))}
-        </ul>
-      )}
+              {items.map((item, index) => (
+                <li
+                  key={item.user_id}
+                  onClick={() => selectUser(item)}
+                  onMouseEnter={() => setSelectedIndex(index)}
+                  className={`px-3 py-2 cursor-pointer text-sm transition-colors ${
+                    index === selectedIndex ? 'bg-opacity-20' : ''
+                  }`}
+                  style={{
+                    backgroundColor: index === selectedIndex ? 'var(--accent-primary)' : 'transparent',
+                    color: index === selectedIndex ? 'var(--accent-text)' : 'inherit',
+                  }}
+                >
+                  {formatUser(item)}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
