@@ -12,13 +12,17 @@ if [ ! -z "$VITE_SHOW_SWAGGER" ] && [ "$VITE_SHOW_SWAGGER" == "true" ]; then
 fi
 
 if [ ! -z "$SHM_BASE_PATH" ] && [ "$SHM_BASE_PATH" != "/" ]; then
-    sed -i "s|location / {|location $SHM_BASE_PATH/ {|" /etc/nginx/http.d/default.conf
-    sed -i "s|#proxy_cookie_path;|proxy_cookie_path / $SHM_BASE_PATH;|" /etc/nginx/http.d/default.conf
+    # Update base path in index.html first
+    sed -i "s|<base href=\"/\" />|<base href=\"$SHM_BASE_PATH/\" />|" /app/index.html
+    
+    # Update nginx config
     sed -i "s|try_files \$uri \$uri/ /index.html;|try_files \$uri \$uri/ $SHM_BASE_PATH/index.html;|" /etc/nginx/http.d/default.conf
+    sed -i "s|location / {|location $SHM_BASE_PATH/ {|" /etc/nginx/http.d/default.conf
     sed -i "s|location /shm {|location $SHM_BASE_PATH/shm {|" /etc/nginx/http.d/default.conf
     sed -i "s|/shm/healthcheck|$SHM_BASE_PATH/shm/healthcheck|" /etc/nginx/http.d/default.conf
-    sed -i "s|<base href=\"/\" />|<base href=\"$SHM_BASE_PATH/\" />|" /app/index.html
-
+    sed -i "s|#proxy_cookie_path;|proxy_cookie_path / $SHM_BASE_PATH;|" /etc/nginx/http.d/default.conf
+    
+    # Add redirect from / to /web/
     REDIRECT="    location = / {\n        return 301 \$scheme://\$host$SHM_BASE_PATH/;\n    }\n\n    "
     sed -i "s|location $SHM_BASE_PATH/ {|$REDIRECT location $SHM_BASE_PATH/ {|" /etc/nginx/http.d/default.conf
 
