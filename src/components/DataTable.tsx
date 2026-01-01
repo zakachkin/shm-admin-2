@@ -778,7 +778,7 @@ function DataTable({
                       />
                       <input
                         type="text"
-                        placeholder="Фильтр... (! исключить)"
+                        placeholder={col.key}
                         value={columnFilters[col.key] || ''}
                         onChange={e => setColumnFilters(prev => ({
                           ...prev,
