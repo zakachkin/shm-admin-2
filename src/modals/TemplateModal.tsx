@@ -890,7 +890,7 @@ export default function TemplateModal({
                       value={formData.id || ''}
                       onChange={(e) => handleChange('id', e.target.value)}
                       readOnly={!isAdd}
-                      pattern="[A-Za-z0-9_\-\/]+"
+                      pattern="[A-Za-z0-9_/-]+"
                       placeholder="template-id"
                       className={`w-64 px-3 py-2 text-sm rounded border ${!isAdd ? 'opacity-60' : ''}`}
                       style={{
@@ -1013,7 +1013,7 @@ export default function TemplateModal({
                 value={formData.id || ''}
                 onChange={(e) => handleChange('id', e.target.value)}
                 readOnly={!isAdd}
-                pattern="[A-Za-z0-9_\-\/]+"
+                pattern="[A-Za-z0-9_/-]+"
                 placeholder="template-id"
                 className={`flex-1 px-3 py-2 text-sm rounded border ${!isAdd ? 'opacity-60' : ''}`}
                 style={inputStyles}
