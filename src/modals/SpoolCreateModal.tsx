@@ -74,12 +74,6 @@ export default function SpoolCreateModal({
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
 
-      if (field === 'mode' && value !== 'selected_user') {
-        const newSettings = { ...newData.settings };
-        delete newSettings.user_id;
-        newData.settings = newSettings;
-      }
-
       return newData;
     });
   };
@@ -113,6 +107,17 @@ export default function SpoolCreateModal({
     setSaving(true);
     try {
       const period = Number(formData.period) || 0;
+
+      const settings = { ...(formData.settings || {}) };
+      if (!settings.user_id) {
+        settings.user_id = formData.user_id || selectedUser?.user_id || '';
+      }
+      if (!settings.user_id) {
+        toast.error('Укажите пользователя (settings.user_id)');
+        setSaving(false);
+        return;
+      }
+
       const args = {
         event: {
           name: 'TASK',
@@ -123,7 +128,7 @@ export default function SpoolCreateModal({
           server_gid: formData.server_gid,
         },
         prio: formData.prio || 1000,
-        settings: formData.settings,
+        settings,
       };
 
       await onSave(args);
