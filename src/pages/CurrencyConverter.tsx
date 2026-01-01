@@ -45,7 +45,7 @@ function CurrencyConverter() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [currencies, setCurrencies] = useState<CurrencyWithChanges[]>([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string>('');
 
   const cardStyles = {
     backgroundColor: 'var(--theme-card-bg)',

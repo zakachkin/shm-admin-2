@@ -17,7 +17,7 @@ RUN apk add --no-cache nginx wget
 
 EXPOSE 80
 
-COPY nginx.conf /etc/nginx/http.d/default.conf
+COPY nginx.conf.template /etc/nginx/nginx.conf.template
 
 COPY swagger/index.html /swagger/index.html
 
@@ -30,4 +30,4 @@ WORKDIR /app
 
 ENTRYPOINT ["/entry.sh"]
 
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD wget --no-verbose --tries=1 --spider "127.0.0.1/shm/healthcheck.cgi" || exit 1
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 CMD wget --no-verbose --tries=1 --spider "127.0.0.1${SHM_BASE_PATH:-}/shm/healthcheck.cgi" || exit 1

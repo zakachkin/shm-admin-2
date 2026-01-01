@@ -496,9 +496,6 @@ function Layout() {
                   <p className="text-sm font-medium truncate" style={{ color: 'var(--theme-header-text)' }}>
                     {user?.login || '-'}
                   </p>
-                  <p className="text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
-                    ID: {user?.user_id || '-'}
-                  </p>
                 </div>
               </div>
               <button

@@ -56,7 +56,8 @@ function App() {
     return () => document.removeEventListener('click', handleToastClick);
   }, []);
 
-  const basename = document.querySelector('base')?.getAttribute('href') || '/';
+  const baseHref = document.querySelector('base')?.getAttribute('href') || '/';
+  const basename = baseHref.endsWith('/') ? baseHref.slice(0, -1) : baseHref;
 
   return (
     <BrowserRouter basename={basename}>
@@ -85,7 +86,7 @@ function App() {
         }}
       />
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="login" element={<Login />} />
         <Route
           path="/"
           element={
