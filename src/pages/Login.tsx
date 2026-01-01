@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogIn } from 'lucide-react';
+import { LogIn, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 import { useBrandingStore } from '../store/brandingStore';
@@ -15,6 +15,8 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
+  const [otpToken, setOtpToken] = useState('');
+  const [otpRequired, setOtpRequired] = useState(false);
 
   useEffect(() => {
     fetchBranding();
@@ -23,23 +25,48 @@ function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!login || !password) {
       toast.error('Введите логин и пароль');
       return;
     }
 
+    if (otpRequired && !otpToken) {
+      toast.error('Введите OTP код');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const { user, sessionId } = await shm_login(login, password);
+      const result = await shm_login(login, password, otpRequired ? otpToken : undefined);
+      
+      // Если требуется OTP, показываем поле для ввода
+      if (result.otpRequired) {
+        setOtpRequired(true);
+        toast.success('Введите код двухфакторной аутентификации');
+        setIsLoading(false);
+        return;
+      }
+      
+      const { user, sessionId } = result;
       setAuth(user, sessionId);
       await refetchBranding();
       toast.success('Успешный вход!');
       navigate('/');
     } catch (error: any) {
       toast.error(error.message || 'Ошибка входа');
+      // Если ошибка OTP, очищаем только токен
+      if (otpRequired) {
+        setOtpToken('');
+      }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleBack = () => {
+    setOtpRequired(false);
+    setOtpToken('');
   };
 
   return (
@@ -107,25 +134,60 @@ function Login() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={otpRequired}
               />
             </div>
+            {otpRequired && (
+              <div>
+                <label
+                  htmlFor="otp"
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: 'var(--theme-content-text)' }}
+                >
+                  Код двухфакторной аутентификации
+                </label>
+                <input
+                  id="otp"
+                  type="text"
+                  autoComplete="one-time-code"
+                  className="input"
+                  placeholder="000000"
+                  value={otpToken}
+                  onChange={(e) => setOtpToken(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                  maxLength={8}
+                  autoFocus
+                />
+              </div>
+            )}
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="btn-primary w-full flex justify-center items-center gap-2"
-            style={{ background: `linear-gradient(135deg, ${colors.primaryColor}, ${colors.primaryColorHover})` }}
-          >
-            {isLoading ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                <LogIn className="w-5 h-5" />
-                Войти
-              </>
+          <div className="flex gap-2">
+            {otpRequired && (
+              <button
+                type="button"
+                onClick={handleBack}
+                className="btn-secondary flex justify-center items-center gap-2"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                Назад
+              </button>
             )}
-          </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="btn-primary flex-1 flex justify-center items-center gap-2"
+              style={{ background: `linear-gradient(135deg, ${colors.primaryColor}, ${colors.primaryColorHover})` }}
+            >
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <LogIn className="w-5 h-5" />
+                  Войти
+                </>
+              )}
+            </button>
+          </div>
         </form>
       </div>
     </div>

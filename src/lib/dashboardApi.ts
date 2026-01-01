@@ -103,6 +103,67 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
   }
 }
 
+interface PeriodData {
+  items?: number;
+  registered?: number;
+  last_login?: number;
+  amount?: number;
+  delta?: number;
+  percent?: string;
+  [key: string]: any;
+}
 
+export interface AnalyticsStats {
+  users: {
+    items: number;
+    blocked: number;
+    day_7?: PeriodData;
+    month?: PeriodData;
+    month_3?: PeriodData;
+    year?: PeriodData;
+    all?: PeriodData;
+  };
+  pays: {
+    items: number;
+    total_sum: number;
+    day_7?: PeriodData;
+    month?: PeriodData;
+    month_3?: PeriodData;
+    year?: PeriodData;
+    all?: PeriodData;
+  };
+  bonus: {
+    items: number;
+    total_sum: number;
+    day_7?: PeriodData;
+    month?: PeriodData;
+    month_3?: PeriodData;
+    year?: PeriodData;
+    all?: PeriodData;
+  };
+  withdraws: {
+    items: number;
+    total_sum: number;
+    day_7?: PeriodData;
+    month?: PeriodData;
+    month_3?: PeriodData;
+    year?: PeriodData;
+    all?: PeriodData;
+  };
+  user_services: {
+    items: number;
+    day_7?: PeriodData;
+    month?: PeriodData;
+    month_3?: PeriodData;
+    year?: PeriodData;
+    all?: PeriodData;
+  };
+}
 
-
+export async function fetchAnalyticsStats(): Promise<AnalyticsStats> {
+  const response = await shm_request('shm/v1/admin/analytics');
+  if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+    return response.data[0] as AnalyticsStats;
+  }
+  return response.data as AnalyticsStats;
+}

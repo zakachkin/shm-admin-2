@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Settings, Save, Plus, Trash2, Bot, Globe, CreditCard, List, Palette } from 'lucide-react';
+import { Settings, Save, Plus, Trash2, Bot, Globe, CreditCard, List, Palette, Shield } from 'lucide-react';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
 import toast from 'react-hot-toast';
 import DataTable, { SortDirection } from '../components/DataTable';
@@ -7,13 +7,14 @@ import { ConfigModal, ConfigCreateModal } from '../modals';
 import Help from '../components/Help';
 import { Link } from 'react-router-dom';
 import TemplateSelect from '../components/TemplateSelect';
+import QRCode from 'qrcode';
 
 interface ConfigItem {
   key: string;
   value: any;
 }
 
-type TabType = 'general' | 'branding' | 'telegram' | 'payment' | 'all';
+type TabType = 'general' | 'branding' | 'telegram' | 'otp' | 'payment' | 'all';
 
 interface TelegramBot {
   token: string;
@@ -40,6 +41,15 @@ function ConfigurationTabs() {
   // Брендинг (company)
   const [companyName, setCompanyName] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
+
+  // OTP настройки
+  const [otpWindow, setOtpWindow] = useState(1);
+  const [otpEnabled, setOtpEnabled] = useState(false);
+  const [otpSetupModal, setOtpSetupModal] = useState(false);
+  const [otpSetupData, setOtpSetupData] = useState<any>(null);
+  const [otpVerifyToken, setOtpVerifyToken] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
 
   // Telegram боты
   const [telegramBots, setTelegramBots] = useState<Record<string, TelegramBot>>({});
@@ -101,7 +111,26 @@ function ConfigurationTabs() {
     if (activeTab === 'all') {
       fetchTableData(limit, offset, filters, sortField, sortDirection);
     }
+    if (activeTab === 'otp') {
+      checkOtpStatus();
+    }
   }, [activeTab, limit, offset, filters, sortField, sortDirection]);
+
+  // Генерация QR кода когда открывается модальное окно
+  useEffect(() => {
+    if (otpSetupModal && otpSetupData?.qr_url) {
+      QRCode.toDataURL(otpSetupData.qr_url, {
+        width: 200,
+        margin: 1,
+        color: {
+          dark: '#000000',
+          light: '#ffffff'
+        }
+      })
+        .then((url: string) => setQrCodeDataUrl(url))
+        .catch((err: Error) => console.error('QR Code generation error:', err));
+    }
+  }, [otpSetupModal, otpSetupData]);
 
   const fetchTableData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setTableLoading(true);
@@ -166,6 +195,8 @@ function ConfigurationTabs() {
           setTelegramBots(bots || {});
         } else if (item.key === '_shm') {
           setCloudAuth(item.value?.cloud?.auth || null);
+        } else if (item.key === 'otp') {
+          setOtpWindow(item.value?.window || 1);
         }
       });
     } catch (error) {
@@ -209,6 +240,95 @@ function ConfigurationTabs() {
       name: companyName,
       logoUrl: logoUrl,
     });
+  };
+
+  const checkOtpStatus = async () => {
+    try {
+      const response = await shm_request('shm/v1/user/otp/status');
+      const status = response.data?.[0];
+      if (status && status.enabled) {
+        setOtpEnabled(true);
+      } else {
+        setOtpEnabled(false);
+      }
+    } catch (error) {
+      setOtpEnabled(false);
+    }
+  };
+
+  const setupOtp = async () => {
+    try {
+      const response = await shm_request('shm/v1/user/otp/setup', { method: 'POST' });
+      const data = response.data?.[0];
+      if (data) {
+        setOtpSetupData(data);
+        setOtpSetupModal(true);
+        setOtpVerifyToken('');
+        setOtpError('');
+      }
+    } catch (error) {
+      toast.error('Ошибка настройки OTP');
+    }
+  };
+
+  const verifyAndEnableOtp = async () => {
+    setOtpError('');
+    
+    if (!otpVerifyToken) {
+      setOtpError('Введите код из приложения');
+      return;
+    }
+
+    try {
+      const response = await shm_request('shm/v1/user/otp/enable', {
+        method: 'POST',
+        body: JSON.stringify({ token: otpVerifyToken }),
+      });
+      
+      if (response.data && response.data[0] && response.data[0].success) {
+        toast.success('OTP успешно включен');
+        setOtpSetupModal(false);
+        checkOtpStatus();
+      }
+    } catch (error: any) {
+      // Обработка ошибок как в старой версии
+      if (error.response?.data?.error) {
+        const errorCode = error.response.data.error;
+        switch(errorCode) {
+          case 'TOKEN_REQUIRED':
+            setOtpError('Требуется токен');
+            break;
+          case 'INVALID_TOKEN':
+            setOtpError('Недействительный токен. Проверьте код и попробуйте снова.');
+            break;
+          case 'OTP_NOT_SETUP':
+            setOtpError('OTP не настроен. Начните настройку заново.');
+            break;
+          default:
+            setOtpError(errorCode);
+        }
+      } else {
+        setOtpError('Ошибка сети или сервера');
+      }
+    }
+  };
+
+  const disableOtp = async () => {
+    const token = prompt('Введите OTP код для отключения:');
+    if (!token || token.length < 6) {
+      return;
+    }
+
+    try {
+      await shm_request('shm/v1/user/otp/disable', {
+        method: 'POST',
+        body: JSON.stringify({ token }),
+      });
+      toast.success('OTP отключен');
+      checkOtpStatus();
+    } catch (error) {
+      toast.error('Ошибка отключения OTP');
+    }
   };
 
   const generateSecret = () => {
@@ -438,6 +558,14 @@ function ConfigurationTabs() {
         >
           <Bot className="w-4 h-4" />
           Telegram боты
+        </button>
+        <button
+          onClick={() => setActiveTab('otp')}
+          className="px-4 py-2 border-b-2 transition-colors flex items-center gap-2"
+          style={tabButtonStyle(activeTab === 'otp')}
+        >
+          <Shield className="w-4 h-4" />
+          OTP (2FA)
         </button>
         {CloudAuth !== null && (
           <Link
@@ -682,6 +810,58 @@ https://t.me/Name_bot?start=USER_ID
               Сохранить брендинг
             </button>
           </div>
+      )}
+
+      {/* Вкладка "OTP (2FA)" */}
+      {activeTab === 'otp' && (
+        <div className="space-y-4">
+          {/* Статус OTP */}
+          <div className="rounded-lg border p-6" style={cardStyles}>
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--theme-content-text)' }}>
+              <Shield className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
+              Статус двухфакторной аутентификации
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium" style={{ color: 'var(--theme-content-text)' }}>
+                    OTP для вашего аккаунта
+                  </p>
+                  <p className="text-sm" style={{ color: 'var(--theme-content-text-muted)' }}>
+                    {otpEnabled ? 'Двухфакторная аутентификация включена' : 'Двухфакторная аутентификация отключена'}
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  {!otpEnabled ? (
+                    <button
+                      onClick={setupOtp}
+                      className="px-4 py-2 rounded flex items-center gap-2"
+                      style={{
+                        backgroundColor: 'var(--accent-success)',
+                        color: 'white',
+                      }}
+                    >
+                      <Shield className="w-4 h-4" />
+                      Настроить OTP
+                    </button>
+                  ) : (
+                    <button
+                      onClick={disableOtp}
+                      className="px-4 py-2 rounded flex items-center gap-2"
+                      style={{
+                        backgroundColor: 'var(--accent-danger)',
+                        color: 'white',
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Отключить OTP
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Вкладка "Telegram боты" */}
@@ -1136,6 +1316,136 @@ https://t.me/Name_bot?start=USER_ID
                 </button>
                 <button
                   onClick={() => setWebhookModalOpen(false)}
+                  className="px-4 py-2 rounded"
+                  style={{
+                    backgroundColor: 'var(--theme-button-secondary-bg)',
+                    color: 'var(--theme-button-secondary-text)',
+                  }}
+                >
+                  Отмена
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно настройки OTP */}
+      {otpSetupModal && otpSetupData && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setOtpSetupModal(false)}
+        >
+          <div
+            className="rounded-lg border p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+            style={cardStyles}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--theme-content-text)' }}>
+              <Shield className="w-6 h-6" />
+              Настройка двухфакторной аутентификации
+            </h2>
+
+            <div className="space-y-6">
+              {/* Секретный ключ */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--theme-content-text)' }}>
+                  Секретный ключ (для ввода вручную)
+                </label>
+                <input
+                  type="text"
+                  value={otpSetupData.secret}
+                  readOnly
+                  className="w-full px-3 py-2 rounded border font-mono text-sm"
+                  style={{ ...inputStyles, opacity: 0.8 }}
+                />
+              </div>
+
+              {/* Резервные коды */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--theme-content-text)' }}>
+                  Резервные коды (сохраните в безопасном месте)
+                </label>
+                <div className="p-4 rounded border" style={{ ...inputStyles, opacity: 0.8 }}>
+                  <div className="grid grid-cols-2 gap-2">
+                    {otpSetupData.backup_codes?.map((code: string, idx: number) => (
+                      <code key={idx} className="block font-mono text-sm" style={{ color: 'var(--theme-content-text)' }}>
+                        {code}
+                      </code>
+                    ))}
+                  </div>
+                </div>
+                <p className="text-xs mt-1" style={{ color: 'var(--accent-warning)' }}>
+                  Сохраните эти коды! Они понадобятся для входа, если вы потеряете доступ к приложению аутентификатора.
+                </p>
+              </div>
+
+              {/* QR код */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--theme-content-text)' }}>
+                  Отсканируйте QR-код в приложении аутентификатора
+                </label>
+                <div className="flex justify-center p-4 rounded border" style={inputStyles}>
+                  {qrCodeDataUrl ? (
+                    <img
+                      src={qrCodeDataUrl}
+                      alt="QR Code"
+                      className="w-48 h-48"
+                    />
+                  ) : (
+                    <div className="w-48 h-48 flex items-center justify-center" style={{ color: 'var(--theme-content-text-muted)' }}>
+                      Генерация QR кода...
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs mt-1" style={{ color: 'var(--theme-content-text-muted)' }}>
+                  Используйте Google Authenticator, Authy или любое другое приложение для TOTP
+                </p>
+              </div>
+
+              {/* Поле ввода кода */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--theme-content-text)' }}>
+                  Введите 6-значный код из приложения для подтверждения
+                </label>
+                <input
+                  type="text"
+                  value={otpVerifyToken}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                    setOtpVerifyToken(value);
+                    setOtpError('');
+                  }}
+                  placeholder="123456"
+                  maxLength={6}
+                  className="w-full px-3 py-2 rounded border font-mono text-lg text-center"
+                  style={inputStyles}
+                />
+                {otpError && (
+                  <p className="text-sm mt-1" style={{ color: 'var(--accent-danger)' }}>
+                    {otpError}
+                  </p>
+                )}
+              </div>
+
+              {/* Кнопки */}
+              <div className="flex gap-3 pt-4 border-t" style={{ borderColor: 'var(--theme-card-border)' }}>
+                <button
+                  onClick={verifyAndEnableOtp}
+                  disabled={otpVerifyToken.length !== 6}
+                  className="flex-1 px-4 py-2 rounded flex items-center justify-center gap-2"
+                  style={{
+                    backgroundColor: otpVerifyToken.length === 6 ? 'var(--accent-success)' : 'var(--theme-button-secondary-bg)',
+                    color: otpVerifyToken.length === 6 ? 'white' : 'var(--theme-button-secondary-text)',
+                    opacity: otpVerifyToken.length === 6 ? 1 : 0.6,
+                    cursor: otpVerifyToken.length === 6 ? 'pointer' : 'not-allowed',
+                  }}
+                >
+                  <Shield className="w-4 h-4" />
+                  Включить OTP
+                </button>
+                <button
+                  onClick={() => setOtpSetupModal(false)}
                   className="px-4 py-2 rounded"
                   style={{
                     backgroundColor: 'var(--theme-button-secondary-bg)',

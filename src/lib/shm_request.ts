@@ -51,13 +51,17 @@ export function normalizeListResponse<T = any>(res: any): ApiListResponse<T> {
   return { data, total };
 }
 
-export async function shm_login(login: string, password: string): Promise<any> {
+export async function shm_login(login: string, password: string, otpToken?: string): Promise<any> {
   const response = await fetch('shm/v1/user/auth', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ login, password }),
+    body: JSON.stringify({ 
+      login, 
+      password,
+      ...(otpToken ? { otp_token: otpToken } : {})
+    }),
   });
 
   if (!response.ok) {
@@ -65,6 +69,15 @@ export async function shm_login(login: string, password: string): Promise<any> {
   }
 
   const data = await response.json();
+
+  if (data.status === 'fail' && data.msg === 'INVALID_OTP_TOKEN') {
+    throw new Error('Неверный OTP код');
+  }
+
+  if (data.otp_required) {
+    return { otpRequired: true, login: data.login };
+  }
+
   const sessionId = data.id;
 
   if (!sessionId) {
