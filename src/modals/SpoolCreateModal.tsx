@@ -60,8 +60,8 @@ export default function SpoolCreateModal({
   useEffect(() => {
     if (selectedUser?.user_id) {
       setFormData(prev => ({
-        user_id: defaultUserId || selectedUser?.user_id || null,
         ...prev,
+        user_id: defaultUserId || selectedUser?.user_id || null,
         settings: {
           ...prev.settings,
           user_id: selectedUser.user_id,
@@ -112,13 +112,14 @@ export default function SpoolCreateModal({
 
     setSaving(true);
     try {
+      const period = Number(formData.period) || 0;
       const args = {
         event: {
           name: 'TASK',
           kind: 'Jobs',
           method: 'job_users',
           title: formData.title,
-          period: formData.period || 0,
+          period,
           server_gid: formData.server_gid,
         },
         prio: formData.prio || 1000,
@@ -142,7 +143,8 @@ export default function SpoolCreateModal({
 
       toast.success('Задача создана');
     } catch (error) {
-      toast.error('Ошибка создания');
+      const message = error instanceof Error ? error.message : String(error);
+      toast.error(message || 'Ошибка создания');
     } finally {
       setSaving(false);
     }
