@@ -4,6 +4,7 @@ import { X, Play } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { shm_request } from '../lib/shm_request';
 import UserSelect from '../components/UserSelect';
+import { useCacheStore } from '../store/cacheStore';
 
 interface TemplateTestModalProps {
   open: boolean;
@@ -16,11 +17,21 @@ export default function TemplateTestModal({
   onClose,
   templateId,
 }: TemplateTestModalProps) {
+  const { get: getCached, set: setCache } = useCacheStore();
   const [userId, setUserId] = useState<number>(1);
   const [usi, setUsi] = useState('');
   const [dryRun, setDryRun] = useState(true);
   const [rendering, setRendering] = useState(false);
   const [renderResult, setRenderResult] = useState('');
+  const cacheKey = `template_render_${templateId}_${userId}_${dryRun ? 1 : 0}_${usi || 'none'}`;
+
+  React.useEffect(() => {
+    if (!open) return;
+    const cached = getCached(cacheKey);
+    if (cached) {
+      setRenderResult(cached);
+    }
+  }, [open, cacheKey, getCached]);
 
   const handleRender = async () => {
     if (!userId) {
@@ -35,13 +46,15 @@ export default function TemplateTestModal({
         dry_run: dryRun ? '1' : '0',
         format: 'default',
       });
-
+      
       if (usi) {
         params.append('usi', usi);
       }
 
-      const response = await shm_request(`shm/v1/template/${templateId}?${params.toString()}`);
-      setRenderResult(response.data?.[0] || JSON.stringify(response.data, null, 2));
+      const response = await shm_request(`/shm/v1/template/${templateId}?${params.toString()}`);
+      const result = response.data?.[0] || JSON.stringify(response.data, null, 2);
+      setRenderResult(result);
+      setCache(cacheKey, result);
       toast.success('Успех');
     } catch (error) {
       toast.error('Ошибка');
@@ -72,29 +85,27 @@ export default function TemplateTestModal({
     <div className="flex justify-end items-center w-full gap-2">
       <button
         onClick={handleClose}
-        className="p-2 rounded flex items-center gap-2"
+        className="px-4 py-2 rounded flex items-center gap-2"
         style={{
           backgroundColor: 'var(--theme-button-secondary-bg)',
           color: 'var(--theme-button-secondary-text)',
           border: '1px solid var(--theme-button-secondary-border)',
         }}
-        title="Закрыть"
       >
         <X className="w-4 h-4" />
-        <span className="hidden sm:inline">Закрыть</span>
+        Закрыть
       </button>
       <button
         onClick={handleRender}
         disabled={rendering || !userId}
-        className="p-2 rounded flex items-center gap-2 disabled:opacity-50 btn-primary"
+        className="px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50 btn-primary"
         style={{
           backgroundColor: 'var(--accent-primary)',
           color: 'var(--accent-text)',
         }}
-        title="Render"
       >
         <Play className="w-4 h-4" />
-        <span className="hidden sm:inline">{rendering ? 'Рендер...' : 'Render'}</span>
+        {rendering ? 'Рендер...' : 'Render'}
       </button>
     </div>
   );
@@ -104,7 +115,7 @@ export default function TemplateTestModal({
       open={open}
       onClose={handleClose}
       title="Тест шаблона"
-      size="lg"
+      size="xl"
       resizable={true}
       footer={renderFooter()}
     >
@@ -175,6 +186,3 @@ export default function TemplateTestModal({
     </Modal>
   );
 }
-
-
-
