@@ -26,22 +26,33 @@ const payColumns = [
   { key: 'comment_text', label: 'Комментарий', visible: false, sortable: false, localFilter: true },
 ];
 
+const collectJsonText = (value: any, out: string[], seen: Set<any>, depth: number) => {
+  if (value == null) return;
+  if (depth > 6) return;
+  if (typeof value === 'string') {
+    if (value.trim()) out.push(value);
+    return;
+  }
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    out.push(String(value));
+    return;
+  }
+  if (typeof value !== 'object') return;
+  if (seen.has(value)) return;
+  seen.add(value);
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectJsonText(item, out, seen, depth + 1));
+    return;
+  }
+  Object.values(value).forEach((item) => collectJsonText(item, out, seen, depth + 1));
+};
+
 const getCommentText = (comment: any) => {
   if (!comment) return '';
-  if (typeof comment === 'string') return comment;
-  if (typeof comment === 'object') {
-    const textPart = typeof comment.text === 'string' ? comment.text : '';
-    try {
-      const jsonPart = JSON.stringify(comment);
-      if (textPart && jsonPart && jsonPart !== textPart) {
-        return `${textPart} ${jsonPart}`;
-      }
-      return textPart || jsonPart;
-    } catch {
-      return textPart || String(comment);
-    }
-  }
-  return String(comment);
+  const parts: string[] = [];
+  collectJsonText(comment, parts, new Set(), 0);
+  if (parts.length === 0) return '';
+  return Array.from(new Set(parts)).join(' ');
 };
 
 const mapPayFilters = (input: Record<string, any>) => {
