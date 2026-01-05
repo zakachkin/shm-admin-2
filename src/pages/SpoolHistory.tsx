@@ -43,6 +43,15 @@ const spoolHistoryColumns = [
   { key: 'settings', label: 'settings', visible: false, sortable: true },
 ];
 
+const mapSpoolHistoryFilters = (input: Record<string, any>) => {
+  const mapped = { ...input };
+  if (Object.prototype.hasOwnProperty.call(mapped, 'title')) {
+    mapped['event.title'] = mapped.title;
+    delete mapped.title;
+  }
+  return mapped;
+};
+
 function SpoolHistory() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -68,7 +77,7 @@ function SpoolHistory() {
     setLoading(true);
     let url = `shm/v1/admin/spool/history?limit=${l}&offset=${o}`;
 
-    const combinedFilters = { ...f, ...externalFilters };
+    const combinedFilters = mapSpoolHistoryFilters({ ...f, ...externalFilters });
     if (Object.keys(combinedFilters).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(combinedFilters))}`;
     }
