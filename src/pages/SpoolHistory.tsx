@@ -15,8 +15,8 @@ const spoolHistoryColumns = [
     visible: true,
     sortable: false,
     filter: false,
-    filterValue: (_value: any, row: any) => row?.event?.title,
-    render: (_value: any, row: any) => row?.event?.title || '-'
+    filterValue: (_value: any, row: any) => row?.event?.title || row?.title,
+    render: (_value: any, row: any) => row?.event?.title || row?.title || '-'
   },
   {
     key: 'status',
