@@ -48,6 +48,7 @@ interface DataTableProps {
   height?: string;
   storageKey?: string;
   externalFilters?: Record<string, any>;
+  sendExcludeFilters?: boolean;
 }
 
 const LIMITS = [50, 100, 500, 1000, 5000];
@@ -113,7 +114,8 @@ function DataTable({
   sortField,
   sortDirection,
   storageKey,
-  externalFilters
+  externalFilters,
+  sendExcludeFilters
 }: DataTableProps) {
   const [filters, setFilters] = useState<Record<string, any>>({});
   
@@ -283,7 +285,12 @@ function DataTable({
         const hasExplicitWildcard = rawValue.includes('%');
         const pattern = hasExplicitWildcard ? rawValue : `%${rawValue}%`;
 
-        if (isExclude) return;
+        if (isExclude) {
+          if (sendExcludeFilters) {
+            formattedFilters[key] = `!${pattern}`;
+          }
+          return;
+        }
 
         formattedFilters[key] = pattern;
       });
@@ -300,7 +307,7 @@ function DataTable({
         clearTimeout(filterTimeoutRef.current);
       }
     };
-  }, [columnFilters, excludeFilters, onFilterChange]);
+  }, [columnFilters, excludeFilters, onFilterChange, sendExcludeFilters]);
 
   useEffect(() => {
     if (!loading && isFirstLoad.current) {

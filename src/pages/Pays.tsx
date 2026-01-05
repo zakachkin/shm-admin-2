@@ -129,9 +129,10 @@ function Pays() {
           sortDirection={sortDirection}
           onRowClick={handleRowClick}
           onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
-        storageKey="pays"
-        externalFilters={externalFilters}
-      />
+          storageKey="pays"
+          externalFilters={externalFilters}
+          sendExcludeFilters
+        />
       </div>
 
       <PayModal
