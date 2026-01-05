@@ -12,9 +12,12 @@ import {
   RefreshCw,
   ArrowUpRight,
   ArrowDownRight,
+  Gift,
+  RotateCcw,
 } from 'lucide-react';
 import { StatCard, StatCardGrid, ChartCard } from '../components/analytics';
 import { AreaLineChart, BarChart } from '../components/charts';
+import { useCacheStore } from '../store/cacheStore';
 import {
   fetchDashboardAnalytics,
   DashboardAnalytics,
@@ -36,15 +39,37 @@ function getStatusColor(status: string): string {
 }
 
 function Dashboard() {
+  const { settings, get: getCached, set: setCache, needsBackgroundRefresh } = useCacheStore();
   const [loading, setLoading] = useState(true);
+  const [isBackgroundRefresh, setIsBackgroundRefresh] = useState(false);
+  const backgroundRefreshRef = useRef(false);
   const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
 
-  const fetchDashboardData = async () => {
-    setLoading(true);
+  const cacheKey = 'dashboard_main';
 
+  const fetchDashboardData = async (forceRefresh = false) => {
+    if (!forceRefresh && settings.enabled) {
+      const cached = getCached(cacheKey);
+      if (cached) {
+        setAnalytics(cached);
+        setLoading(false);
+
+        if (needsBackgroundRefresh(cacheKey) && !backgroundRefreshRef.current) {
+          backgroundRefreshRef.current = true;
+          setIsBackgroundRefresh(true);
+          fetchDashboardData(true);
+        }
+        return;
+      }
+    }
+
+    if (!isBackgroundRefresh) {
+      setLoading(true);
+    }
+    
     try {
       const data = await fetchDashboardAnalytics(7);
-
+      
       // Добавляем метки дат и цвета для графиков
       const enrichedData: DashboardAnalytics = {
         ...data,
@@ -64,7 +89,17 @@ function Dashboard() {
 
       setAnalytics(enrichedData);
 
+      if (settings.enabled) {
+        setCache(cacheKey, enrichedData);
+      }
+
+      if (isBackgroundRefresh) {
+        setIsBackgroundRefresh(false);
+        backgroundRefreshRef.current = false;
+      }
+      
     } catch (error) {
+      console.error('Dashboard fetch error:', error);
     } finally {
       setLoading(false);
     }
@@ -100,9 +135,23 @@ function Dashboard() {
               Обзор системы SHM
             </p>
           </div>
-          </div>
+          {settings.enabled && !loading && !isBackgroundRefresh && getCached(cacheKey) && (
+            <span 
+              className="text-xs px-2 py-1 rounded-full flex items-center gap-1"
+              style={{ 
+                backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                color: 'var(--theme-primary-color)',
+                border: '1px solid rgba(34, 211, 238, 0.3)',
+              }}
+              title="Данные загружены из кеша"
+            >
+              <Activity className="w-3 h-3" />
+              Кеш
+            </span>
+          )}
+        </div>
         <button
-          onClick={() => fetchDashboardData()}
+          onClick={() => fetchDashboardData(true)}
           disabled={loading}
           className="btn-secondary flex items-center gap-2"
         >
@@ -113,37 +162,70 @@ function Dashboard() {
 
       {/* Основные метрики */}
       <StatCardGrid columns={3}>
-        <Link
-          to="/users">
         <StatCard
           title="Пользователи"
           value={analytics?.counts.totalUsers ?? '...'}
           icon={Users}
           color="cyan"
           loading={loading}
+          onClick={() => window.location.href = '/users'}
         />
-        </Link>
-        <Link
-          to="/user-services">
         <StatCard
           title="Услуги пользователей"
           value={analytics?.counts.activeUserServices ?? '...'}
           icon={Package}
           color="emerald"
           loading={loading}
+          onClick={() => window.location.href = '/user-services'}
         />
-        </Link>
-        <Link
-          to="/pays">
         <StatCard
-          title="Платежи"
-          value={analytics?.counts.totalRevenue ?? '...'}
-          icon={Package}
+          title="Серверы"
+          value={analytics?.counts.totalServers ?? '...'}
+          icon={Server}
+          color="violet"
+          loading={loading}
+          onClick={() => window.location.href = '/servers'}
+        />
+      </StatCardGrid>
+
+      {/* Финансовые метрики */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mt-6">
+        <StatCard
+          title="Выручка (7 дней)"
+          value={analytics ? formatMoney(analytics.revenue.totalRevenue) : '...'}
+          icon={DollarSign}
           color="emerald"
           loading={loading}
         />
-        </Link>
-      </StatCardGrid>
+        <StatCard
+          title="Списания (7 дней)"
+          value={analytics ? formatMoney(analytics.revenue.totalWithdraws) : '...'}
+          icon={ArrowDownRight}
+          color="rose"
+          loading={loading}
+        />
+        <StatCard
+          title="Бонусы (7 дней)"
+          value={analytics ? formatMoney(analytics.revenue.totalBonusWithdraws) : '...'}
+          icon={Gift}
+          color="amber"
+          loading={loading}
+        />
+        <StatCard
+          title="Возвраты (7 дней)"
+          value={analytics ? formatMoney(analytics.revenue.totalRefunds) : '...'}
+          icon={RotateCcw}
+          color="cyan"
+          loading={loading}
+        />
+        <StatCard
+          title="Чистая прибыль"
+          value={analytics ? formatMoney(analytics.revenue.netRevenue) : '...'}
+          icon={analytics && analytics.revenue.netRevenue >= 0 ? ArrowUpRight : ArrowDownRight}
+          color={analytics && analytics.revenue.netRevenue >= 0 ? 'emerald' : 'rose'}
+          loading={loading}
+        />
+      </div>
 
       {/* Графики и аналитика */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
@@ -175,8 +257,8 @@ function Dashboard() {
           iconColor="text-violet-400"
           loading={loading}
           actions={
-            <Link
-              to="/user-services"
+            <Link 
+              to="/user-services" 
               className="text-xs flex items-center gap-1 hover:opacity-80 transition-opacity"
               style={{ color: 'var(--theme-primary-color)' }}
             >
@@ -196,6 +278,33 @@ function Dashboard() {
             </div>
           )}
         </ChartCard>
+      </div>
+
+      {}
+      <div className="mt-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {[
+            { to: '/users', icon: Users, label: 'Пользователи', color: 'cyan' },
+            { to: '/user-services', icon: Package, label: 'Услуги', color: 'emerald' },
+            { to: '/pays', icon: CreditCard, label: 'Платежи', color: 'violet' },
+            { to: '/servers', icon: Server, label: 'Серверы', color: 'amber' },
+            { to: '/spool', icon: Activity, label: 'Задачи', color: 'rose' },
+            { to: '/analytics', icon: TrendingUp, label: 'Аналитика', color: 'blue' },
+          ].map(({ to, icon: Icon, label, color }) => (
+            <Link
+              key={to}
+              to={to}
+              className="card p-4 flex flex-col items-center gap-2 hover:scale-[1.02] transition-transform cursor-pointer"
+            >
+              <div className={`w-10 h-10 rounded-xl bg-${color}-500/20 flex items-center justify-center`}>
+                <Icon className={`w-5 h-5 text-${color}-400`} />
+              </div>
+              <span className="text-sm" style={{ color: 'var(--theme-content-text)' }}>
+                {label}
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
