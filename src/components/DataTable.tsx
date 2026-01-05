@@ -27,6 +27,7 @@ interface Column {
   render?: (value: any, row: any) => React.ReactNode;
   filterType?: 'text' | 'select';
   filterOptions?: Array<{ value: string; label: string }>;
+  localFilter?: boolean;
 }
 
 export type SortDirection = 'asc' | 'desc' | null;
@@ -49,6 +50,7 @@ interface DataTableProps {
   storageKey?: string;
   externalFilters?: Record<string, any>;
   sendExcludeFilters?: boolean;
+  forceLocalFilter?: boolean;
 }
 
 const LIMITS = [50, 100, 500, 1000, 5000];
@@ -115,7 +117,8 @@ function DataTable({
   sortDirection,
   storageKey,
   externalFilters,
-  sendExcludeFilters
+  sendExcludeFilters,
+  forceLocalFilter
 }: DataTableProps) {
   const [filters, setFilters] = useState<Record<string, any>>({});
   
@@ -199,16 +202,23 @@ function DataTable({
     for (const [key, value] of Object.entries(columnFilters)) {
       const rawText = String(value ?? '').trim();
       if (!rawText) continue;
-      if (!shouldExcludeLocally(key, rawText)) continue;
 
       const excludeValue = getExcludeValue(rawText);
       if (!excludeValue) continue;
 
       const column = columns.find((c) => c.key === key);
       const isSelect = column?.filterType === 'select';
+      const isExclude = shouldExcludeLocally(key, rawText);
+      const useLocalFilter = forceLocalFilter || column?.localFilter;
 
       if (isSelect) {
-        result = result.filter((row) => String(row?.[key] ?? '') !== excludeValue);
+        if (!useLocalFilter && !isExclude) {
+          continue;
+        }
+        result = result.filter((row) => {
+          const cellValue = String(row?.[key] ?? '');
+          return isExclude ? cellValue !== excludeValue : cellValue === excludeValue;
+        });
         continue;
       }
 
@@ -221,7 +231,9 @@ function DataTable({
       result = result.filter((row) => {
         const hay = String(row?.[key] ?? '').toLowerCase();
         const matches = matcher ? matcher.test(hay) : hay.includes(needle);
-        return !matches;
+        if (isExclude) return !matches;
+        if (useLocalFilter) return matches;
+        return true;
       });
     }
 

@@ -191,6 +191,7 @@ function Pays() {
           storageKey="pays"
           externalFilters={externalFilters}
           sendExcludeFilters
+          forceLocalFilter
         />
       </div>
 
