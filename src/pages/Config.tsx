@@ -1,15 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import DataTable, { SortDirection } from '../components/DataTable';
 import Help from '../components/Help';
+import { ConfigModal, ConfigCreateModal } from '../modals';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
-import { TemplateCreateModal, TemplateUploadModal } from '../modals';
-import { Plus, Upload } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
-const templateColumns = [
-  { key: 'id', label: 'Имя шаблона', visible: true, sortable: true },
+const configColumns = [
+  { key: 'key', label: 'Ключ', visible: true, sortable: true },
+  { key: 'value', label: 'Значение', visible: true, sortable: false },
 ];
 
-function Templates() {
+function Config() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
@@ -18,17 +19,18 @@ function Templates() {
   const [sortField, setSortField] = useState<string | undefined>();
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [filters, setFilters] = useState<Record<string, any>>({});
+  const [selectedRow, setSelectedRow] = useState<any>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, any>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `/shm/v1/admin/template?limit=${l}&offset=${o}`;
-    
+    let url = `shm/v1/admin/config?limit=${l}&offset=${o}`;
+
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
     }
-    
+
     if (sf && sd) {
       url += `&sort_field=${sf}&sort_direction=${sd}`;
     }
@@ -79,34 +81,23 @@ function Templates() {
   }, []);
 
   const handleRowClick = (row: any) => {
-    // Открываем шаблон через глобальный TemplateModal
-    window.dispatchEvent(new CustomEvent('openTemplate', { detail: row }));
+    setSelectedRow(row);
+    setEditModalOpen(true);
+  };
+
+  const handleSave = () => {
+    fetchData(limit, offset, filters, sortField, sortDirection);
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <h2 className="text-xl font-bold">Шаблоны</h2>
-          <Help content="<b>Шаблоны</b>: список шаблонов для событий и уведомлений." />
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setUploadModalOpen(true)}
-            className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-success"
-            title="Загрузить из файла"
-          >
-            <Upload className="w-4 h-4" />
-            Загрузить из файла
-          </button>
+      <div className="flex items-center mb-4">
+        <h2 className="text-xl font-bold">Конфигурация</h2>
+        <Help content="<b>Конфигурация</b>: системные настройки биллинга. Можно редактировать значения через JSON Editor." />
+        <div className="ml-auto">
           <button
             onClick={() => setCreateModalOpen(true)}
-            className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
-            title="Создать шаблон"
-            style={{
-              backgroundColor: 'var(--accent-primary)',
-              color: 'var(--accent-text)',
-            }}
+          className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
           >
             <Plus className="w-4 h-4" />
             Добавить
@@ -114,7 +105,7 @@ function Templates() {
         </div>
       </div>
       <DataTable
-        columns={templateColumns}
+        columns={configColumns}
         data={data}
         loading={loading}
         total={total}
@@ -125,34 +116,23 @@ function Templates() {
         onFilterChange={handleFilterChange}
         sortField={sortField}
         sortDirection={sortDirection}
-        onRowClick={handleRowClick}
         onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
-        storageKey="templates"
+        onRowClick={handleRowClick}
+        storageKey="config"
       />
-      <TemplateCreateModal
+      <ConfigModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        data={selectedRow}
+        onSave={handleSave}
+      />
+      <ConfigCreateModal
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
-        onSave={async (data) => {
-          await shm_request(`/shm/v1/admin/template`, {
-            method: 'PUT',
-            body: JSON.stringify(data),
-          });
-          fetchData(limit, offset, filters, sortField, sortDirection);
-        }}
-      />
-      <TemplateUploadModal
-        open={uploadModalOpen}
-        onClose={() => setUploadModalOpen(false)}
-        onSave={async (data) => {
-          await shm_request(`/shm/v1/admin/template`, {
-            method: 'PUT',
-            body: JSON.stringify(data),
-          });
-          fetchData(limit, offset, filters, sortField, sortDirection);
-        }}
+        onSave={handleSave}
       />
     </div>
   );
 }
 
-export default Templates;
+export default Config;
