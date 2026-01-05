@@ -2,8 +2,11 @@ import { create } from 'zustand';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
 
 export interface BrandingSettings {
-  name: string;
+  appName: string;
+  appTitle: string;
   logoUrl: string;
+  primaryColor: string;
+  loginSubtitle: string;
 }
 
 interface BrandingState {
@@ -17,9 +20,14 @@ interface BrandingState {
 }
 
 const DEFAULT_BRANDING: BrandingSettings = {
-  name: 'SHM Admin',
+  appName: 'SHM Admin',
+  appTitle: 'SHM Admin',
   logoUrl: '',
+  primaryColor: '#22d3ee',
+  loginSubtitle: 'Войдите в систему управления',
 };
+
+let brandingFetchPromise: Promise<void> | null = null;
 
 export const useBrandingStore = create<BrandingState>((set, get) => ({
   branding: DEFAULT_BRANDING,
@@ -28,40 +36,47 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
 
   fetchBranding: async () => {
     const state = get();
-    if (state.loaded || state.loading) return;
+    if (state.loaded) return;
+    if (brandingFetchPromise) return brandingFetchPromise;
 
-    set({ loading: true });
-    try {
-      // Получаем настройки компании из SHM API (admin/config)
-      const result = await shm_request('shm/v1/admin/config?key=company');
-      const configItem = normalizeListResponse(result).data?.[0];
-      const rawValue = configItem?.value ?? configItem?.data ?? configItem;
-      let company = rawValue;
-      if (typeof rawValue === 'string') {
-        try {
-          company = JSON.parse(rawValue);
-        } catch {
-          company = null;
+    brandingFetchPromise = (async () => {
+      set({ loading: true });
+      try {
+        // ?????>�?�O?o?c?? ???o�?�'�????u?o?n ?o?????o?o???n?n ?n?u SHM API (admin/config)
+        const result = await shm_request('shm/v1/admin/config?key=company');
+        const configItem = normalizeListResponse(result).data?.[0];
+        const rawValue = configItem?.value ?? configItem?.data ?? configItem;
+        let company = rawValue;
+        if (typeof rawValue === 'string') {
+          try {
+            company = JSON.parse(rawValue);
+          } catch {
+            company = null;
+          }
         }
-      }
-      if (company?.name || company?.title) {
-        const branding = {
-          name: company.name || DEFAULT_BRANDING.name,
-          logoUrl: company.logoUrl || DEFAULT_BRANDING.logoUrl,
-        };
-        set({ branding, loaded: true });
-        document.title = branding.name;
-      } else {
+        if (company?.name || company?.title) {
+          const branding = {
+            ...DEFAULT_BRANDING,
+            appName: company.name || DEFAULT_BRANDING.appName,
+            appTitle: company.title || DEFAULT_BRANDING.appTitle,
+          };
+          set({ branding, loaded: true });
+          document.title = branding.appTitle;
+        } else {
+          set({ branding: DEFAULT_BRANDING, loaded: true });
+          document.title = DEFAULT_BRANDING.appTitle;
+        }
+      } catch (error) {
+        // ???n�:?? ?n??????�??n�?�??c?? ??�??n?+?o?n (???o?o�??n???c�?, 401 ???>�? ???c?o??�'??�??n?u?????o????�<�:)
         set({ branding: DEFAULT_BRANDING, loaded: true });
-        document.title = DEFAULT_BRANDING.name;
+        document.title = DEFAULT_BRANDING.appTitle;
+      } finally {
+        set({ loading: false });
+        brandingFetchPromise = null;
       }
-    } catch (error) {
-      // Тихо игнорируем ошибки (например, 401 для неавторизованных)
-      set({ branding: DEFAULT_BRANDING, loaded: true });
-      document.title = DEFAULT_BRANDING.name;
-    } finally {
-      set({ loading: false });
-    }
+    })();
+
+    return brandingFetchPromise;
   },
 
   refetchBranding: async () => {
@@ -76,8 +91,8 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
 
       // Сохраняем в SHM API через admin/config
       const configData = {
-        name: newBranding.name,
-        logoUrl: newBranding.logoUrl,
+        name: newBranding.appName,
+        title: newBranding.appTitle || newBranding.appName,
       };
 
       const result = await shm_request('shm/v1/admin/config', {
@@ -91,7 +106,7 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
       // Проверяем статус ответа
       if (result.status === 200) {
         set({ branding: newBranding });
-        document.title = newBranding.name;
+        document.title = newBranding.appTitle || newBranding.appName;
       } else {
         throw new Error(`API returned status ${result.status}`);
       }
@@ -106,8 +121,8 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
     set({ loading: true });
     try {
       const defaultConfig = {
-        name: DEFAULT_BRANDING.name,
-        logoUrl: DEFAULT_BRANDING.logoUrl,
+        name: DEFAULT_BRANDING.appName,
+        title: DEFAULT_BRANDING.appTitle,
       };
 
       const result = await shm_request('shm/v1/admin/config', {
@@ -121,7 +136,7 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
       // Проверяем статус ответа
       if (result.status === 200) {
         set({ branding: DEFAULT_BRANDING });
-        document.title = DEFAULT_BRANDING.name;
+        document.title = DEFAULT_BRANDING.appTitle;
       } else {
         throw new Error(`API returned status ${result.status}`);
       }
@@ -132,3 +147,4 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
     }
   },
 }));
+
