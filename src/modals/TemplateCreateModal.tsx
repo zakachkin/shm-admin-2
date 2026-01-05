@@ -156,16 +156,12 @@ export default function TemplateCreateModal({
             ))}
           </div>
         </div>
-        <div className="text-xs mb-2" style={{ color: 'var(--theme-content-text-muted)' }}>
-          Подсказка: полное описание метода - Ctrl+Shift+H
-        </div>
-
-        {}
+{}
         <div className="flex items-start gap-3">
           <label className="w-24 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Данные
           </label>
-          <div className="flex-1 border rounded overflow-hidden" style={{ borderColor: inputStyles.borderColor }}>
+          <div className="flex-1 border rounded overflow-hidden tt-editor" style={{ borderColor: inputStyles.borderColor }}>
             <Editor
               height="400px"
               language={editorLanguage}
