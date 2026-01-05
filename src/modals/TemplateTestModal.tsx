@@ -4,7 +4,6 @@ import { X, Play } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { shm_request } from '../lib/shm_request';
 import UserSelect from '../components/UserSelect';
-import { useCacheStore } from '../store/cacheStore';
 
 interface TemplateTestModalProps {
   open: boolean;
@@ -17,21 +16,11 @@ export default function TemplateTestModal({
   onClose,
   templateId,
 }: TemplateTestModalProps) {
-  const { get: getCached, set: setCache } = useCacheStore();
   const [userId, setUserId] = useState<number>(1);
   const [usi, setUsi] = useState('');
   const [dryRun, setDryRun] = useState(true);
   const [rendering, setRendering] = useState(false);
   const [renderResult, setRenderResult] = useState('');
-  const cacheKey = `template_render_${templateId}_${userId}_${dryRun ? 1 : 0}_${usi || 'none'}`;
-
-  React.useEffect(() => {
-    if (!open) return;
-    const cached = getCached(cacheKey);
-    if (cached) {
-      setRenderResult(cached);
-    }
-  }, [open, cacheKey, getCached]);
 
   const handleRender = async () => {
     if (!userId) {
@@ -46,7 +35,7 @@ export default function TemplateTestModal({
         dry_run: dryRun ? '1' : '0',
         format: 'default',
       });
-      
+
       if (usi) {
         params.append('usi', usi);
       }
@@ -54,7 +43,6 @@ export default function TemplateTestModal({
       const response = await shm_request(`/shm/v1/template/${templateId}?${params.toString()}`);
       const result = response.data?.[0] || JSON.stringify(response.data, null, 2);
       setRenderResult(result);
-      setCache(cacheKey, result);
       toast.success('Успех');
     } catch (error) {
       toast.error('Ошибка');
