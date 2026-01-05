@@ -26,6 +26,7 @@ interface Column {
   width?: number;
   sortable?: boolean;
   render?: (value: any, row: any) => React.ReactNode;
+  filterValue?: (value: any, row: any) => any;
   filterType?: 'text' | 'select';
   filterOptions?: Array<{ value: string; label: string }>;
 }
@@ -125,6 +126,11 @@ function getFilterableString(value: any): string {
     }
   }
   return String(value);
+}
+
+function getRowFilterValue(row: any, column: Column, key: string) {
+  const raw = row?.[key];
+  return column.filterValue ? column.filterValue(raw, row) : raw;
 }
 
 function DataTableTree({
@@ -531,7 +537,8 @@ function DataTableTree({
 
         const isExclude = !!excludeFilters[key];
         const column = columns.find((c) => c.key === key);
-        const cellValue = getFilterableString(node.row?.[key]);
+        if (!column) continue;
+        const cellValue = getFilterableString(getRowFilterValue(node.row, column, key));
 
         if (column?.filterType === 'select') {
           if (isExclude) {

@@ -25,6 +25,7 @@ interface Column {
   width?: number;
   sortable?: boolean;
   render?: (value: any, row: any) => React.ReactNode;
+  filterValue?: (value: any, row: any) => any;
   filterType?: 'text' | 'select';
   filterOptions?: Array<{ value: string; label: string }>;
   localFilter?: boolean;
@@ -113,6 +114,11 @@ function getFilterableString(value: any): string {
     }
   }
   return String(value);
+}
+
+function getRowFilterValue(row: any, column: Column, key: string) {
+  const raw = row?.[key];
+  return column.filterValue ? column.filterValue(raw, row) : raw;
 }
 
 function DataTable({ 
@@ -229,7 +235,7 @@ function DataTable({
           continue;
         }
         result = result.filter((row) => {
-          const cellValue = getFilterableString(row?.[key]);
+          const cellValue = getFilterableString(getRowFilterValue(row, column, key));
           return isExclude ? cellValue !== excludeValue : cellValue === excludeValue;
         });
         continue;
@@ -242,7 +248,7 @@ function DataTable({
 
       const needle = excludeValue.toLowerCase();
       result = result.filter((row) => {
-        const hay = getFilterableString(row?.[key]).toLowerCase();
+        const hay = getFilterableString(getRowFilterValue(row, column, key)).toLowerCase();
         const matches = matcher ? matcher.test(hay) : hay.includes(needle);
         if (isExclude) return !matches;
         if (useLocalFilter) return matches;

@@ -10,12 +10,13 @@ const spoolHistoryColumns = [
   { key: 'user_id', label: 'USER ID', visible: true, sortable: true },
   { key: 'event', label: 'Событие', visible: true, sortable: true },
   {
-    key: 'event',
+    key: 'title',
     label: 'Название',
     visible: true,
     sortable: false,
     filter: false,
-    render: (value: any, row: any) => row?.event?.title || '-'
+    filterValue: (_value: any, row: any) => row?.event?.title,
+    render: (_value: any, row: any) => row?.event?.title || '-'
   },
   {
     key: 'status',
