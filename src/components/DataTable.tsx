@@ -101,6 +101,20 @@ function formatCellValue(value: any): React.ReactNode {
   return String(value);
 }
 
+function getFilterableString(value: any): string {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  if (typeof value === 'object') {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return '';
+    }
+  }
+  return String(value);
+}
+
 function DataTable({ 
   columns: initialColumns, 
   data, 
@@ -121,6 +135,7 @@ function DataTable({
   forceLocalFilter
 }: DataTableProps) {
   const [filters, setFilters] = useState<Record<string, any>>({});
+  const isForceLocalFilter = forceLocalFilter ?? true;
   
   const [columns, setColumns] = useState<Column[]>(() => {
     const defaultColumns = initialColumns.map(col => ({ 
@@ -209,14 +224,14 @@ function DataTable({
       const column = columns.find((c) => c.key === key);
       const isSelect = column?.filterType === 'select';
       const isExclude = shouldExcludeLocally(key, rawText);
-      const useLocalFilter = forceLocalFilter || column?.localFilter;
+      const useLocalFilter = isForceLocalFilter || column?.localFilter;
 
       if (isSelect) {
         if (!useLocalFilter && !isExclude) {
           continue;
         }
         result = result.filter((row) => {
-          const cellValue = String(row?.[key] ?? '');
+          const cellValue = getFilterableString(row?.[key]);
           return isExclude ? cellValue !== excludeValue : cellValue === excludeValue;
         });
         continue;
@@ -229,7 +244,7 @@ function DataTable({
 
       const needle = excludeValue.toLowerCase();
       result = result.filter((row) => {
-        const hay = String(row?.[key] ?? '').toLowerCase();
+        const hay = getFilterableString(row?.[key]).toLowerCase();
         const matches = matcher ? matcher.test(hay) : hay.includes(needle);
         if (isExclude) return !matches;
         if (useLocalFilter) return matches;
@@ -278,7 +293,7 @@ function DataTable({
   }, [externalFilters]);
 
   useEffect(() => {
-    if (!onFilterChange) return;
+    if (!onFilterChange || isForceLocalFilter) return;
     
     if (filterTimeoutRef.current) {
       clearTimeout(filterTimeoutRef.current);
@@ -319,7 +334,7 @@ function DataTable({
         clearTimeout(filterTimeoutRef.current);
       }
     };
-  }, [columnFilters, excludeFilters, onFilterChange, sendExcludeFilters]);
+  }, [columnFilters, excludeFilters, isForceLocalFilter, onFilterChange, sendExcludeFilters]);
 
   useEffect(() => {
     if (!loading && isFirstLoad.current) {

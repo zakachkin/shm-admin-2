@@ -50,6 +50,7 @@ interface DataTableTreeProps {
   height?: string;
   storageKey?: string;
   externalFilters?: Record<string, string>;
+  forceLocalFilter?: boolean;
   parentKeyId: string; // Ключ для определения родителя (например, 'parent' или 'service_id')
   itemKeyId: string; // Ключ для идентификации строки (например, 'service_id' или 'user_service_id')
   maxDeepLevel?: number; // Максимальная глубина дерева
@@ -190,6 +191,7 @@ function DataTableTree({
   const filterTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onRefreshRef = useRef(onRefresh);
   const prevFormattedFiltersRef = useRef<string>('');
+  const isForceLocalFilter = forceLocalFilter ?? true;
 
   // Преобразование плоского списка в дерево
   useEffect(() => {
@@ -230,7 +232,7 @@ function DataTableTree({
   }, [externalFilters]);
 
   useEffect(() => {
-    if (!onFilterChange) return;
+    if (!onFilterChange || isForceLocalFilter) return;
 
     if (filterTimeoutRef.current) {
       clearTimeout(filterTimeoutRef.current);
@@ -256,7 +258,7 @@ function DataTableTree({
         clearTimeout(filterTimeoutRef.current);
       }
     };
-  }, [columnFilters, onFilterChange]);
+  }, [columnFilters, isForceLocalFilter, onFilterChange]);
 
   useEffect(() => {
     if (isInitialMount.current) {
