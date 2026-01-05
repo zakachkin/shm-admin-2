@@ -54,7 +54,7 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $host;
 
-        proxy_pass http://shm.local/shm;
+        proxy_pass http://shm.local;
     }
 
     location = /shm/v1/swagger.json {
@@ -71,7 +71,7 @@ server {
         proxy_set_header Host $host;
         proxy_set_header session-id $http_session_id;
 
-        proxy_pass http://shm.local/shm;
+        proxy_pass http://shm.local;
     }
 
     location = /shm/v1/swagger_admin.json {
