@@ -12,18 +12,35 @@ const paySystemLabels: Record<string, string> = {
 };
 
 const payColumns = [
-  { key: 'id', label: 'ID', visible: true, sortable: true },
-  { key: 'user_id', label: 'Пользователь', visible: true, sortable: true },
-  { key: 'money', label: 'Сумма', visible: true, sortable: true },
-  { key: 'date', label: 'Дата', visible: true, sortable: true },
+  { key: 'id', label: 'ID', visible: true, sortable: true, localFilter: true },
+  { key: 'user_id', label: 'Пользователь', visible: true, sortable: true, localFilter: true },
+  { key: 'money', label: 'Сумма', visible: true, sortable: true, localFilter: true },
+  { key: 'date', label: 'Дата', visible: true, sortable: true, localFilter: true },
   {
     key: 'pay_system_id',
     label: 'Плат. система',
     visible: false,
     sortable: true,
+    localFilter: true,
     render: (value: string) => paySystemLabels[value] || value,
   },
-  { key: 'comment_text', label: 'Комментарий', visible: false, sortable: false, localFilter: true },
+  {
+    key: 'comment_text',
+    label: 'Комментарий',
+    visible: false,
+    sortable: false,
+    localFilter: true,
+    render: (_value: string, row: any) => {
+      const comment = row?.comment;
+      if (comment === null || comment === undefined) return '';
+      if (typeof comment === 'string') return comment;
+      try {
+        return JSON.stringify(comment);
+      } catch {
+        return String(comment);
+      }
+    },
+  },
 ];
 
 const collectJsonText = (value: any, out: string[], seen: Set<any>, depth: number) => {
@@ -47,10 +64,10 @@ const collectJsonText = (value: any, out: string[], seen: Set<any>, depth: numbe
   Object.values(value).forEach((item) => collectJsonText(item, out, seen, depth + 1));
 };
 
-const getCommentText = (comment: any) => {
-  if (!comment) return '';
+const getSearchText = (payload: any) => {
+  if (!payload) return '';
   const parts: string[] = [];
-  collectJsonText(comment, parts, new Set(), 0);
+  collectJsonText(payload, parts, new Set(), 0);
   if (parts.length === 0) return '';
   return Array.from(new Set(parts)).join(' ');
 };
@@ -103,7 +120,7 @@ function Pays() {
         const { data: items, total: count } = normalizeListResponse(res);
         const normalized = items.map((item: any) => ({
           ...item,
-          comment_text: getCommentText(item.comment),
+          comment_text: getSearchText(item),
         }));
         setData(normalized);
         setTotal(count);
