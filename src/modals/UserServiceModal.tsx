@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
 import WithdrawModal from './WithdrawModal';
-import ChangeServiceModal from './ChangeServiceModal';
-import { Save, Trash2, X, Loader2, ChevronDown, RussianRuble } from 'lucide-react';
+import { Save, Trash2, X, Loader2, ChevronDown, Receipt } from 'lucide-react';
 import toast from 'react-hot-toast';
 import JsonEditor from '../components/JsonEditor';
 import UserSelect from '../components/UserSelect';
@@ -47,7 +46,7 @@ export default function UserServiceModal({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const [withdrawData, setWithdrawData] = useState<Record<string, any> | null>(null);
-  const [changeServiceModalOpen, setChangeServiceModalOpen] = useState(false);
+  const [changingService, setChangingService] = useState(false);
 
   const statusMenuRef = useRef<HTMLDivElement>(null);
 
@@ -97,6 +96,44 @@ export default function UserServiceModal({
 
   const handleChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleServiceChange = async (serviceId: number | null, service: any) => {
+    if (!serviceId || serviceId === formData.service_id) {
+      return;
+    }
+
+    if (!formData.user_service_id || !formData.user_id) {
+      toast.error('Недостаточно данных для смены тарифа');
+      return;
+    }
+
+    const previousServiceId = formData.service_id;
+    setChangingService(true);
+    try {
+      await shm_request('shm/v1/admin/user/service', {
+        method: 'POST',
+        body: JSON.stringify({
+          user_id: formData.user_id,
+          user_service_id: formData.user_service_id,
+          service_id: serviceId,
+          finish_active: 0,
+        }),
+      });
+
+      setFormData(prev => ({
+        ...prev,
+        service_id: serviceId,
+        name: service?.name ?? prev.name,
+      }));
+      toast.success('Тариф изменен');
+      onRefresh?.();
+    } catch (error) {
+      setFormData(prev => ({ ...prev, service_id: previousServiceId }));
+      toast.error('Не удалось сменить тариф');
+    } finally {
+      setChangingService(false);
+    }
   };
 
   const handleSave = async () => {
@@ -238,46 +275,43 @@ export default function UserServiceModal({
   const statusConfig = STATUS_CONFIG[formData.status] || { label: formData.status, color: '#6b7280', bgColor: '#f3f4f6' };
 
   const renderFooter = () => (
-    <div className="flex flex-col sm:flex-row justify-between w-full gap-2">
+    <div className="flex justify-between w-full">
       <div>
         {onDelete && canDelete && (
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="p-2 rounded flex items-center gap-2 bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
-            title="Удалить"
+            className="px-4 py-2 rounded flex items-center gap-2 bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
           >
             <Trash2 className="w-4 h-4" />
-            <span className="hidden sm:inline">{deleting ? 'Удаление...' : 'Удалить'}</span>
+            {deleting ? 'Удаление...' : 'Удалить'}
           </button>
         )}
       </div>
-      <div className="flex gap-2 flex-wrap justify-end">
+      <div className="flex gap-2">
         <button
           onClick={onClose}
-          className="p-2 rounded flex items-center gap-2"
+          className="px-4 py-2 rounded flex items-center gap-2"
           style={{
             backgroundColor: 'var(--theme-button-secondary-bg)',
             color: 'var(--theme-button-secondary-text)',
             border: '1px solid var(--theme-button-secondary-border)',
           }}
-          title="Отмена"
         >
           <X className="w-4 h-4" />
-          <span className="hidden sm:inline">Отмена</span>
+          Отмена
         </button>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="p-2 rounded flex items-center gap-2 btn-success disabled:opacity-50"
+          className="px-4 py-2 rounded flex items-center gap-2 btn-success disabled:opacity-50"
           style={{
             backgroundColor: 'var(--accent-primary)',
             color: 'var(--accent-text)',
           }}
-          title="Сохранить"
         >
           <Save className="w-4 h-4" />
-          <span className="hidden sm:inline">{saving ? 'Сохранение...' : 'Сохранить'}</span>
+          {saving ? 'Сохранение...' : 'Сохранить'}
         </button>
       </div>
     </div>
@@ -317,19 +351,25 @@ export default function UserServiceModal({
         {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
-            Услуга:
+            Услуга
           </label>
           <div className="flex-1">
             <ServiceSelect
               value={formData.service_id}
-              readonly
+              readonly={false}
+              onChange={handleServiceChange}
               onServiceUpdated={onRefresh}
             />
+            {changingService && (
+              <div className="mt-1 text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
+                Меняем тариф...
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Статус, Биллинг, Смена тарифа */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        {}
+        <div className="grid grid-cols-2 gap-6">
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
               Статус
@@ -396,7 +436,7 @@ export default function UserServiceModal({
           </div>
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
-              Биллинг:
+              Биллинг
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -412,29 +452,10 @@ export default function UserServiceModal({
               )}
             </label>
           </div>
-
-          <div className="flex items-center gap-3">
-          <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
-            Смена тарифа:
-            </label>
-            <button
-              type="button"
-              onClick={() => setChangeServiceModalOpen(true)}
-              className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
-              style={{
-                backgroundColor: 'var(--accent-primary)',
-                borderColor: 'var(--accent-primary)',
-                color: 'var(--accent-text)',
-              }}
-              title="Сменить тариф"
-            >
-              Сменить
-            </button>
-            </div>
         </div>
 
-        {/* Стоимость и Действует до */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        {}
+        <div className="grid grid-cols-2 gap-6">
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
               Стоимость
@@ -471,7 +492,7 @@ export default function UserServiceModal({
                   }}
                   title="Списания"
                 >
-                  <RussianRuble className="w-4 h-4" />
+                  <Receipt className="w-4 h-4" />
                 </button>
               )}
             </div>
@@ -537,17 +558,6 @@ export default function UserServiceModal({
         onClose={() => setWithdrawModalOpen(false)}
         data={withdrawData}
         onSave={handleSaveWithdraw}
-      />
-
-      {}
-      <ChangeServiceModal
-        open={changeServiceModalOpen}
-        onClose={() => setChangeServiceModalOpen(false)}
-        userServiceData={formData}
-        onSuccess={() => {
-          onRefresh?.();
-          onClose();
-        }}
       />
     </Modal>
   );
