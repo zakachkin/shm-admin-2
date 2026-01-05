@@ -113,6 +113,20 @@ function formatCellValue(value: any): React.ReactNode {
   return String(value);
 }
 
+function getFilterableString(value: any): string {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  if (typeof value === 'object') {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return '';
+    }
+  }
+  return String(value);
+}
+
 function DataTableTree({
   columns: initialColumns,
   data,
@@ -406,10 +420,7 @@ function DataTableTree({
     setColumnFilters({});
   };
 
-  const handleToggleNode = async (nodeIndex: number) => {
-    const node = flattenTree()[nodeIndex];
-    if (!node) return;
-
+  const handleToggleNode = async (node: TreeNode) => {
     if (!node.isExpanded && !node.childrenLoaded && onLoadChildren) {
       // Загружаем дочерние элементы
       try {
@@ -488,6 +499,45 @@ function DataTableTree({
   };
 
   const hasActiveFilters = Object.values(columnFilters).some(v => v);
+  const flatData = React.useMemo(() => {
+    if (!hasActiveFilters) {
+      return flattenTree();
+    }
+
+    const matchesFilters = (node: TreeNode) => {
+      for (const [key, value] of Object.entries(columnFilters)) {
+        const rawValue = String(value ?? '').trim();
+        if (!rawValue) continue;
+
+        const column = columns.find((c) => c.key === key);
+        const cellValue = getFilterableString(node.row?.[key]);
+
+        if (column?.filterType === 'select') {
+          if (cellValue !== rawValue) return false;
+          continue;
+        }
+
+        const hay = cellValue.toLowerCase();
+        const needle = rawValue.toLowerCase();
+        if (!hay.includes(needle)) return false;
+      }
+      return true;
+    };
+
+    const filterTree = (nodes: TreeNode[]) => {
+      const result: TreeNode[] = [];
+      for (const node of nodes) {
+        const childMatches = filterTree(node.children);
+        const nodeMatches = matchesFilters(node);
+        if (nodeMatches || childMatches.length > 0) {
+          result.push(node, ...childMatches);
+        }
+      }
+      return result;
+    };
+
+    return filterTree(treeNodes);
+  }, [columnFilters, columns, hasActiveFilters, treeNodes]);
 
   const currentPage = Math.floor(offset / limit) + 1;
   const totalPages = Math.ceil(total / limit) || 1;
@@ -502,7 +552,6 @@ function DataTableTree({
   };
 
   const visibleColumns = columns.filter(col => col.visible);
-  const flatData = flattenTree();
 
   return (
     <div
@@ -882,7 +931,7 @@ function DataTableTree({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleToggleNode(idx);
+                            handleToggleNode(node);
                           }}
                           className="p-1 hover:opacity-70"
                           style={{ color: 'var(--theme-content-text)' }}
