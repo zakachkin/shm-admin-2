@@ -23,18 +23,22 @@ const payColumns = [
     sortable: true,
     render: (value: string) => paySystemLabels[value] || value,
   },
-  { key: 'comment_text', label: 'Комментарий', visible: false, sortable: false },
+  { key: 'comment_text', label: 'Комментарий', visible: false, sortable: false, localFilter: true },
 ];
 
 const getCommentText = (comment: any) => {
   if (!comment) return '';
   if (typeof comment === 'string') return comment;
   if (typeof comment === 'object') {
-    if (typeof comment.text === 'string') return comment.text;
+    const textPart = typeof comment.text === 'string' ? comment.text : '';
     try {
-      return JSON.stringify(comment);
+      const jsonPart = JSON.stringify(comment);
+      if (textPart && jsonPart && jsonPart !== textPart) {
+        return `${textPart} ${jsonPart}`;
+      }
+      return textPart || jsonPart;
     } catch {
-      return String(comment);
+      return textPart || String(comment);
     }
   }
   return String(comment);
