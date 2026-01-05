@@ -23,8 +23,31 @@ const payColumns = [
     sortable: true,
     render: (value: string) => paySystemLabels[value] || value,
   },
-  { key: 'comment', label: 'Комментарий', visible: false, sortable: false },
+  { key: 'comment_text', label: 'Комментарий', visible: false, sortable: false },
 ];
+
+const getCommentText = (comment: any) => {
+  if (!comment) return '';
+  if (typeof comment === 'string') return comment;
+  if (typeof comment === 'object') {
+    if (typeof comment.text === 'string') return comment.text;
+    try {
+      return JSON.stringify(comment);
+    } catch {
+      return String(comment);
+    }
+  }
+  return String(comment);
+};
+
+const mapPayFilters = (input: Record<string, any>) => {
+  const mapped = { ...input };
+  if (Object.prototype.hasOwnProperty.call(mapped, 'comment_text')) {
+    mapped['comment.text'] = mapped.comment_text;
+    delete mapped.comment_text;
+  }
+  return mapped;
+};
 
 function Pays() {
   const [data, setData] = useState<any[]>([]);
@@ -63,7 +86,11 @@ function Pays() {
     shm_request(url)
       .then(res => {
         const { data: items, total: count } = normalizeListResponse(res);
-        setData(items);
+        const normalized = items.map((item: any) => ({
+          ...item,
+          comment_text: getCommentText(item.comment),
+        }));
+        setData(normalized);
         setTotal(count);
       })
       .catch(() => setData([]))
@@ -86,7 +113,7 @@ function Pays() {
   };
 
   const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
-    setFilters(newFilters);
+    setFilters(mapPayFilters(newFilters));
     setOffset(0);
   }, []);
 
