@@ -323,7 +323,7 @@ function DataTable({
   }, [externalFilters]);
 
   useEffect(() => {
-    if (!onFilterChange || isForceLocalFilter) return;
+    if (!onFilterChange) return;
     
     if (filterTimeoutRef.current) {
       clearTimeout(filterTimeoutRef.current);
@@ -364,7 +364,7 @@ function DataTable({
         clearTimeout(filterTimeoutRef.current);
       }
     };
-  }, [columnFilters, excludeFilters, isForceLocalFilter, onFilterChange, sendExcludeFilters]);
+  }, [columnFilters, excludeFilters, onFilterChange, sendExcludeFilters]);
 
   useEffect(() => {
     if (!loading && isFirstLoad.current) {

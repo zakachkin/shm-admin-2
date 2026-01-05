@@ -297,7 +297,7 @@ function DataTableTree({
   }, [externalFilters]);
 
   useEffect(() => {
-    if (!onFilterChange || isForceLocalFilter) return;
+    if (!onFilterChange) return;
 
     if (filterTimeoutRef.current) {
       clearTimeout(filterTimeoutRef.current);
@@ -323,7 +323,7 @@ function DataTableTree({
         clearTimeout(filterTimeoutRef.current);
       }
     };
-  }, [columnFilters, isForceLocalFilter, onFilterChange]);
+  }, [columnFilters, onFilterChange]);
 
   useEffect(() => {
     if (isInitialMount.current) {
