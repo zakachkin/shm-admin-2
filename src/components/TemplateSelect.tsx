@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { FileText, Edit, Search, List, Plus } from 'lucide-react';
+import { FileText, Edit, Search, List } from 'lucide-react';
 import { shm_request } from '../lib/shm_request';
 import TemplateModal from '../modals/TemplateModal';
-import TemplateCreateModal from '../modals/TemplateCreateModal';
-import toast from 'react-hot-toast';
 
 interface Template {
   id: string;
@@ -39,10 +37,9 @@ export default function TemplateSelect({
   const [loading, setLoading] = useState(false);
   const [loadingTemplate, setLoadingTemplate] = useState(false);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'search' | 'list'>('list');
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null);
-
+  
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -68,8 +65,8 @@ export default function TemplateSelect({
       lastLoadedTemplateIdRef.current = value;
       abortControllerRef.current = new AbortController();
       setLoadingTemplate(true);
-
-      shm_request(`shm/v1/admin/template?id=${value}`)
+      
+      shm_request(`/shm/v1/admin/template?id=${value}`)
         .then(res => {
           const data = res.data || res;
           const templates = Array.isArray(data) ? data : [];
@@ -99,7 +96,7 @@ export default function TemplateSelect({
   useEffect(() => {
     if (viewMode === 'list' && allTemplates.length === 0) {
       setLoading(true);
-      shm_request('shm/v1/admin/template?limit=0')
+      shm_request('/shm/v1/admin/template?limit=0')
         .then(res => {
           const data = res.data || res;
           const templates = Array.isArray(data) ? data : [];
@@ -122,7 +119,7 @@ export default function TemplateSelect({
     setLoading(true);
     onLoadingChange?.(true);
 
-    shm_request(`shm/v1/admin/template?id=${encodeURIComponent(query)}`)
+    shm_request(`/shm/v1/admin/template?id=${encodeURIComponent(query)}`)
       .then(res => {
         const data = res.data || res;
         const templates = Array.isArray(data) ? data : [];
@@ -254,12 +251,12 @@ export default function TemplateSelect({
 
   const handleSave = async (templateData: Record<string, any>) => {
     try {
-      const method = templateData.is_add ? 'PUT' : 'POST';
-      await shm_request('shm/v1/admin/template', {
+      const method = templateData.is_add ? 'POST' : 'PUT';
+      await shm_request('/shm/v1/admin/template', {
         method,
         body: JSON.stringify(templateData),
       });
-
+      
       if (templateData.id === selectedTemplate?.id && selectedTemplate) {
         setSelectedTemplate({
           ...selectedTemplate,
@@ -267,45 +264,9 @@ export default function TemplateSelect({
           id: templateData.id || selectedTemplate.id,
         });
       }
-
+      
       onTemplateUpdated?.();
     } catch (error) {
-      throw error;
-    }
-  };
-
-  const handleCreate = async (templateData: Record<string, any>) => {
-    try {
-      await shm_request('shm/v1/admin/template', {
-        method: 'PUT',
-        body: JSON.stringify(templateData),
-      });
-
-      toast.success('Шаблон создан');
-
-      // Обновляем список шаблонов если в режиме списка
-      if (viewMode === 'list') {
-        const res = await shm_request('shm/v1/admin/template?limit=0');
-        const data = res.data || res;
-        const templates = Array.isArray(data) ? data : [];
-        setAllTemplates(templates);
-        setItems(templates);
-      }
-
-      // Устанавливаем созданный шаблон как выбранный
-      const newTemplate: Template = {
-        id: templateData.id,
-        settings: templateData.settings,
-        data: templateData.data,
-      };
-      setSelectedTemplate(newTemplate);
-      setSearch(formatTemplate(newTemplate));
-      onChange?.(templateData.id, newTemplate);
-
-      setCreateModalOpen(false);
-      onTemplateUpdated?.();
-    } catch (error: any) {
-      toast.error(error.data?.error || 'Ошибка создания шаблона');
       throw error;
     }
   };
@@ -341,7 +302,7 @@ export default function TemplateSelect({
         >
           <Edit className="w-4 h-4" />
         </button>
-
+        
         <TemplateModal
           open={templateModalOpen}
           onClose={() => setTemplateModalOpen(false)}
@@ -366,6 +327,7 @@ export default function TemplateSelect({
   return (
     <div ref={containerRef} className={`w-full ${className}`}>
       <div className="flex items-center gap-2">
+        {}
         <button
           onClick={() => {
             const newMode = viewMode === 'search' ? 'list' : 'search';
@@ -393,23 +355,24 @@ export default function TemplateSelect({
           )}
         </button>
 
+        {}
         <div className="relative flex-1">
           <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
             <FileText className="w-4 h-4" style={{ color: 'var(--theme-content-text-muted)' }} />
           </div>
-
+          
           {loadingTemplate ? (
-            <div
+            <div 
               className="w-full pl-10 pr-3 py-2 text-sm rounded border"
               style={inputStyles}
             >
               <div className="flex items-center gap-2">
-                <div
-                  className="h-4 rounded animate-pulse flex-1"
-                  style={{
+                <div 
+                  className="h-4 rounded animate-pulse flex-1" 
+                  style={{ 
                     maxWidth: '100px',
                     backgroundColor: 'var(--theme-input-border)',
-                  }}
+                  }} 
                 />
               </div>
             </div>
@@ -426,13 +389,14 @@ export default function TemplateSelect({
               style={inputStyles}
             />
           )}
-
+          
           {loading && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
             </div>
           )}
 
+          {}
           {dropdownVisible && items.length > 0 && dropdownPosition && (
             <div
               className="fixed z-[9999] rounded shadow-lg max-h-60 overflow-y-auto"
@@ -465,6 +429,7 @@ export default function TemplateSelect({
           )}
         </div>
 
+        {}
         {selectedTemplate && (
           <button
             onClick={handleEdit}
@@ -479,30 +444,14 @@ export default function TemplateSelect({
             <Edit className="w-4 h-4" />
           </button>
         )}
-        <button
-          onClick={() => setCreateModalOpen(true)}
-          className="p-2 rounded transition-colors"
-          style={{
-            backgroundColor: 'var(--theme-button-secondary-bg)',
-            color: 'var(--theme-button-secondary-text)',
-            border: '1px solid var(--theme-button-secondary-border)',
-          }}
-          title="Создать новый шаблон"
-        >
-          <Plus className="w-4 h-4" />
-        </button>
       </div>
 
+      {}
       <TemplateModal
         open={templateModalOpen}
         onClose={() => setTemplateModalOpen(false)}
         data={selectedTemplate}
         onSave={handleSave}
-      />
-      <TemplateCreateModal
-        open={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        onSave={handleCreate}
       />
     </div>
   );

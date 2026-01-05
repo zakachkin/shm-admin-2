@@ -17,18 +17,18 @@ function Templates() {
   const [offset, setOffset] = useState(0);
   const [sortField, setSortField] = useState<string | undefined>();
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
-  const [filters, setFilters] = useState<Record<string, any>>({});
+  const [filters, setFilters] = useState<Record<string, string>>({});
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
-  const fetchData = useCallback((l: number, o: number, f: Record<string, any>, sf?: string, sd?: SortDirection) => {
+  const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
-    let url = `shm/v1/admin/template?limit=${l}&offset=${o}`;
-
+    let url = `/shm/v1/admin/template?limit=${l}&offset=${o}`;
+    
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
     }
-
+    
     if (sf && sd) {
       url += `&sort_field=${sf}&sort_direction=${sd}`;
     }
@@ -73,7 +73,7 @@ function Templates() {
     setOffset(0);
   };
 
-  const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
+  const handleFilterChange = useCallback((newFilters: Record<string, string>) => {
     setFilters(newFilters);
     setOffset(0);
   }, []);
@@ -88,16 +88,16 @@ function Templates() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <h2 className="text-xl font-bold">Шаблоны</h2>
+          <Help content="<b>Шаблоны</b>: список шаблонов для событий и уведомлений." />
         </div>
-        <div className="flex items-end gap-2">
+        <div className="flex gap-2">
           <button
             onClick={() => setUploadModalOpen(true)}
             className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-success"
             title="Загрузить из файла"
           >
             <Upload className="w-4 h-4" />
-            
-          <span className="hidden sm:inline">Загрузить из файла</span>
+            Загрузить из файла
           </button>
           <button
             onClick={() => setCreateModalOpen(true)}
@@ -109,7 +109,7 @@ function Templates() {
             }}
           >
             <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Добавить</span>
+            Добавить
           </button>
         </div>
       </div>
@@ -133,8 +133,8 @@ function Templates() {
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onSave={async (data) => {
-          await shm_request(`shm/v1/admin/template`, {
-            method: 'PUT',
+          await shm_request(`/shm/v1/admin/template`, {
+            method: 'POST',
             body: JSON.stringify(data),
           });
           fetchData(limit, offset, filters, sortField, sortDirection);
@@ -144,8 +144,8 @@ function Templates() {
         open={uploadModalOpen}
         onClose={() => setUploadModalOpen(false)}
         onSave={async (data) => {
-          await shm_request(`shm/v1/admin/template`, {
-            method: 'PUT',
+          await shm_request(`/shm/v1/admin/template`, {
+            method: 'POST',
             body: JSON.stringify(data),
           });
           fetchData(limit, offset, filters, sortField, sortDirection);
