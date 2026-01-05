@@ -195,14 +195,12 @@ function DataTable({
   const onRefreshRef = useRef(onRefresh); 
   const prevFormattedFiltersRef = useRef<string>(''); 
 
-  const shouldExcludeLocally = useCallback((key: string, rawValue: string) => {
-    if (excludeFilters[key]) return true;
-    return rawValue.trim().startsWith('!');
+  const shouldExcludeLocally = useCallback((key: string) => {
+    return !!excludeFilters[key];
   }, [excludeFilters]);
 
   const getExcludeValue = useCallback((rawValue: string) => {
-    const trimmed = rawValue.trim();
-    return trimmed.startsWith('!') ? trimmed.slice(1).trim() : trimmed;
+    return rawValue.trim();
   }, []);
 
   const likePatternToRegExp = useCallback((pattern: string) => {
@@ -223,7 +221,7 @@ function DataTable({
 
       const column = columns.find((c) => c.key === key);
       const isSelect = column?.filterType === 'select';
-      const isExclude = shouldExcludeLocally(key, rawText);
+      const isExclude = shouldExcludeLocally(key);
       const useLocalFilter = isForceLocalFilter || column?.localFilter;
 
       if (isSelect) {
@@ -305,7 +303,7 @@ function DataTable({
         const trimmedValue = String(value ?? '').trim();
         if (!trimmedValue) return;
 
-        const isExclude = shouldExcludeLocally(key, trimmedValue);
+        const isExclude = shouldExcludeLocally(key);
         const rawValue = getExcludeValue(trimmedValue);
         if (!rawValue) return;
 
@@ -812,7 +810,7 @@ function DataTable({
                       />
                       <input
                         type="text"
-                        placeholder="Фильтр... (! исключить)"
+                        placeholder="Фильтр..."
                         value={columnFilters[col.key] || ''}
                         onChange={e => setColumnFilters(prev => ({
                           ...prev,

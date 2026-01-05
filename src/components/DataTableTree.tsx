@@ -144,12 +144,14 @@ function DataTableTree({
   sortDirection,
   storageKey,
   externalFilters,
+  forceLocalFilter,
   parentKeyId,
   itemKeyId,
   maxDeepLevel = 10,
 }: DataTableTreeProps) {
   const [treeNodes, setTreeNodes] = useState<TreeNode[]>([]);
   const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+  const [excludeFilters, setExcludeFilters] = useState<Record<string, boolean>>({});
 
   const [columns, setColumns] = useState<Column[]>(() => {
     const defaultColumns = initialColumns.map(col => ({
@@ -242,6 +244,23 @@ function DataTableTree({
       }
 
       return newFilters;
+    });
+
+    setExcludeFilters(prev => {
+      const next = { ...prev };
+      prevExternalFiltersKeys.current.forEach(key => {
+        if (!externalFilters || !(key in externalFilters)) {
+          delete next[key];
+        }
+      });
+      if (externalFilters) {
+        Object.keys(externalFilters).forEach((key) => {
+          if (!(key in next)) {
+            next[key] = false;
+          }
+        });
+      }
+      return next;
     });
   }, [externalFilters]);
 
@@ -418,6 +437,7 @@ function DataTableTree({
 
   const clearAllFilters = () => {
     setColumnFilters({});
+    setExcludeFilters({});
   };
 
   const handleToggleNode = async (node: TreeNode) => {
@@ -509,16 +529,25 @@ function DataTableTree({
         const rawValue = String(value ?? '').trim();
         if (!rawValue) continue;
 
+        const isExclude = !!excludeFilters[key];
         const column = columns.find((c) => c.key === key);
         const cellValue = getFilterableString(node.row?.[key]);
 
         if (column?.filterType === 'select') {
+          if (isExclude) {
+            if (cellValue === rawValue) return false;
+            continue;
+          }
           if (cellValue !== rawValue) return false;
           continue;
         }
 
         const hay = cellValue.toLowerCase();
         const needle = rawValue.toLowerCase();
+        if (isExclude) {
+          if (hay.includes(needle)) return false;
+          continue;
+        }
         if (!hay.includes(needle)) return false;
       }
       return true;
@@ -537,7 +566,7 @@ function DataTableTree({
     };
 
     return filterTree(treeNodes);
-  }, [columnFilters, columns, hasActiveFilters, treeNodes]);
+  }, [columnFilters, columns, excludeFilters, hasActiveFilters, treeNodes]);
 
   const currentPage = Math.floor(offset / limit) + 1;
   const totalPages = Math.ceil(total / limit) || 1;
@@ -837,14 +866,32 @@ function DataTableTree({
                         className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none"
                         style={{ color: 'var(--theme-content-text-muted)' }}
                       />
-                      {columnFilters[col.key] && (
+                      <div className="absolute right-6 top-1/2 -translate-y-1/2 flex gap-0.5">
                         <button
-                          onClick={() => setColumnFilters(prev => ({ ...prev, [col.key]: '' }))}
-                          className="absolute right-6 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-slate-500/30"
+                          type="button"
+                          onClick={() => setExcludeFilters(prev => ({ ...prev, [col.key]: !prev[col.key] }))}
+                          className="p-0.5 rounded hover:bg-slate-500/30"
+                          title={excludeFilters[col.key] ? 'Исключение включено' : 'Исключить'}
                         >
-                          <X className="w-3 h-3" style={{ color: 'var(--theme-content-text-muted)' }} />
+                          <FilterX
+                            className="w-3 h-3"
+                            style={{ color: excludeFilters[col.key] ? 'var(--theme-primary-color)' : 'var(--theme-content-text-muted)' }}
+                          />
                         </button>
-                      )}
+                        {columnFilters[col.key] && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setColumnFilters(prev => ({ ...prev, [col.key]: '' }));
+                              setExcludeFilters(prev => ({ ...prev, [col.key]: false }));
+                            }}
+                            className="p-0.5 rounded hover:bg-slate-500/30"
+                            title="Очистить"
+                          >
+                            <X className="w-3 h-3" style={{ color: 'var(--theme-content-text-muted)' }} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ) : (
                     <div className="relative">
@@ -860,21 +907,39 @@ function DataTableTree({
                           ...prev,
                           [col.key]: e.target.value
                         }))}
-                        className="w-full text-xs py-1 pl-7 pr-2 rounded"
+                        className="w-full text-xs py-1 pl-7 pr-12 rounded"
                         style={{
                           backgroundColor: 'var(--theme-input-bg)',
                           border: '1px solid var(--theme-input-border)',
                           color: 'var(--theme-input-text)',
                         }}
                       />
-                      {columnFilters[col.key] && (
+                      <div className="absolute right-1 top-1/2 -translate-y-1/2 flex gap-0.5">
                         <button
-                          onClick={() => setColumnFilters(prev => ({ ...prev, [col.key]: '' }))}
-                          className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-slate-500/30"
+                          type="button"
+                          onClick={() => setExcludeFilters(prev => ({ ...prev, [col.key]: !prev[col.key] }))}
+                          className="p-0.5 rounded hover:bg-slate-500/30"
+                          title={excludeFilters[col.key] ? 'Исключение включено' : 'Исключить'}
                         >
-                          <X className="w-3 h-3" style={{ color: 'var(--theme-content-text-muted)' }} />
+                          <FilterX
+                            className="w-3 h-3"
+                            style={{ color: excludeFilters[col.key] ? 'var(--theme-primary-color)' : 'var(--theme-content-text-muted)' }}
+                          />
                         </button>
-                      )}
+                        {columnFilters[col.key] && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setColumnFilters(prev => ({ ...prev, [col.key]: '' }));
+                              setExcludeFilters(prev => ({ ...prev, [col.key]: false }));
+                            }}
+                            className="p-0.5 rounded hover:bg-slate-500/30"
+                            title="Очистить"
+                          >
+                            <X className="w-3 h-3" style={{ color: 'var(--theme-content-text-muted)' }} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </th>
